@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext'; // ⚡ NOVO
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
@@ -12,28 +13,30 @@ import AdminOrders from './pages/AdminOrders';
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/" element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<Dashboard />} />
-            <Route path="orders" element={<Orders />} />
-            <Route path="new-order" element={<NewOrder />} />
-            <Route path="admin/orders" element={
-              <ProtectedRoute requireAdmin>
-                <AdminOrders />
+    <ThemeProvider> {/* ⚡ NOVO */}
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Layout />
               </ProtectedRoute>
-            } />
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </Router>
+            }>
+              <Route index element={<Dashboard />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="new-order" element={<NewOrder />} />
+              <Route path="admin/orders" element={
+                <ProtectedRoute requireAdmin>
+                  <AdminOrders />
+                </ProtectedRoute>
+              } />
+            </Route>
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </ThemeProvider>
   );
 }
 

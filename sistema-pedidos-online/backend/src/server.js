@@ -10,15 +10,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Configuração CORS para produção
-// Configuração CORS para produção - SUBSTITUA ESTA PARTE
+// DEFINIÇÃO DA VARIÁVEL allowedOrigins - ESTAVA FALTANDO!
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://sistema-pedidos-production-bba4.up.railway.app',
+  'https://sistema-pedidos-online.netlify.app',
+  'https://*.netlify.app'
+];
+
+// Configuração CORS
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://sistema-pedidos-production-bba4.up.railway.app',
-    'https://sistema-pedidos-online.netlify.app',
-    'https://*.netlify.app'
-  ],
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']

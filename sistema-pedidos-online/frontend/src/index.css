@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,104 +7,77 @@
 @layer base {
   html {
     font-family: 'Inter', system-ui, sans-serif;
-    scroll-behavior: smooth;
   }
   
   body {
-    @apply bg-dark-50 text-dark-900 antialiased;
+    @apply bg-white text-gray-900 antialiased;
   }
 }
 
 @layer components {
-  /* Botões modernos */
+  /* Botões minimalistas */
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg border-0;
+    @apply bg-gray-900 hover:bg-gray-800 text-white font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 border border-gray-900;
   }
   
   .btn-secondary {
-    @apply bg-white/80 backdrop-blur-sm border border-dark-200 text-dark-700 hover:bg-white hover:border-primary-300 hover:text-primary-600 font-medium py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-sm;
+    @apply bg-white text-gray-700 hover:bg-gray-50 font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 border border-gray-300;
   }
 
-  .btn-ghost {
-    @apply bg-transparent text-dark-600 hover:text-primary-600 hover:bg-primary-50 font-medium py-2 px-4 rounded-lg transition-all duration-200;
-  }
-
-  /* Inputs elegantes */
+  /* Inputs clean */
   .input-field {
-    @apply w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-dark-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 placeholder:text-dark-400 shadow-sm;
+    @apply w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors duration-200 placeholder:text-gray-400;
   }
 
-  /* Cards modernos */
+  /* Cards minimalistas */
   .card {
-    @apply bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-sm hover:shadow-xl transition-all duration-500 p-6;
+    @apply bg-white border border-gray-200 rounded-lg p-6;
   }
 
-  .card-glass {
-    @apply bg-white/40 backdrop-blur-md rounded-2xl border border-white/30 shadow-lg hover:shadow-2xl transition-all duration-500 p-6;
-  }
-
-  /* Nav items */
+  /* Navigation */
   .nav-item {
-    @apply flex items-center px-4 py-3 text-dark-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200 font-medium;
+    @apply flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200 font-medium;
   }
 
   .nav-item-active {
-    @apply flex items-center px-4 py-3 text-primary-600 bg-primary-50 rounded-xl font-medium;
+    @apply flex items-center px-3 py-2 text-gray-900 bg-gray-50 rounded-lg font-medium border-r-2 border-gray-900;
   }
 
-  /* Status badges modernos */
+  /* Status badges simples */
   .status-badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all duration-300;
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
   }
 
   .status-em-analise {
-    @apply status-badge bg-yellow-100 text-yellow-800 border border-yellow-200;
+    @apply status-badge bg-yellow-50 text-yellow-800 border border-yellow-200;
   }
 
   .status-aprovado {
-    @apply status-badge bg-green-100 text-green-800 border border-green-200;
+    @apply status-badge bg-green-50 text-green-800 border border-green-200;
   }
 
   .status-rejeitado {
-    @apply status-badge bg-red-100 text-red-800 border border-red-200;
+    @apply status-badge bg-red-50 text-red-800 border border-red-200;
   }
 
   .status-andamento {
-    @apply status-badge bg-blue-100 text-blue-800 border border-blue-200;
+    @apply status-badge bg-blue-50 text-blue-800 border border-blue-200;
   }
 
   .status-concluido {
-    @apply status-badge bg-dark-100 text-dark-800 border border-dark-200;
-  }
-
-  /* Gradientes e efeitos */
-  .gradient-bg {
-    @apply bg-gradient-to-br from-primary-50 via-white to-blue-50;
-  }
-
-  .text-gradient {
-    @apply bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent;
-  }
-
-  /* Animação de entrada suave */
-  .animate-in {
-    animation: slideIn 0.6s ease-out;
+    @apply status-badge bg-gray-50 text-gray-800 border border-gray-200;
   }
 }
 
-/* Scrollbar personalizada */
+/* Scrollbar discreta */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-dark-100;
+  @apply bg-gray-100;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary-500 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary-600;
+  @apply bg-gray-400 rounded-full;
 }

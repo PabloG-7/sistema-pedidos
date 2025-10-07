@@ -2,34 +2,83 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { Package, PlusCircle, BarChart3, Users, TrendingUp, Clock } from 'lucide-react';
+import { Package, PlusCircle, BarChart3, Users, TrendingUp, Clock, Calendar } from 'lucide-react';
 
-// Componente de gráfico simples (sem biblioteca externa)
-const SimpleBarChart = ({ data, title, color = 'bg-blue-500' }) => {
-  const maxValue = Math.max(...data.map(item => item.value));
+// Componente de gráfico melhorado
+const StatusChart = ({ data, title }) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
   
   return (
     <div className="card">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</h3>
-      <div className="space-y-2">
-        {data.map((item, index) => (
-          <div key={index} className="flex items-center justify-between">
-            <span className="text-sm text-gray-600 dark:text-gray-300 w-20 truncate">{item.label}</span>
-            <div className="flex-1 mx-2">
-              <div className="relative">
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+      <div className="space-y-3">
+        {data.map((item, index) => {
+          const percentage = total > 0 ? (item.value / total) * 100 : 0;
+          const statusClass = getStatusClass(item.label);
+          
+          return (
+            <div key={index} className="flex items-center justify-between">
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                <span className={`status-badge ${statusClass} shrink-0`}>
+                  {item.label}
+                </span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {item.value}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2 w-24">
+                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div
-                    className={`${color} h-2 rounded-full transition-all duration-500`}
-                    style={{ width: `${(item.value / maxValue) * 100}%` }}
+                    className="h-2 rounded-full transition-all duration-500"
+                    style={{ 
+                      width: `${percentage}%`,
+                      backgroundColor: getStatusColor(item.label)
+                    }}
                   ></div>
                 </div>
+                <span className="text-xs text-gray-500 dark:text-gray-400 w-8 text-right">
+                  {percentage.toFixed(0)}%
+                </span>
               </div>
             </div>
-            <span className="text-sm font-medium text-gray-900 dark:text-white w-8 text-right">
-              {item.value}
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Componente de categorias melhorado
+const CategoryChart = ({ data, title }) => {
+  return (
+    <div className="card">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</h3>
+      <div className="space-y-3">
+        {data.slice(0, 5).map((item, index) => (
+          <div key={index} className="flex items-center justify-between">
+            <span className="text-sm text-gray-600 dark:text-gray-300 truncate flex-1 pr-2">
+              {item.label}
             </span>
+            <div className="flex items-center space-x-2">
+              <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                  style={{ 
+                    width: `${Math.min(item.value * 20, 100)}%` // Escala para melhor visualização
+                  }}
+                ></div>
+              </div>
+              <span className="text-sm font-medium text-gray-900 dark:text-white w-6 text-right">
+                {item.value}
+              </span>
+            </div>
           </div>
         ))}
+        {data.length === 0 && (
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-2">
+            Nenhuma categoria com pedidos
+          </p>
+        )}
       </div>
     </div>
   );
@@ -38,24 +87,24 @@ const SimpleBarChart = ({ data, title, color = 'bg-blue-500' }) => {
 // Componente de métrica
 const MetricCard = ({ title, value, icon: Icon, change, color = 'blue' }) => {
   const colorClasses = {
-    blue: 'bg-blue-500',
-    green: 'bg-green-500',
-    yellow: 'bg-yellow-500',
-    purple: 'bg-purple-500'
+    blue: 'text-blue-600 bg-blue-50 dark:bg-blue-500/10',
+    green: 'text-green-600 bg-green-50 dark:bg-green-500/10', 
+    yellow: 'text-yellow-600 bg-yellow-50 dark:bg-yellow-500/10',
+    purple: 'text-purple-600 bg-purple-50 dark:bg-purple-500/10'
   };
 
   return (
     <div className="card">
       <div className="flex items-center">
-        <div className={`p-3 rounded-lg ${colorClasses[color]} bg-opacity-10`}>
-          <Icon className={`h-6 w-6 text-${color}-500`} />
+        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
+          <Icon className="h-6 w-6" />
         </div>
-        <div className="ml-4">
-          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+        <div className="ml-4 flex-1 min-w-0">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 truncate">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white truncate">{value}</p>
           {change && (
             <p className={`text-xs ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {change > 0 ? '↑' : '↓'} {Math.abs(change)}% em relação ao mês anterior
+              {change > 0 ? '↗' : '↘'} {Math.abs(change)}% vs último mês
             </p>
           )}
         </div>
@@ -81,7 +130,6 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      // Buscar pedidos do usuário (ou todos se for admin)
       const endpoint = isAdmin ? '/orders' : '/orders/my-orders';
       const response = await api.get(endpoint);
       const ordersData = response.data.orders || [];
@@ -104,7 +152,10 @@ const Dashboard = () => {
         totalOrders,
         pendingOrders,
         completedOrders,
-        averageBudget: averageBudget.toFixed(2)
+        averageBudget: averageBudget.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })
       });
     } catch (error) {
       console.error('Erro ao buscar dados do dashboard:', error);
@@ -120,17 +171,19 @@ const Dashboard = () => {
     { label: 'Em andamento', value: orders.filter(o => o.status === 'Em andamento').length },
     { label: 'Concluído', value: orders.filter(o => o.status === 'Concluído').length },
     { label: 'Rejeitado', value: orders.filter(o => o.status === 'Rejeitado').length },
-  ];
+  ].filter(item => item.value > 0);
 
   const categoryData = Object.entries(
     orders.reduce((acc, order) => {
       acc[order.category] = (acc[order.category] || 0) + 1;
       return acc;
     }, {})
-  ).map(([category, count]) => ({
-    label: category,
-    value: count
-  }));
+  )
+    .map(([category, count]) => ({
+      label: category,
+      value: count
+    }))
+    .sort((a, b) => b.value - a.value);
 
   if (loading) {
     return (
@@ -141,43 +194,43 @@ const Dashboard = () => {
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+      <div className="mb-2">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
           Olá, {user?.name}!
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Bem-vindo ao painel de controle do sistema
+        <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm md:text-base">
+          Bem-vindo ao painel de controle
         </p>
       </div>
 
       {/* Métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <MetricCard
-          title="Total de Pedidos"
+          title="Total Pedidos"
           value={stats.totalOrders}
           icon={Package}
           color="blue"
           change={5}
         />
         <MetricCard
-          title="Pedidos Pendentes"
+          title="Pendentes"
           value={stats.pendingOrders}
           icon={Clock}
           color="yellow"
           change={-2}
         />
         <MetricCard
-          title="Pedidos Concluídos"
+          title="Concluídos"
           value={stats.completedOrders}
           icon={TrendingUp}
           color="green"
           change={8}
         />
         <MetricCard
-          title="Ticket Médio (R$)"
-          value={stats.averageBudget}
+          title="Ticket Médio"
+          value={`R$ ${stats.averageBudget}`}
           icon={BarChart3}
           color="purple"
           change={12}
@@ -185,18 +238,18 @@ const Dashboard = () => {
       </div>
 
       {/* Ações Rápidas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <Link
           to="/new-order"
-          className="card hover:shadow-lg transition-shadow duration-300 group"
+          className="card hover:shadow-lg transition-shadow duration-300 group border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400"
         >
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <PlusCircle className="h-8 w-8 text-blue-600 group-hover:text-blue-700" />
+              <PlusCircle className="h-6 w-6 md:h-8 md:w-8 text-blue-600 group-hover:text-blue-700 dark:text-blue-400" />
             </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Novo Pedido</h3>
-              <p className="text-gray-500 dark:text-gray-400">Solicite um novo orçamento</p>
+            <div className="ml-3 md:ml-4">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-white">Novo Pedido</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Solicitar orçamento</p>
             </div>
           </div>
         </Link>
@@ -207,11 +260,11 @@ const Dashboard = () => {
         >
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Package className="h-8 w-8 text-green-600 group-hover:text-green-700" />
+              <Package className="h-6 w-6 md:h-8 md:w-8 text-green-600 group-hover:text-green-700 dark:text-green-400" />
             </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Meus Pedidos</h3>
-              <p className="text-gray-500 dark:text-gray-400">Acompanhe seus pedidos</p>
+            <div className="ml-3 md:ml-4">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-white">Meus Pedidos</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Acompanhar pedidos</p>
             </div>
           </div>
         </Link>
@@ -223,53 +276,82 @@ const Dashboard = () => {
           >
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <Users className="h-8 w-8 text-purple-600 group-hover:text-purple-700" />
+                <Users className="h-6 w-6 md:h-8 md:w-8 text-purple-600 group-hover:text-purple-700 dark:text-purple-400" />
               </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Painel Admin</h3>
-                <p className="text-gray-500 dark:text-gray-400">Gerencie todos os pedidos</p>
+              <div className="ml-3 md:ml-4">
+                <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-white">Painel Admin</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">Gerenciar pedidos</p>
               </div>
             </div>
           </Link>
         )}
       </div>
 
-      {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SimpleBarChart
+      {/* Gráficos - Em coluna no mobile, lado a lado no desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <StatusChart
           data={statusData}
-          title="Pedidos por Status"
-          color="bg-blue-500"
+          title="Distribuição por Status"
         />
-        <SimpleBarChart
+        <CategoryChart
           data={categoryData}
-          title="Pedidos por Categoria"
-          color="bg-green-500"
+          title="Top Categorias"
         />
       </div>
 
-      {/* Pedidos Recentes */}
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Pedidos Recentes</h2>
-        <div className="card">
+      {/* Pedidos Recentes - Melhorado para mobile */}
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Pedidos Recentes</h2>
+          <Link 
+            to="/orders" 
+            className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            Ver todos
+          </Link>
+        </div>
+        
+        <div className="card p-4">
           {orders.slice(0, 5).map((order) => (
-            <div key={order.id} className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-              <div className="flex-1">
-                <h4 className="font-medium text-gray-900 dark:text-white">{order.category}</h4>
-                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{order.description}</p>
+            <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0 space-y-2 sm:space-y-0">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start space-x-2">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-900 dark:text-white text-sm md:text-base truncate">
+                      {order.category}
+                    </h4>
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
+                      {order.description}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  R$ {order.estimated_budget}
+              
+              <div className="flex items-center justify-between sm:justify-end space-x-4 w-full sm:w-auto">
+                <span className="text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                  R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
                 </span>
-                <span className={`status-badge ${getStatusClass(order.status)}`}>
+                <span className={`status-badge ${getStatusClass(order.status)} shrink-0`}>
                   {order.status}
                 </span>
               </div>
             </div>
           ))}
+          
           {orders.length === 0 && (
-            <p className="text-gray-500 dark:text-gray-400 text-center py-4">Nenhum pedido encontrado</p>
+            <div className="text-center py-6">
+              <Package className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400">Nenhum pedido encontrado</p>
+              <Link 
+                to="/new-order" 
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-2 inline-block"
+              >
+                Criar primeiro pedido
+              </Link>
+            </div>
           )}
         </div>
       </div>
@@ -277,7 +359,7 @@ const Dashboard = () => {
   );
 };
 
-// Helper function para classes de status
+// Helper functions
 const getStatusClass = (status) => {
   const statusMap = {
     'Em análise': 'status-em-analise',
@@ -287,6 +369,17 @@ const getStatusClass = (status) => {
     'Concluído': 'status-concluido'
   };
   return statusMap[status] || 'status-em-analise';
+};
+
+const getStatusColor = (status) => {
+  const colorMap = {
+    'Em análise': '#eab308', // yellow-500
+    'Aprovado': '#22c55e',   // green-500
+    'Rejeitado': '#ef4444',  // red-500
+    'Em andamento': '#3b82f6', // blue-500
+    'Concluído': '#6b7280'   // gray-500
+  };
+  return colorMap[status] || '#6b7280';
 };
 
 export default Dashboard;

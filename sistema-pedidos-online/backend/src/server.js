@@ -11,24 +11,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Configuração CORS para produção
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://sistema-pedidos-production-bba4.up.railway.app',
-  'https://seu-frontend.vercel.app', // Substitua pela URL do Vercel depois
-  'https://seu-site.netlify.app'     // Substitua pela URL do Netlify depois
-];
-
+// Configuração CORS para produção - SUBSTITUA ESTA PARTE
 app.use(cors({
-  origin: function (origin, callback) {
-    // Permitir requests sem origin (como mobile apps ou curl)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
+  origin: [
+    'http://localhost:3000',
+    'https://sistema-pedidos-production-bba4.up.railway.app',
+    'https://sistema-pedidos-online.netlify.app',
+    'https://*.netlify.app'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']

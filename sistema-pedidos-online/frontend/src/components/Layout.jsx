@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext'; // ⚡ NOVO
 import {
   Menu,
   Package,
@@ -11,18 +11,15 @@ import {
   User,
   Settings,
   Sun,
-  Moon
+  Moon // ⚡ NOVO
 } from 'lucide-react';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout, isAdmin } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme } = useTheme(); // ⚡ NOVO
   const location = useLocation();
   const navigate = useNavigate();
-
-  console.log('🔧 Layout renderizado - User:', user);
-  console.log('🔧 Current path:', location.pathname);
 
   const handleLogout = () => {
     logout();
@@ -83,6 +80,7 @@ const Layout = () => {
                 </div>
               </div>
               
+              {/* ⚡ NOVO: Botão Toggle Tema */}
               <button
                 onClick={toggleTheme}
                 className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg transition-colors"
@@ -139,21 +137,24 @@ const Layout = () => {
                 </div>
               </div>
               
-              <button
-                onClick={toggleTheme}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors"
-                title={isDark ? 'Modo claro' : 'Modo escuro'}
-              >
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </button>
-              
-              <button
-                onClick={handleLogout}
-                className="ml-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors"
-                title="Sair"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
+              <div className="flex space-x-1">
+                {/* ⚡ NOVO: Botão Toggle Tema */}
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors"
+                  title={isDark ? 'Modo claro' : 'Modo escuro'}
+                >
+                  {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                </button>
+                
+                <button
+                  onClick={handleLogout}
+                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors"
+                  title="Sair"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -174,15 +175,8 @@ const Layout = () => {
         <main className="flex-1">
           <div className="py-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="bg-yellow-100 border border-yellow-400 p-4 rounded-lg mb-4">
-                <p className="text-yellow-800 font-medium">DEBUG: Outlet deve renderizar abaixo</p>
-              </div>
-              
-              {/* ⚡ AQUI É ONDE O CONTEÚDO DEVE APARECER */}
-              <Outlet />
-              
-              <div className="bg-red-100 border border-red-400 p-4 rounded-lg mt-4">
-                <p className="text-red-800 font-medium">DEBUG: Se você vê isso, o Outlet não renderizou</p>
+              <div className="animate-fade-in">
+                <Outlet />
               </div>
             </div>
           </div>

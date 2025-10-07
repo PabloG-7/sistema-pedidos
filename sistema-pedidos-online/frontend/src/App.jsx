@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider } from './contexts/ThemeContext'; // ⚡ NOVO
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
@@ -13,7 +13,7 @@ import AdminOrders from './pages/AdminOrders';
 
 function App() {
   return (
-    <ThemeProvider>
+    <ThemeProvider> {/* ⚡ NOVO - ENVOLVE TUDO */}
       <Router>
         <AuthProvider>
           <Routes>

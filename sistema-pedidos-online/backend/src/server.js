@@ -1,21 +1,31 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import orderRoutes from './routes/orders.js';
 import userRoutes from './routes/users.js';
+
+// ⬇️ ADICIONAR ESTE IMPORT PARA UPLOAD
+import uploadRoutes from './routes/uploadRoutes.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// DEFINIÇÃO DA VARIÁVEL allowedOrigins - ESTAVA FALTANDO!
+// Para usar __dirname com ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// DEFINIÇÃO DA VARIÁVEL allowedOrigins
 const allowedOrigins = [
   'http://localhost:3000',
   'https://sistema-pedidos-production-bba4.up.railway.app',
   'https://sistema-pedidos-online.netlify.app',
-  'https://*.netlify.app'
+  'https://*.netlify.app',
+  'https://sistema-pedidos-backend.onrender.com' // ⬅️ ADICIONAR RENDER
 ];
 
 // Configuração CORS
@@ -50,6 +60,10 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/upload', uploadRoutes); // ⬅️ ADICIONAR UPLOAD ROUTES
+
+// Servir arquivos estáticos da pasta uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -86,23 +100,6 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'production' ? {} : err.message
   });
 });
-
-// Adicionar após outras importações de rotas
-const uploadRoutes = require('./routes/uploadRoutes');
-
-// Adicionar após outros app.use de rotas
-app.use('/api/upload', uploadRoutes);
-
-// Servir arquivos estáticos da pasta uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-// ↓↓↓ ADICIONAR ESTES IMPORTS NO TOPO DO ARQUIVO ↓↓↓
-const path = require('path');
-const uploadRoutes = require('./routes/uploadRoutes');
-
-// ↓↓↓ ADICIONAR ESTAS LINHAS APÓS OUTROS app.use() ↓↓↓
-app.use('/api/upload', uploadRoutes);
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);

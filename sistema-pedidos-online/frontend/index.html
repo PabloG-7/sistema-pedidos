@@ -4,10 +4,25 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     
-    <!-- Meta Tags Essenciais -->
+    <!-- PWA Meta Tags -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#1f2937" />
     <meta name="description" content="Sistema moderno para gerenciamento de pedidos e orçamentos">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
+    <!-- PWA Meta iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PedidosOnline">
+    
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#1f2937">
     
     <!-- Favicon com emoji -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
@@ -18,15 +33,59 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     
-    <!-- Script Simplificado - SEM PWA POR ENQUANTO -->
+    <!-- PWA Registration Script -->
     <script>
-      // Registrar Service Worker (opcional)
+      // Registrar Service Worker
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Não registra SW por enquanto
-          console.log('✅ Navegador suporta Service Worker (desativado)');
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('✅ Service Worker registrado: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('❌ Service Worker falhou: ', registrationError);
+            });
         });
       }
+
+      // Install Prompt para PWA
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('📱 PWA pronto para instalação');
+        
+        // Mostrar botão de instalação após 5 segundos
+        setTimeout(() => {
+          const installButton = document.createElement('button');
+          installButton.textContent = '📲 Instalar App';
+          installButton.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10000;
+          `;
+          installButton.onclick = () => {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+              if (choiceResult.outcome === 'accepted') {
+                console.log('🎉 Usuário instalou o PWA');
+                installButton.remove();
+              }
+              deferredPrompt = null;
+            });
+          };
+          document.body.appendChild(installButton);
+        }, 5000);
+      });
     </script>
   </body>
 </html>

@@ -19,13 +19,15 @@ const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// DEFINIÇÃO DA VARIÁVEL allowedOrigins
+// DEFINIÇÃO DA VARIÁVEL allowedOrigins - ATUALIZADA!
 const allowedOrigins = [
   'http://localhost:3000',
   'https://sistema-pedidos-production-bba4.up.railway.app',
   'https://sistema-pedidos-online.netlify.app',
   'https://*.netlify.app',
-  'https://sistema-pedidos-backend.onrender.com' // ⬅️ ADICIONAR RENDER
+  'https://sistema-pedidos-backend.onrender.com',
+  'https://sistema-pedidos-online.vercel.app', // ⬅️ NOVO: DOMÍNIO VERCEL
+  'https://*.vercel.app' // ⬅️ NOVO: TODOS OS SUBDOMÍNIOS VERCEL
 ];
 
 // Configuração CORS

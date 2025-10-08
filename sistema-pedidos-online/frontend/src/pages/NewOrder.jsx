@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import FileUpload from '../components/FileUpload';
 
 const NewOrder = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const NewOrder = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [attachments, setAttachments] = useState([]);
 
   const navigate = useNavigate();
 
@@ -36,7 +38,12 @@ const NewOrder = () => {
     try {
       await api.post('/orders', {
         ...formData,
-        estimated_budget: parseFloat(formData.estimated_budget)
+        estimated_budget: parseFloat(formData.estimated_budget),
+        attachments: attachments.map(file => ({
+          filename: file.filename,
+          originalName: file.originalName,
+          path: file.path
+        }))
       });
       
       navigate('/orders');
@@ -50,20 +57,20 @@ const NewOrder = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Novo Pedido</h1>
-        <p className="text-gray-600">Preencha os detalhes do seu pedido abaixo</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Novo Pedido</h1>
+        <p className="text-gray-600 dark:text-gray-400">Preencha os detalhes do seu pedido abaixo</p>
       </div>
 
       <div className="card">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+            <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded">
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Categoria *
             </label>
             <select
@@ -84,8 +91,8 @@ const NewOrder = () => {
           </div>
 
           <div>
-            <label htmlFor="estimated_budget" className="block text-sm font-medium text-gray-700">
-              Orçamento Estimado (R$)*
+            <label htmlFor="estimated_budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Orçamento Estimado (R$) *
             </label>
             <input
               type="number"
@@ -102,7 +109,7 @@ const NewOrder = () => {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Descrição do Pedido *
             </label>
             <textarea
@@ -115,8 +122,22 @@ const NewOrder = () => {
               className="input-field"
               placeholder="Descreva detalhadamente o que você precisa..."
             />
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Mínimo de 10 caracteres. Seja o mais detalhado possível para obter um orçamento preciso.
+            </p>
+          </div>
+
+          {/* SEÇÃO DE UPLOAD - NOVA */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Anexos do Pedido (Opcional)
+            </label>
+            <FileUpload 
+              onFilesChange={setAttachments}
+              maxFiles={5}
+            />
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Adicione imagens, PDFs ou documentos para melhorar seu orçamento (Máx. 5MB por arquivo)
             </p>
           </div>
 

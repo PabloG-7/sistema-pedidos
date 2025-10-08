@@ -87,6 +87,23 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Adicionar após outras importações de rotas
+const uploadRoutes = require('./routes/uploadRoutes');
+
+// Adicionar após outros app.use de rotas
+app.use('/api/upload', uploadRoutes);
+
+// Servir arquivos estáticos da pasta uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// ↓↓↓ ADICIONAR ESTES IMPORTS NO TOPO DO ARQUIVO ↓↓↓
+const path = require('path');
+const uploadRoutes = require('./routes/uploadRoutes');
+
+// ↓↓↓ ADICIONAR ESTAS LINHAS APÓS OUTROS app.use() ↓↓↓
+app.use('/api/upload', uploadRoutes);
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);

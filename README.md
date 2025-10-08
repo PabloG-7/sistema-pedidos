@@ -251,5 +251,3 @@ npm run preview  # Preview do build
 - 🔐 Autenticação social (Google/GitHub)
 
 ---
-
-> Feito com 💙 por [PabloG-7](https://github.com/PabloG-7)

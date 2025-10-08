@@ -77,7 +77,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 // Rota para servir arquivos
 router.get('/files/:filename', (req, res) => {
   const filename = req.params.filename;
-  const filePath = path.join(__dirname, '../../uploads', filename);
+  const filePath = path.join(process.cwd(), 'uploads', filename);
 
   if (fs.existsSync(filePath)) {
     res.sendFile(filePath);
@@ -89,4 +89,4 @@ router.get('/files/:filename', (req, res) => {
   }
 });
 
-module.exports = router;
+export default router; // ⬅️ MUDOU PARA ES6!

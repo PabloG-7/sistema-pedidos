@@ -12,47 +12,50 @@ import {
   Calendar,
   ArrowUpRight,
   FileText,
-  CheckCircle2
+  CheckCircle2,
+  Zap,
+  Cpu
 } from 'lucide-react';
 
-// Componente de gráfico moderno
+// Componente de gráfico cyberpunk
 const StatusChart = ({ data, title }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   
   return (
-    <div className="card">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          Total: {total}
+    <div className="neo-card group hover-lift">
+      <div className="flex items-center justify-between mb-8">
+        <h3 className="text-xl font-black text-slate-100">{title}</h3>
+        <div className="text-cyan-400 font-bold">
+          TOTAL: {total}
         </div>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-6">
         {data.map((item, index) => {
           const percentage = total > 0 ? (item.value / total) * 100 : 0;
           const statusClass = getStatusClass(item.label);
           
           return (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center space-x-3 flex-1 min-w-0">
-                <span className={`status-badge ${statusClass} status-badge-hover`}>
+            <div key={index} className="flex items-center justify-between group">
+              <div className="flex items-center space-x-4 flex-1 min-w-0">
+                <span className={`status-glow ${statusClass} hover-lift`}>
                   {item.label}
                 </span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                <span className="text-lg font-bold text-slate-100 min-w-12">
                   {item.value}
                 </span>
               </div>
-              <div className="flex items-center space-x-3 w-32">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div className="flex items-center space-x-4 w-40">
+                <div className="flex-1 bg-slate-700/50 rounded-full h-3 overflow-hidden layered-shadow">
                   <div
-                    className="h-2 rounded-full transition-all duration-700 ease-out"
+                    className="h-3 rounded-full transition-all duration-1000 ease-out"
                     style={{ 
                       width: `${percentage}%`,
-                      background: getStatusGradient(item.label)
+                      background: getStatusGradient(item.label),
+                      boxShadow: `0 0 20px ${getStatusColor(item.label)}`
                     }}
                   ></div>
                 </div>
-                <span className="text-sm font-medium text-gray-500 dark:text-gray-400 w-12 text-right">
+                <span className="text-cyan-400 font-bold text-lg min-w-16 text-right">
                   {percentage.toFixed(0)}%
                 </span>
               </div>
@@ -64,58 +67,52 @@ const StatusChart = ({ data, title }) => {
   );
 };
 
-// Componente de métrica moderno
-const MetricCard = ({ title, value, icon: Icon, change, color = 'indigo' }) => {
+// Componente de métrica cyberpunk
+const MetricCard = ({ title, value, icon: Icon, change, color = 'cyan' }) => {
   const colorConfig = {
-    indigo: {
-      bg: 'from-indigo-500/10 to-purple-500/10',
-      icon: 'text-indigo-600 dark:text-indigo-400',
-      gradient: 'from-indigo-500 to-purple-500'
+    cyan: {
+      gradient: 'from-cyan-500 to-cyan-600',
+      glow: 'shadow-cyan-500/30',
+      text: 'text-cyan-400'
+    },
+    purple: {
+      gradient: 'from-purple-500 to-purple-600',
+      glow: 'shadow-purple-500/30',
+      text: 'text-purple-400'
+    },
+    pink: {
+      gradient: 'from-pink-500 to-pink-600',
+      glow: 'shadow-pink-500/30',
+      text: 'text-pink-400'
     },
     emerald: {
-      bg: 'from-emerald-500/10 to-teal-500/10',
-      icon: 'text-emerald-600 dark:text-emerald-400',
-      gradient: 'from-emerald-500 to-teal-500'
-    },
-    amber: {
-      bg: 'from-amber-500/10 to-orange-500/10',
-      icon: 'text-amber-600 dark:text-amber-400',
-      gradient: 'from-amber-500 to-orange-500'
-    },
-    rose: {
-      bg: 'from-rose-500/10 to-pink-500/10',
-      icon: 'text-rose-600 dark:text-rose-400',
-      gradient: 'from-rose-500 to-pink-500'
+      gradient: 'from-emerald-500 to-emerald-600',
+      glow: 'shadow-emerald-500/30',
+      text: 'text-emerald-400'
     }
   };
 
   const config = colorConfig[color];
 
   return (
-    <div className="metric-card">
-      <div className="flex items-start justify-between">
+    <div className="metric-matrix hover-lift group">
+      <div className="flex items-start justify-between relative z-10">
         <div className="flex-1">
-          <div className={`p-3 rounded-2xl bg-gradient-to-br ${config.bg} inline-block mb-4 hover-scale transition-transform duration-300`}>
-            <Icon className={`h-6 w-6 ${config.icon}`} />
+          <div className={`p-4 bg-gradient-to-br ${config.gradient} rounded-3xl inline-block mb-6 shadow-2xl ${config.glow} hover-lift`}>
+            <Icon className="h-8 w-8 text-white" />
           </div>
-          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{title}</p>
-          <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">{value}</p>
+          <p className="text-slate-400 font-medium mb-3 text-lg">{title}</p>
+          <p className="text-4xl font-black text-slate-100 mb-4">{value}</p>
           {change && (
-            <div className={`inline-flex items-center space-x-1 text-sm font-medium ${
-              change > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-            }`}>
-              <TrendingUp className={`h-4 w-4 ${change > 0 ? '' : 'rotate-180'}`} />
-              <span>{Math.abs(change)}% vs último mês</span>
+            <div className={`inline-flex items-center space-x-3 text-lg font-bold ${change > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <TrendingUp className={`h-6 w-6 ${change > 0 ? '' : 'rotate-180'}`} />
+              <span>{Math.abs(change)}% VS MÊS PASSADO</span>
             </div>
           )}
         </div>
         {change && (
-          <div className={`p-2 rounded-lg ${
-            change > 0 
-              ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
-              : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'
-          }`}>
-            <ArrowUpRight className={`h-4 w-4 ${change > 0 ? '' : 'rotate-180'}`} />
+          <div className={`p-3 rounded-2xl border ${change > 0 ? 'border-emerald-400/50 bg-emerald-500/10' : 'border-rose-400/50 bg-rose-500/10'} shadow-2xl`}>
+            <ArrowUpRight className={`h-6 w-6 ${change > 0 ? 'text-emerald-400' : 'text-rose-400'} ${change > 0 ? '' : 'rotate-180'}`} />
           </div>
         )}
       </div>
@@ -146,7 +143,6 @@ const Dashboard = () => {
       
       setOrders(ordersData);
 
-      // Calcular estatísticas
       const totalOrders = ordersData.length;
       const pendingOrders = ordersData.filter(order => 
         ['Em análise', 'Em andamento'].includes(order.status)
@@ -174,7 +170,6 @@ const Dashboard = () => {
     }
   };
 
-  // Dados para gráficos
   const statusData = [
     { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length },
     { label: 'Aprovado', value: orders.filter(o => o.status === 'Aprovado').length },
@@ -186,125 +181,125 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="loading-spinner"></div>
-          <p className="text-gray-500 dark:text-gray-400">Carregando dashboard...</p>
+        <div className="flex flex-col items-center space-y-6">
+          <div className="loading-cyber"></div>
+          <p className="text-cyan-400 font-bold text-lg">CARREGANDO SISTEMA...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Olá, <span className="gradient-text">{user?.name}</span>! 👋
+          <h1 className="text-4xl lg:text-5xl font-black text-slate-100 mb-4">
+            OLÁ, <span className="gradient-text-animated">{user?.name?.toUpperCase()}</span>! ⚡
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
-            Bem-vindo ao seu painel de controle
+          <p className="text-xl text-cyan-400/80 font-medium">
+            BEM-VINDO AO PAINEL DE CONTROLE NEXUS
           </p>
         </div>
-        <div className="flex items-center space-x-3 mt-4 lg:mt-0">
+        <div className="flex items-center space-x-4 mt-6 lg:mt-0">
           <div className="text-right">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Hoje é</p>
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">
+            <p className="text-cyan-400/80 font-medium">DATA DO SISTEMA</p>
+            <p className="text-2xl font-bold text-slate-100">
               {new Date().toLocaleDateString('pt-BR', { 
-                weekday: 'long', 
-                day: 'numeric', 
-                month: 'long' 
-              })}
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+              }).toUpperCase()}
             </p>
           </div>
-          <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl border border-white/50 dark:border-gray-700/50">
-            <Calendar className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="p-4 bg-slate-800/50 rounded-3xl border border-cyan-400/30 shadow-2xl">
+            <Cpu className="h-8 w-8 text-cyan-400" />
           </div>
         </div>
       </div>
 
       {/* Métricas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
         <MetricCard
-          title="Total de Pedidos"
+          title="TOTAL DE PEDIDOS"
           value={stats.totalOrders}
           icon={Package}
-          color="indigo"
+          color="cyan"
           change={5}
         />
         <MetricCard
-          title="Pendentes"
+          title="PENDENTES"
           value={stats.pendingOrders}
           icon={Clock}
-          color="amber"
+          color="purple"
           change={-2}
         />
         <MetricCard
-          title="Concluídos"
+          title="CONCLUÍDOS"
           value={stats.completedOrders}
           icon={CheckCircle2}
           color="emerald"
           change={8}
         />
         <MetricCard
-          title="Ticket Médio"
+          title="TICKET MÉDIO"
           value={`R$ ${stats.averageBudget}`}
           icon={BarChart3}
-          color="rose"
+          color="pink"
           change={12}
         />
       </div>
 
       {/* Ações Rápidas e Gráficos */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
         {/* Ações Rápidas */}
         <div className="xl:col-span-1 space-y-6">
-          <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Ações Rápidas
+          <div className="neo-card">
+            <h3 className="text-xl font-black text-slate-100 mb-6">
+              AÇÕES RÁPIDAS
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Link
                 to="/new-order"
-                className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 border border-indigo-100 dark:border-indigo-500/20 hover:shadow-md transition-all duration-300"
+                className="flex items-center space-x-5 p-6 rounded-3xl bg-slate-800/50 border border-cyan-400/20 hover:border-cyan-400/50 transition-all duration-500 hover-lift group"
               >
-                <div className="p-2 bg-indigo-500 rounded-lg group-hover-scale transition-transform duration-300">
-                  <PlusCircle className="h-5 w-5 text-white" />
+                <div className="p-3 bg-cyan-500 rounded-2xl shadow-2xl group-hover-glow-item">
+                  <PlusCircle className="h-7 w-7 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900 dark:text-white">Novo Pedido</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Solicitar orçamento</p>
+                  <h4 className="font-black text-slate-100 text-lg">NOVO PEDIDO</h4>
+                  <p className="text-cyan-400/80 text-sm">SOLICITAR ORÇAMENTO</p>
                 </div>
-                <ArrowUpRight className="h-5 w-5 text-indigo-500 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                <ArrowUpRight className="h-6 w-6 text-cyan-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
               </Link>
 
               <Link
                 to="/orders"
-                className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10 border border-emerald-100 dark:border-emerald-500/20 hover:shadow-md transition-all duration-300"
+                className="flex items-center space-x-5 p-6 rounded-3xl bg-slate-800/50 border border-purple-400/20 hover:border-purple-400/50 transition-all duration-500 hover-lift group"
               >
-                <div className="p-2 bg-emerald-500 rounded-lg group-hover-scale transition-transform duration-300">
-                  <FileText className="h-5 w-5 text-white" />
+                <div className="p-3 bg-purple-500 rounded-2xl shadow-2xl group-hover-glow-item">
+                  <FileText className="h-7 w-7 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900 dark:text-white">Meus Pedidos</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Acompanhar pedidos</p>
+                  <h4 className="font-black text-slate-100 text-lg">MEUS PEDIDOS</h4>
+                  <p className="text-purple-400/80 text-sm">ACOMPANHAR PEDIDOS</p>
                 </div>
-                <ArrowUpRight className="h-5 w-5 text-emerald-500 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                <ArrowUpRight className="h-6 w-6 text-purple-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
               </Link>
 
               {isAdmin && (
                 <Link
                   to="/admin/orders"
-                  className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 border border-amber-100 dark:border-amber-500/20 hover:shadow-md transition-all duration-300"
+                  className="flex items-center space-x-5 p-6 rounded-3xl bg-slate-800/50 border border-pink-400/20 hover:border-pink-400/50 transition-all duration-500 hover-lift group"
                 >
-                  <div className="p-2 bg-amber-500 rounded-lg group-hover-scale transition-transform duration-300">
-                    <Users className="h-5 w-5 text-white" />
+                  <div className="p-3 bg-pink-500 rounded-2xl shadow-2xl group-hover-glow-item">
+                    <Users className="h-7 w-7 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 dark:text-white">Painel Admin</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Gerenciar pedidos</p>
+                    <h4 className="font-black text-slate-100 text-lg">PAINEL ADMIN</h4>
+                    <p className="text-pink-400/80 text-sm">GERENCIAR PEDIDOS</p>
                   </div>
-                  <ArrowUpRight className="h-5 w-5 text-amber-500 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  <ArrowUpRight className="h-6 w-6 text-pink-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </Link>
               )}
             </div>
@@ -315,54 +310,54 @@ const Dashboard = () => {
         <div className="xl:col-span-2">
           <StatusChart
             data={statusData}
-            title="Distribuição por Status"
+            title="DISTRIBUIÇÃO POR STATUS"
           />
         </div>
       </div>
 
       {/* Pedidos Recentes */}
-      <div className="card">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Pedidos Recentes</h2>
+      <div className="neo-card">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-black text-slate-100">PEDIDOS RECENTES</h2>
           <Link 
             to="/orders" 
-            className="btn-ghost flex items-center space-x-2"
+            className="btn-ghost-neon flex items-center space-x-3 font-bold"
           >
-            <span>Ver todos</span>
-            <ArrowUpRight className="h-4 w-4" />
+            <span>VER TODOS</span>
+            <ArrowUpRight className="h-5 w-5" />
           </Link>
         </div>
         
         <div className="space-y-4">
           {orders.slice(0, 5).map((order) => (
-            <div key={order.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-300 group">
-              <div className="flex items-center space-x-4 flex-1 min-w-0">
-                <div className={`p-2 rounded-lg ${
-                  order.status === 'Concluído' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
-                  order.status === 'Em andamento' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' :
-                  order.status === 'Em análise' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
-                  'bg-gray-500/10 text-gray-600 dark:text-gray-400'
-                }`}>
-                  <Package className="h-5 w-5" />
+            <div key={order.id} className="flex items-center justify-between p-6 rounded-3xl bg-slate-800/30 border border-slate-600/30 hover:border-cyan-400/30 transition-all duration-500 hover-lift group">
+              <div className="flex items-center space-x-5 flex-1 min-w-0">
+                <div className={`p-3 rounded-2xl ${
+                  order.status === 'Concluído' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                  order.status === 'Em andamento' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' :
+                  order.status === 'Em análise' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                  'bg-slate-500/20 text-slate-300 border border-slate-500/30'
+                } shadow-2xl`}>
+                  <Package className="h-6 w-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <h4 className="font-black text-slate-100 truncate text-lg group-hover:text-cyan-400 transition-colors">
                     {order.category}
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate mt-1">
+                  <p className="text-cyan-400/80 truncate mt-2 text-sm">
                     {order.description}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-6">
-                <span className="text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap">
+              <div className="flex items-center space-x-8">
+                <span className="text-2xl font-black text-slate-100 whitespace-nowrap">
                   R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                   })}
                 </span>
-                <span className={`status-badge ${getStatusClass(order.status)} status-badge-hover`}>
+                <span className={`status-glow ${getStatusClass(order.status)} hover-lift`}>
                   {order.status}
                 </span>
               </div>
@@ -370,17 +365,17 @@ const Dashboard = () => {
           ))}
           
           {orders.length === 0 && (
-            <div className="text-center py-12">
-              <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-2xl inline-block mb-4">
-                <Package className="h-12 w-12 text-gray-400 dark:text-gray-600" />
+            <div className="text-center py-16">
+              <div className="p-6 bg-slate-800/50 rounded-3xl inline-block mb-6 border border-cyan-400/20">
+                <Zap className="h-16 w-16 text-cyan-400" />
               </div>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">Nenhum pedido encontrado</p>
+              <p className="text-cyan-400/80 text-xl mb-6">NENHUM PEDIDO ENCONTRADO</p>
               <Link 
                 to="/new-order" 
-                className="btn-primary inline-flex items-center space-x-2"
+                className="btn-neon inline-flex items-center space-x-3 text-lg"
               >
-                <PlusCircle className="h-4 w-4" />
-                <span>Criar primeiro pedido</span>
+                <PlusCircle className="h-6 w-6" />
+                <span>CRIAR PRIMEIRO PEDIDO</span>
               </Link>
             </div>
           )}
@@ -390,7 +385,7 @@ const Dashboard = () => {
   );
 };
 
-// Helper functions atualizadas
+// Helper functions
 const getStatusClass = (status) => {
   const statusMap = {
     'Em análise': 'status-em-analise',
@@ -407,10 +402,21 @@ const getStatusGradient = (status) => {
     'Em análise': 'linear-gradient(135deg, #f59e0b, #d97706)',
     'Aprovado': 'linear-gradient(135deg, #10b981, #059669)',
     'Rejeitado': 'linear-gradient(135deg, #ef4444, #dc2626)',
-    'Em andamento': 'linear-gradient(135deg, #3b82f6, #2563eb)',
-    'Concluído': 'linear-gradient(135deg, #6b7280, #4b5563)'
+    'Em andamento': 'linear-gradient(135deg, #22d3ee, #0ea5e9)',
+    'Concluído': 'linear-gradient(135deg, #64748b, #475569)'
   };
-  return gradientMap[status] || 'linear-gradient(135deg, #6b7280, #4b5563)';
+  return gradientMap[status] || 'linear-gradient(135deg, #64748b, #475569)';
+};
+
+const getStatusColor = (status) => {
+  const colorMap = {
+    'Em análise': 'rgba(245, 158, 11, 0.5)',
+    'Aprovado': 'rgba(16, 185, 129, 0.5)',
+    'Rejeitado': 'rgba(239, 68, 68, 0.5)',
+    'Em andamento': 'rgba(34, 211, 238, 0.5)',
+    'Concluído': 'rgba(100, 116, 139, 0.5)'
+  };
+  return colorMap[status] || 'rgba(100, 116, 139, 0.5)';
 };
 
 export default Dashboard;

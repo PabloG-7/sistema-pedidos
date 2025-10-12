@@ -20,7 +20,7 @@ const StatusChart = ({ data, title }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   
   return (
-    <div className="card group">
+    <div className="card">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
         <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -33,9 +33,9 @@ const StatusChart = ({ data, title }) => {
           const statusClass = getStatusClass(item.label);
           
           return (
-            <div key={index} className="flex items-center justify-between group">
+            <div key={index} className="flex items-center justify-between">
               <div className="flex items-center space-x-3 flex-1 min-w-0">
-                <span className={`status-badge ${statusClass} transition-transform group-hover:scale-105`}>
+                <span className={`status-badge ${statusClass} status-badge-hover`}>
                   {item.label}
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -92,10 +92,10 @@ const MetricCard = ({ title, value, icon: Icon, change, color = 'indigo' }) => {
   const config = colorConfig[color];
 
   return (
-    <div className="metric-card group">
+    <div className="metric-card">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className={`p-3 rounded-2xl bg-gradient-to-br ${config.bg} inline-block mb-4 group-hover:scale-110 transition-transform duration-300`}>
+          <div className={`p-3 rounded-2xl bg-gradient-to-br ${config.bg} inline-block mb-4 hover-scale transition-transform duration-300`}>
             <Icon className={`h-6 w-6 ${config.icon}`} />
           </div>
           <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{title}</p>
@@ -266,45 +266,45 @@ const Dashboard = () => {
             <div className="space-y-3">
               <Link
                 to="/new-order"
-                className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 border border-indigo-100 dark:border-indigo-500/20 group hover:shadow-md transition-all duration-300"
+                className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 border border-indigo-100 dark:border-indigo-500/20 hover:shadow-md transition-all duration-300"
               >
-                <div className="p-2 bg-indigo-500 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="p-2 bg-indigo-500 rounded-lg group-hover-scale transition-transform duration-300">
                   <PlusCircle className="h-5 w-5 text-white" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900 dark:text-white">Novo Pedido</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Solicitar orçamento</p>
                 </div>
-                <ArrowUpRight className="h-5 w-5 text-indigo-500 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                <ArrowUpRight className="h-5 w-5 text-indigo-500 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
               </Link>
 
               <Link
                 to="/orders"
-                className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10 border border-emerald-100 dark:border-emerald-500/20 group hover:shadow-md transition-all duration-300"
+                className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10 border border-emerald-100 dark:border-emerald-500/20 hover:shadow-md transition-all duration-300"
               >
-                <div className="p-2 bg-emerald-500 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="p-2 bg-emerald-500 rounded-lg group-hover-scale transition-transform duration-300">
                   <FileText className="h-5 w-5 text-white" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900 dark:text-white">Meus Pedidos</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Acompanhar pedidos</p>
                 </div>
-                <ArrowUpRight className="h-5 w-5 text-emerald-500 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                <ArrowUpRight className="h-5 w-5 text-emerald-500 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
               </Link>
 
               {isAdmin && (
                 <Link
                   to="/admin/orders"
-                  className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 border border-amber-100 dark:border-amber-500/20 group hover:shadow-md transition-all duration-300"
+                  className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 border border-amber-100 dark:border-amber-500/20 hover:shadow-md transition-all duration-300"
                 >
-                  <div className="p-2 bg-amber-500 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="p-2 bg-amber-500 rounded-lg group-hover-scale transition-transform duration-300">
                     <Users className="h-5 w-5 text-white" />
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900 dark:text-white">Painel Admin</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Gerenciar pedidos</p>
                   </div>
-                  <ArrowUpRight className="h-5 w-5 text-amber-500 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                  <ArrowUpRight className="h-5 w-5 text-amber-500 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </Link>
               )}
             </div>
@@ -362,7 +362,7 @@ const Dashboard = () => {
                     maximumFractionDigits: 2
                   })}
                 </span>
-                <span className={`status-badge ${getStatusClass(order.status)} group-hover:scale-105 transition-transform`}>
+                <span className={`status-badge ${getStatusClass(order.status)} status-badge-hover`}>
                   {order.status}
                 </span>
               </div>

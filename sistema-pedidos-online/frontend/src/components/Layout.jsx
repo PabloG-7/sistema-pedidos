@@ -12,9 +12,7 @@ import {
   User,
   Settings,
   Sun,
-  Moon,
-  Search,
-  Bell
+  Moon
 } from 'lucide-react';
 
 const Layout = () => {
@@ -85,7 +83,7 @@ const Layout = () => {
                     onClick={() => setSidebarOpen(false)}
                   >
                     <Icon className={`mr-3 h-5 w-5 transition-transform duration-200 ${
-                      isActive ? 'scale-110' : 'group-hover:scale-105'
+                      isActive ? 'scale-110' : 'group-hover-scale'
                     }`} />
                     <span className="font-medium">{item.name}</span>
                   </Link>
@@ -148,11 +146,11 @@ const Layout = () => {
                         : 'text-gray-600 hover:bg-white/50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700/50 dark:hover:text-white'
                     }`}
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                      isActive ? 'opacity-100' : ''
+                    <div className={`absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 transition-opacity duration-300 ${
+                      isActive ? 'opacity-100' : 'group-hover:opacity-100'
                     }`} />
                     <Icon className={`mr-3 h-5 w-5 relative z-10 transition-transform duration-200 ${
-                      isActive ? 'scale-110' : 'group-hover:scale-105'
+                      isActive ? 'scale-110' : 'group-hover-scale'
                     }`} />
                     <span className="font-semibold relative z-10">{item.name}</span>
                   </Link>

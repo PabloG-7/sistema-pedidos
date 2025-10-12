@@ -61,16 +61,16 @@
   }
 
   .card-hover {
-    @apply card hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer;
+    @apply card hover:shadow-lg transition-all duration-300 cursor-pointer;
   }
 
   /* Navigation moderna */
   .nav-item {
-    @apply flex items-center px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-white/50 rounded-xl transition-all duration-200 font-medium group dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/50;
+    @apply flex items-center px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-white/50 rounded-xl transition-all duration-200 font-medium dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/50;
   }
 
   .nav-item-active {
-    @apply flex items-center px-4 py-3 text-indigo-700 bg-indigo-50 rounded-xl font-medium border-r-0 bg-gradient-to-r from-indigo-50 to-white shadow-sm dark:text-indigo-300 dark:bg-indigo-500/10 dark:from-indigo-500/10 dark:to-gray-800;
+    @apply flex items-center px-4 py-3 text-indigo-700 bg-indigo-50 rounded-xl font-medium bg-gradient-to-r from-indigo-50 to-white shadow-sm dark:text-indigo-300 dark:bg-indigo-500/10 dark:from-indigo-500/10 dark:to-gray-800;
   }
 
   /* Status badges modernas */
@@ -79,40 +79,46 @@
   }
 
   .status-em-analise {
-    @apply status-badge bg-amber-50 text-amber-800 border border-amber-200 shadow-sm dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30;
+    @apply bg-amber-50 text-amber-800 border border-amber-200 shadow-sm dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30;
   }
 
   .status-aprovado {
-    @apply status-badge bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-sm dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30;
+    @apply bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-sm dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30;
   }
 
   .status-rejeitado {
-    @apply status-badge bg-rose-50 text-rose-800 border border-rose-200 shadow-sm dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30;
+    @apply bg-rose-50 text-rose-800 border border-rose-200 shadow-sm dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30;
   }
 
   .status-andamento {
-    @apply status-badge bg-blue-50 text-blue-800 border border-blue-200 shadow-sm dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30;
+    @apply bg-blue-50 text-blue-800 border border-blue-200 shadow-sm dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30;
   }
 
   .status-concluido {
-    @apply status-badge bg-gray-50 text-gray-800 border border-gray-200 shadow-sm dark:bg-gray-500/20 dark:text-gray-300 dark:border-gray-500/30;
+    @apply bg-gray-50 text-gray-800 border border-gray-200 shadow-sm dark:bg-gray-500/20 dark:text-gray-300 dark:border-gray-500/30;
   }
 
   /* Metric cards */
   .metric-card {
-    @apply card relative overflow-hidden group;
+    @apply card relative overflow-hidden;
   }
 
   .metric-card::before {
     content: '';
-    @apply absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300;
+    @apply absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 transition-opacity duration-300;
+  }
+
+  .metric-card:hover::before {
+    @apply opacity-100;
   }
 
   /* Loading spinner */
   .loading-spinner {
     @apply animate-spin rounded-full h-6 w-6 border-2 border-indigo-500 border-t-transparent;
   }
+}
 
+@layer utilities {
   /* Animations */
   @keyframes fadeInUp {
     from {
@@ -131,11 +137,12 @@
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-}
 
-@layer utilities {
   /* Scrollbar customizada */
   .scrollbar-thin {
     scrollbar-width: thin;
@@ -151,16 +158,11 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 dark:bg-gray-600 rounded-full hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors;
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full transition-colors;
   }
 
-  /* Text shadows */
-  .text-shadow {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .text-shadow-lg {
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
   }
 }
 
@@ -173,7 +175,28 @@
   backdrop-filter: blur(12px) saturate(160%);
 }
 
-/* Focus states para acessibilidade */
-.focus-ring:focus {
-  @apply outline-none ring-2 ring-indigo-500/50 ring-offset-2 ring-offset-white dark:ring-offset-gray-900;
+/* Hover effects que precisam ser aplicados via classes normais */
+.hover-scale {
+  @apply transition-transform duration-300;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.group-hover-scale {
+  @apply transition-transform duration-300;
+}
+
+.group:hover .group-hover-scale {
+  transform: scale(1.05);
+}
+
+/* Status badge hover effects */
+.status-badge-hover {
+  @apply transition-transform duration-200;
+}
+
+.status-badge-hover:hover {
+  transform: scale(1.05);
 }

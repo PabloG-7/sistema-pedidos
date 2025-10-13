@@ -2,162 +2,125 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { 
-  Package, 
-  Plus, 
-  BarChart3, 
-  Users, 
-  TrendingUp, 
-  Clock, 
-  Calendar,
-  ArrowUpRight,
-  Sparkles,
-  Zap,
-  Target,
-  CheckCircle2,
-  AlertCircle
-} from 'lucide-react';
+import { Rocket, PlusCircle, BarChart3, Users, TrendingUp, Clock, Calendar, ArrowUpRight, Sparkles } from 'lucide-react';
 
-// Componente de métrica ultra moderno
-const MetricCard = ({ title, value, icon: Icon, change, color = 'purple', loading = false }) => {
+// Componente de gráfico moderno
+const StatusChart = ({ data, title }) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  
+  return (
+    <div className="card group hover-lift">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h3>
+        <div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg">
+          <BarChart3 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        {data.map((item, index) => {
+          const percentage = total > 0 ? (item.value / total) * 100 : 0;
+          const statusClass = getStatusClass(item.label);
+          
+          return (
+            <div key={index} className="flex items-center justify-between group/item hover:bg-white/50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition-all duration-300">
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                <span className={`status-badge ${statusClass} group-hover/item:scale-105 transition-transform duration-300`}>
+                  {item.label}
+                </span>
+                <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                  {item.value}
+                </span>
+              </div>
+              <div className="flex items-center space-x-3 w-32">
+                <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="h-3 rounded-full transition-all duration-1000 ease-out"
+                    style={{ 
+                      width: `${percentage}%`,
+                      background: getStatusGradient(item.label)
+                    }}
+                  ></div>
+                </div>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-300 w-10 text-right">
+                  {percentage.toFixed(0)}%
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Componente de métricas premium
+const MetricCard = ({ title, value, icon: Icon, change, color = 'indigo', link }) => {
   const colorConfig = {
-    purple: {
-      bg: 'bg-purple-500/10',
-      icon: 'text-purple-600 dark:text-purple-400',
-      gradient: 'from-purple-500 to-indigo-600',
-      changeColor: 'text-purple-600'
+    indigo: {
+      bg: 'from-indigo-500/10 to-purple-500/10',
+      icon: 'text-indigo-600 dark:text-indigo-400',
+      gradient: 'from-indigo-500 to-purple-500'
     },
     emerald: {
-      bg: 'bg-emerald-500/10', 
+      bg: 'from-emerald-500/10 to-green-500/10',
       icon: 'text-emerald-600 dark:text-emerald-400',
-      gradient: 'from-emerald-500 to-teal-600',
-      changeColor: 'text-emerald-600'
+      gradient: 'from-emerald-500 to-green-500'
     },
     amber: {
-      bg: 'bg-amber-500/10',
+      bg: 'from-amber-500/10 to-orange-500/10',
       icon: 'text-amber-600 dark:text-amber-400',
-      gradient: 'from-amber-500 to-orange-600',
-      changeColor: 'text-amber-600'
+      gradient: 'from-amber-500 to-orange-500'
     },
-    sky: {
-      bg: 'bg-sky-500/10',
-      icon: 'text-sky-600 dark:text-sky-400',
-      gradient: 'from-sky-500 to-cyan-600',
-      changeColor: 'text-sky-600'
+    blue: {
+      bg: 'from-blue-500/10 to-cyan-500/10',
+      icon: 'text-blue-600 dark:text-blue-400',
+      gradient: 'from-blue-500 to-cyan-500'
     }
   };
 
   const config = colorConfig[color];
 
-  if (loading) {
-    return (
-      <div className="card animate-pulse">
-        <div className="flex items-center">
-          <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-2xl"></div>
-          <div className="ml-4 flex-1">
-            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-20 mb-2"></div>
-            <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-16"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="card group hover-lift hover-glow relative overflow-hidden">
-      <div className="flex items-start justify-between">
-        <div className="flex items-center">
-          <div className={`p-3 rounded-2xl ${config.bg} backdrop-blur-sm group-hover:scale-110 transition-transform duration-300`}>
-            <Icon className={`h-6 w-6 ${config.icon}`} />
+    <Link to={link} className="block">
+      <div className="metric-card group cursor-pointer hover-lift">
+        <div className="relative z-10">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-2">{title}</p>
+              <p className="text-3xl font-bold text-slate-900 dark:text-white mb-3">{value}</p>
+              
+              {change && (
+                <div className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-semibold ${
+                  change > 0 
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' 
+                    : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'
+                }`}>
+                  <TrendingUp className={`h-3 w-3 ${change > 0 ? '' : 'rotate-180'}`} />
+                  <span>{Math.abs(change)}%</span>
+                </div>
+              )}
+            </div>
+            
+            <div className={`p-3 rounded-xl bg-gradient-to-br ${config.bg}`}>
+              <Icon className={`h-6 w-6 ${config.icon}`} />
+            </div>
           </div>
-          <div className="ml-4">
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{title}</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+          
+          <div className="flex items-center justify-between mt-4">
+            <div className="text-xs text-slate-500 dark:text-slate-400">
+              Clique para ver detalhes
+            </div>
+            <ArrowUpRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
           </div>
         </div>
         
-        {change && (
-          <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-semibold ${
-            change > 0 
-              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' 
-              : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'
-          }`}>
-            <TrendingUp className={`h-3 w-3 ${change > 0 ? '' : 'rotate-180'}`} />
-            <span>{Math.abs(change)}%</span>
-          </div>
-        )}
+        {/* Gradient overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl from-indigo-500/5 to-purple-500/5"></div>
       </div>
-      
-      {/* Animated gradient border */}
-      <div className={`absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r ${config.gradient} group-hover:w-full transition-all duration-700 rounded-full`}></div>
-    </div>
-  );
-};
-
-// Componente de card de ação rápida
-const QuickActionCard = ({ title, description, icon: Icon, href, color = 'purple' }) => {
-  const colorConfig = {
-    purple: 'from-purple-500 to-indigo-600',
-    emerald: 'from-emerald-500 to-teal-600',
-    amber: 'from-amber-500 to-orange-600',
-    sky: 'from-sky-500 to-cyan-600'
-  };
-
-  return (
-    <Link
-      to={href}
-      className="card card-hover group relative overflow-hidden"
-    >
-      <div className="flex items-center">
-        <div className={`w-14 h-14 bg-gradient-to-br ${colorConfig[color]} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-          <Icon className="h-6 w-6 text-white" />
-        </div>
-        <div className="ml-4 flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-gradient transition-colors">
-            {title}
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{description}</p>
-        </div>
-        <ArrowUpRight className="h-5 w-5 text-gray-400 group-hover:text-purple-500 transition-colors duration-300" />
-      </div>
-      
-      {/* Hover effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-indigo-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"></div>
     </Link>
   );
 };
-
-// Componente de pedido recente
-const RecentOrderItem = ({ order, index }) => (
-  <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700/50 transition-all duration-300 group border border-transparent hover:border-gray-200 dark:hover:border-gray-600">
-    <div className="flex items-center space-x-4 flex-1 min-w-0">
-      <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-sm shadow-lg">
-        #{index + 1}
-      </div>
-      <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-gray-900 dark:text-white truncate text-sm">
-          {order.category}
-        </h4>
-        <p className="text-gray-500 dark:text-gray-400 text-xs truncate mt-1">
-          {order.description}
-        </p>
-        <div className="flex items-center space-x-2 mt-2">
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            {new Date(order.created_at).toLocaleDateString('pt-BR')}
-          </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">•</span>
-          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-            R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR')}
-          </span>
-        </div>
-      </div>
-    </div>
-    
-    <div className={`status-badge ${getStatusClass(order.status)} transform group-hover:scale-105 transition-transform duration-300`}>
-      {order.status}
-    </div>
-  </div>
-);
 
 const Dashboard = () => {
   const { user, isAdmin } = useAuth();
@@ -176,15 +139,13 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      // Simular loading para demonstrar as animações
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
       const endpoint = isAdmin ? '/orders' : '/orders/my-orders';
       const response = await api.get(endpoint);
       const ordersData = response.data.orders || [];
       
       setOrders(ordersData);
 
+      // Calcular estatísticas
       const totalOrders = ordersData.length;
       const pendingOrders = ordersData.filter(order => 
         ['Em análise', 'Em andamento'].includes(order.status)
@@ -212,6 +173,7 @@ const Dashboard = () => {
     }
   };
 
+  // Dados para gráficos
   const statusData = [
     { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length },
     { label: 'Aprovado', value: orders.filter(o => o.status === 'Aprovado').length },
@@ -220,203 +182,230 @@ const Dashboard = () => {
     { label: 'Rejeitado', value: orders.filter(o => o.status === 'Rejeitado').length },
   ].filter(item => item.value > 0);
 
+  const categoryData = Object.entries(
+    orders.reduce((acc, order) => {
+      acc[order.category] = (acc[order.category] || 0) + 1;
+      return acc;
+    }, {})
+  )
+    .map(([category, count]) => ({
+      label: category,
+      value: count
+    }))
+    .sort((a, b) => b.value - a.value);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <div className="text-center space-y-4">
+          <div className="spinner border-3 border-indigo-500 border-r-transparent mx-auto"></div>
+          <p className="text-slate-600 dark:text-slate-400">Carregando dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen pb-8">
-      {/* Header Hero */}
-      <div className="relative overflow-hidden rounded-3xl gradient-primary p-8 text-white mb-8 mx-4 lg:mx-0">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24"></div>
-        
-        <div className="relative z-10">
-          <div className="flex items-center space-x-3 mb-2">
-            <Sparkles className="h-6 w-6 text-amber-300 animate-pulse" />
-            <h1 className="text-3xl md:text-4xl font-bold text-shadow-lg">
-              Olá, {user?.name}! 👋
-            </h1>
+    <div className="space-y-8 animate-slide-in">
+      {/* Header com Welcome */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl">
+              <Sparkles className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white">
+                Olá, {user?.name}! 👋
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400 text-lg">
+                Bem-vindo ao painel de controle Orion
+              </p>
+            </div>
           </div>
-          <p className="text-purple-100 text-lg mb-6">
-            {isAdmin ? 'Painel administrativo completo' : 'Acompanhe seus pedidos em tempo real'}
-          </p>
+        </div>
+        
+        <div className="mt-4 lg:mt-0">
+          <Link
+            to="/new-order"
+            className="btn-primary flex items-center space-x-2 group"
+          >
+            <PlusCircle className="h-5 w-5 group-hover:scale-110 transition-transform" />
+            <span>Novo Pedido</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Grid de Métricas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard
+          title="Total de Pedidos"
+          value={stats.totalOrders}
+          icon={Rocket}
+          color="indigo"
+          change={12}
+          link="/orders"
+        />
+        <MetricCard
+          title="Pedidos Pendentes"
+          value={stats.pendingOrders}
+          icon={Clock}
+          color="amber"
+          change={-3}
+          link="/orders"
+        />
+        <MetricCard
+          title="Concluídos"
+          value={stats.completedOrders}
+          icon={TrendingUp}
+          color="emerald"
+          change={8}
+          link="/orders"
+        />
+        <MetricCard
+          title="Ticket Médio"
+          value={`R$ ${stats.averageBudget}`}
+          icon={BarChart3}
+          color="blue"
+          change={15}
+          link="/orders"
+        />
+      </div>
+
+      {/* Gráficos e Dados */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <StatusChart
+          data={statusData}
+          title="Distribuição por Status"
+        />
+        
+        {/* Quick Actions */}
+        <div className="card space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Ações Rápidas</h3>
+            <div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg">
+              <Users className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            </div>
+          </div>
           
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-              <div className="text-2xl font-bold text-white">{stats.totalOrders}</div>
-              <div className="text-purple-200 text-sm">Total</div>
-            </div>
-            <div className="text-center p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-              <div className="text-2xl font-bold text-white">{stats.pendingOrders}</div>
-              <div className="text-purple-200 text-sm">Pendentes</div>
-            </div>
-            <div className="text-center p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-              <div className="text-2xl font-bold text-white">{stats.completedOrders}</div>
-              <div className="text-purple-200 text-sm">Concluídos</div>
-            </div>
-            <div className="text-center p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-              <div className="text-2xl font-bold text-white">R$ {stats.averageBudget}</div>
-              <div className="text-purple-200 text-sm">Ticket Médio</div>
-            </div>
+          <div className="grid grid-cols-1 gap-4">
+            <Link
+              to="/new-order"
+              className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-xl hover:shadow-lg transition-all duration-300 group"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <PlusCircle className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 dark:text-white">Novo Pedido</h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Solicitar orçamento</p>
+                </div>
+              </div>
+              <ArrowUpRight className="h-5 w-5 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+            </Link>
+
+            <Link
+              to="/orders"
+              className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-500/10 dark:to-green-500/10 rounded-xl hover:shadow-lg transition-all duration-300 group"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <BarChart3 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 dark:text-white">Meus Pedidos</h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Acompanhar pedidos</p>
+                </div>
+              </div>
+              <ArrowUpRight className="h-5 w-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+            </Link>
+
+            {isAdmin && (
+              <Link
+                to="/admin/orders"
+                className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 rounded-xl hover:shadow-lg transition-all duration-300 group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                    <Users className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-900 dark:text-white">Painel Admin</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Gerenciar pedidos</p>
+                  </div>
+                </div>
+                <ArrowUpRight className="h-5 w-5 text-slate-400 group-hover:text-amber-500 transition-colors" />
+              </Link>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="px-4 lg:px-0">
-        {/* Métricas Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 stagger-animation">
-          <MetricCard
-            title="Total Pedidos"
-            value={stats.totalOrders}
-            icon={Package}
-            color="purple"
-            change={12}
-            loading={loading}
-          />
-          <MetricCard
-            title="Pendentes"
-            value={stats.pendingOrders}
-            icon={Clock}
-            color="amber"
-            change={-3}
-            loading={loading}
-          />
-          <MetricCard
-            title="Concluídos"
-            value={stats.completedOrders}
-            icon={CheckCircle2}
-            color="emerald"
-            change={8}
-            loading={loading}
-          />
-          <MetricCard
-            title="Ticket Médio"
-            value={`R$ ${stats.averageBudget}`}
-            icon={BarChart3}
-            color="sky"
-            change={15}
-            loading={loading}
-          />
+      {/* Pedidos Recentes */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Pedidos Recentes</h2>
+          <Link 
+            to="/orders" 
+            className="btn-ghost flex items-center space-x-2"
+          >
+            <span>Ver todos</span>
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
-
-        {/* Ações Rápidas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 stagger-animation">
-          <QuickActionCard
-            title="Novo Pedido"
-            description="Solicitar orçamento"
-            icon={Plus}
-            href="/new-order"
-            color="purple"
-          />
-          <QuickActionCard
-            title="Meus Pedidos"
-            description="Acompanhar pedidos"
-            icon={Package}
-            href="/orders"
-            color="emerald"
-          />
-          {isAdmin && (
-            <QuickActionCard
-              title="Painel Admin"
-              description="Gerenciar pedidos"
-              icon={Users}
-              href="/admin/orders"
-              color="sky"
-            />
-          )}
-        </div>
-
-        {/* Conteúdo Principal */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Pedidos Recentes */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Pedidos Recentes</h2>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">Últimos pedidos atualizados</p>
+        
+        <div className="space-y-4">
+          {orders.slice(0, 5).map((order) => (
+            <div key={order.id} className="flex items-center justify-between p-4 bg-white/50 dark:bg-gray-800/50 rounded-xl hover:bg-white dark:hover:bg-gray-700/50 transition-all duration-300 group">
+              <div className="flex items-center space-x-4 flex-1 min-w-0">
+                <div className={`p-3 rounded-xl ${getStatusBgClass(order.status)}`}>
+                  {getStatusIcon(order.status)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-slate-900 dark:text-white truncate">
+                    {order.category}
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 truncate mt-1">
+                    {order.description}
+                  </p>
+                </div>
               </div>
+              
+              <div className="flex items-center space-x-6">
+                <span className="text-lg font-bold text-slate-900 dark:text-white whitespace-nowrap">
+                  R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
+                </span>
+                <span className={`status-badge ${getStatusClass(order.status)} group-hover:scale-105 transition-transform`}>
+                  {order.status}
+                </span>
+              </div>
+            </div>
+          ))}
+          
+          {orders.length === 0 && (
+            <div className="text-center py-12">
+              <Rocket className="h-16 w-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+              <p className="text-slate-500 dark:text-slate-400 text-lg mb-4">Nenhum pedido encontrado</p>
               <Link 
-                to="/orders" 
-                className="btn-secondary flex items-center space-x-2 text-sm"
+                to="/new-order" 
+                className="btn-primary inline-flex items-center space-x-2"
               >
-                <span>Ver Todos</span>
-                <ArrowUpRight className="h-4 w-4" />
+                <PlusCircle className="h-5 w-5" />
+                <span>Criar primeiro pedido</span>
               </Link>
             </div>
-            
-            <div className="space-y-3">
-              {orders.slice(0, 5).map((order, index) => (
-                <RecentOrderItem key={order.id} order={order} index={index} />
-              ))}
-              
-              {orders.length === 0 && !loading && (
-                <div className="text-center py-8">
-                  <Package className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Nenhum pedido encontrado</p>
-                  <Link 
-                    to="/new-order" 
-                    className="btn-primary inline-flex items-center space-x-2 text-sm"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span>Criar Primeiro Pedido</span>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Status Overview */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Visão Geral</h2>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">Distribuição por status</p>
-              </div>
-              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center">
-                <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {statusData.map((item, index) => (
-                <div key={index} className="flex items-center justify-between group">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${getStatusColorClass(item.label)} group-hover:scale-125 transition-transform duration-300`}></div>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {item.label}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="text-sm font-bold text-gray-900 dark:text-white">
-                      {item.value}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Quick Stats */}
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">{orders.length}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
-                </div>
-                <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
-                  <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                    {orders.filter(o => o.status === 'Concluído').length}
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Finalizados</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-// Helper functions
+// Helper functions atualizadas
 const getStatusClass = (status) => {
   const statusMap = {
     'Em análise': 'status-em-analise',
@@ -428,15 +417,38 @@ const getStatusClass = (status) => {
   return statusMap[status] || 'status-em-analise';
 };
 
-const getStatusColorClass = (status) => {
-  const colorMap = {
-    'Em análise': 'bg-amber-400',
-    'Aprovado': 'bg-emerald-400',
-    'Rejeitado': 'bg-rose-400',
-    'Em andamento': 'bg-sky-400',
-    'Concluído': 'bg-gray-400'
+const getStatusGradient = (status) => {
+  const gradientMap = {
+    'Em análise': 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    'Aprovado': 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    'Rejeitado': 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+    'Em andamento': 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    'Concluído': 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
   };
-  return colorMap[status] || 'bg-gray-400';
+  return gradientMap[status] || 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+};
+
+const getStatusBgClass = (status) => {
+  const bgMap = {
+    'Em análise': 'bg-amber-100 dark:bg-amber-500/20',
+    'Aprovado': 'bg-emerald-100 dark:bg-emerald-500/20',
+    'Rejeitado': 'bg-rose-100 dark:bg-rose-500/20',
+    'Em andamento': 'bg-blue-100 dark:bg-blue-500/20',
+    'Concluído': 'bg-slate-100 dark:bg-slate-500/20'
+  };
+  return bgMap[status] || 'bg-amber-100 dark:bg-amber-500/20';
+};
+
+const getStatusIcon = (status) => {
+  const iconClass = "h-6 w-6";
+  const icons = {
+    'Em análise': <Clock className={`${iconClass} text-amber-600 dark:text-amber-400`} />,
+    'Aprovado': <TrendingUp className={`${iconClass} text-emerald-600 dark:text-emerald-400`} />,
+    'Rejeitado': <div className={`${iconClass} text-rose-600 dark:text-rose-400`}>✕</div>,
+    'Em andamento': <div className={`${iconClass} text-blue-600 dark:text-blue-400`}>⟳</div>,
+    'Concluído': <div className={`${iconClass} text-slate-600 dark:text-slate-400`}>✓</div>
+  };
+  return icons[status] || <Clock className={`${iconClass} text-amber-600 dark:text-amber-400`} />;
 };
 
 export default Dashboard;

@@ -2,205 +2,106 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { Zap, Plus, TrendingUp, Activity, Users, Clock, Star, Rocket, ArrowUpRight, Package } from 'lucide-react';
+import { Package, PlusCircle, BarChart3, Users, TrendingUp, Clock, Calendar, ArrowUpRight, ArrowDownRight, Zap } from 'lucide-react';
 
-// Holographic Chart Component
-const HolographicChart = ({ data, title }) => {
+// Componente de gráfico moderno
+const StatusChart = ({ data, title }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   
   return (
-    <div className="luxury-card p-8 relative overflow-hidden group hover-scale">
-      <div className="absolute -inset-1 holographic rounded-3xl opacity-50"></div>
+    <div className="card group hover:transform hover:scale-105 transition-all duration-500">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
+        <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg">
+          <BarChart3 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+        </div>
+      </div>
       
-      <div className="relative z-10">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-2xl font-bold text-white">{title}</h3>
-          <div className="p-3 bg-cyan-500/10 rounded-xl border border-cyan-500/30">
-            <Activity className="h-6 w-6 text-cyan-400" />
-          </div>
-        </div>
-        
-        <div className="space-y-6">
-          {data.map((item, index) => {
-            const percentage = total > 0 ? (item.value / total) * 100 : 0;
-            const statusClass = getStatusClass(item.label);
-            
-            return (
-              <div key={index} className="group">
-                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-all duration-300">
-                  <div className="flex items-center space-x-4 flex-1 min-w-0">
-                    <span className={`status-badge ${statusClass} transition-transform duration-300 group-hover:scale-110`}>
-                      {item.label}
-                    </span>
-                    <span className="text-lg font-bold text-white">
-                      {item.value}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-4 w-40">
-                    <div className="flex-1 bg-gray-800 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="h-3 rounded-full transition-all duration-1000 ease-out"
-                        style={{ 
-                          width: `${percentage}%`,
-                          background: getStatusGradient(item.label)
-                        }}
-                      ></div>
-                    </div>
-                    <span className="text-sm font-black text-cyan-400 w-12 text-right">
-                      {percentage.toFixed(0)}%
-                    </span>
-                  </div>
-                </div>
+      <div className="space-y-4">
+        {data.map((item, index) => {
+          const percentage = total > 0 ? (item.value / total) * 100 : 0;
+          const statusClass = getStatusClass(item.label);
+          
+          return (
+            <div key={index} className="flex items-center justify-between group/item hover:bg-white/50 dark:hover:bg-gray-700/50 p-2 rounded-xl transition-all duration-300">
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                <span className={`status-badge transform group-hover/item:scale-105 transition-transform duration-300 ${statusClass}`}>
+                  {item.label}
+                </span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {item.value}
+                </span>
               </div>
-            );
-          })}
-        </div>
+              <div className="flex items-center space-x-3 w-28">
+                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="h-2 rounded-full transition-all duration-1000 ease-out"
+                    style={{ 
+                      width: `${percentage}%`,
+                      backgroundColor: getStatusColor(item.label)
+                    }}
+                  ></div>
+                </div>
+                <span className="text-sm font-bold text-gray-900 dark:text-white w-10 text-right">
+                  {percentage.toFixed(0)}%
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 };
 
-// Cyber Metric Card
-const CyberMetricCard = ({ title, value, icon: Icon, change, trend, color = 'cyan', link }) => {
-  const colorConfig = {
-    cyan: { 
-      from: 'from-cyan-500', 
-      to: 'to-blue-500', 
-      glow: 'shadow-cyan-500/30',
-      bg: 'bg-cyan-500/10',
-      border: 'border-cyan-500/30'
-    },
-    pink: { 
-      from: 'from-pink-500', 
-      to: 'to-purple-500', 
-      glow: 'shadow-pink-500/30',
-      bg: 'bg-pink-500/10',
-      border: 'border-pink-500/30'
-    },
-    green: { 
-      from: 'from-green-500', 
-      to: 'to-emerald-500', 
-      glow: 'shadow-green-500/30',
-      bg: 'bg-green-500/10',
-      border: 'border-green-500/30'
-    },
-    yellow: { 
-      from: 'from-yellow-500', 
-      to: 'to-amber-500', 
-      glow: 'shadow-yellow-500/30',
-      bg: 'bg-yellow-500/10',
-      border: 'border-yellow-500/30'
-    }
+// Componente de métrica moderno
+const MetricCard = ({ title, value, icon: Icon, change, color = 'indigo', loading = false }) => {
+  const colorClasses = {
+    indigo: 'from-indigo-500 to-purple-600',
+    green: 'from-emerald-500 to-green-600',
+    yellow: 'from-amber-500 to-yellow-600',
+    blue: 'from-blue-500 to-cyan-600',
+    pink: 'from-pink-500 to-rose-600'
   };
 
-  const config = colorConfig[color];
-
-  const CardContent = () => (
-    <div className="metric-card-premium group">
-      <div className="relative z-10">
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex-1">
-            <p className="text-gray-400 text-sm font-semibold tracking-widest uppercase mb-2">{title}</p>
-            <p className="text-4xl font-black text-white mb-3">{value}</p>
-            
-            <div className="flex items-center space-x-3">
-              {change && (
-                <div className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-black ${
-                  trend === 'up' 
-                    ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-                    : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                }`}>
-                  <TrendingUp className={`h-3 w-3 ${trend === 'up' ? '' : 'rotate-180'}`} />
-                  <span>{change}%</span>
-                </div>
-              )}
-              <div className="text-xs text-gray-500 font-mono">
-                LIVE
-              </div>
-            </div>
+  if (loading) {
+    return (
+      <div className="card animate-pulse">
+        <div className="flex items-center">
+          <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-xl"></div>
+          <div className="ml-4 flex-1 space-y-2">
+            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-20"></div>
+            <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-16"></div>
           </div>
-          
-          <div className={`p-4 rounded-2xl bg-gradient-to-br ${config.from} ${config.to} ${config.glow} shadow-2xl`}>
-            <Icon className="h-6 w-6 text-white" />
-          </div>
-        </div>
-        
-        {/* Animated bar */}
-        <div className="w-full bg-gray-800 rounded-full h-1 overflow-hidden">
-          <div 
-            className={`h-1 bg-gradient-to-r ${config.from} ${config.to} rounded-full transition-all duration-1000`}
-            style={{ width: `${Math.min((change || 0) + 70, 100)}%` }}
-          ></div>
         </div>
       </div>
-      
-      {/* Neon border effect */}
-      <div className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r ${config.from} ${config.to} blur-sm -z-10`}></div>
-    </div>
-  );
-
-  if (link) {
-    return (
-      <Link to={link} className="block">
-        <CardContent />
-      </Link>
     );
   }
 
-  return <CardContent />;
-};
-
-// Quick Action Card
-const QuickActionCard = ({ title, description, icon: Icon, color, link }) => {
-  const colorConfig = {
-    cyan: { 
-      bg: 'from-cyan-500/10 to-blue-500/10',
-      border: 'border-cyan-500/20',
-      hoverBorder: 'border-cyan-500/40',
-      iconBg: 'bg-cyan-500/20',
-      iconBorder: 'border-cyan-500/30',
-      iconColor: 'text-cyan-400',
-      textColor: 'text-cyan-300'
-    },
-    green: { 
-      bg: 'from-green-500/10 to-emerald-500/10',
-      border: 'border-green-500/20',
-      hoverBorder: 'border-green-500/40',
-      iconBg: 'bg-green-500/20',
-      iconBorder: 'border-green-500/30',
-      iconColor: 'text-green-400',
-      textColor: 'text-green-300'
-    },
-    pink: { 
-      bg: 'from-pink-500/10 to-purple-500/10',
-      border: 'border-pink-500/20',
-      hoverBorder: 'border-pink-500/40',
-      iconBg: 'bg-pink-500/20',
-      iconBorder: 'border-pink-500/30',
-      iconColor: 'text-pink-400',
-      textColor: 'text-pink-300'
-    }
-  };
-
-  const config = colorConfig[color] || colorConfig.cyan;
-
   return (
-    <Link to={link} className="block group">
-      <div className={`flex items-center justify-between p-6 bg-gradient-to-r ${config.bg} rounded-2xl border ${config.border} hover:${config.hoverBorder} transition-all duration-300 hover:scale-105`}>
-        <div className="flex items-center space-x-4">
-          <div className={`p-3 rounded-xl ${config.iconBg} border ${config.iconBorder}`}>
-            <Icon className={`h-6 w-6 ${config.iconColor}`} />
-          </div>
-          <div>
-            <h4 className="font-bold text-white text-lg">{title}</h4>
-            <p className={`text-sm ${config.textColor}`}>{description}</p>
-          </div>
+    <div className="card group hover:transform hover:scale-105 transition-all duration-500 cursor-pointer">
+      <div className="flex items-center">
+        <div className={`p-3 rounded-xl bg-gradient-to-r ${colorClasses[color]} shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+          <Icon className="h-6 w-6 text-white" />
         </div>
-        <div className={`${config.iconColor} group-hover:scale-110 transition-transform`}>
-          <ArrowUpRight className="h-5 w-5" />
+        <div className="ml-4 flex-1 min-w-0">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 truncate">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white truncate">{value}</p>
+          {change !== undefined && (
+            <div className="flex items-center space-x-1 mt-1">
+              {change > 0 ? (
+                <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+              ) : (
+                <ArrowDownRight className="h-4 w-4 text-rose-500" />
+              )}
+              <span className={`text-xs font-semibold ${change > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {Math.abs(change)}% vs último mês
+              </span>
+            </div>
+          )}
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 
@@ -210,8 +111,7 @@ const Dashboard = () => {
     totalOrders: 0,
     pendingOrders: 0,
     completedOrders: 0,
-    averageBudget: 0,
-    totalRevenue: 0
+    averageBudget: 0
   });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -228,6 +128,7 @@ const Dashboard = () => {
       
       setOrders(ordersData);
 
+      // Calcular estatísticas
       const totalOrders = ordersData.length;
       const pendingOrders = ordersData.filter(order => 
         ['Em análise', 'Em andamento'].includes(order.status)
@@ -235,13 +136,8 @@ const Dashboard = () => {
       const completedOrders = ordersData.filter(order => 
         order.status === 'Concluído'
       ).length;
-      
-      const totalBudget = ordersData.reduce((sum, order) => 
-        sum + parseFloat(order.estimated_budget || 0), 0
-      );
-      
       const averageBudget = ordersData.length > 0 
-        ? totalBudget / ordersData.length
+        ? ordersData.reduce((sum, order) => sum + parseFloat(order.estimated_budget || 0), 0) / ordersData.length
         : 0;
 
       setStats({
@@ -249,10 +145,6 @@ const Dashboard = () => {
         pendingOrders,
         completedOrders,
         averageBudget: averageBudget.toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }),
-        totalRevenue: totalBudget.toLocaleString('pt-BR', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         })
@@ -264,7 +156,7 @@ const Dashboard = () => {
     }
   };
 
-  // Data for charts
+  // Dados para gráficos
   const statusData = [
     { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length },
     { label: 'Aprovado', value: orders.filter(o => o.status === 'Aprovado').length },
@@ -273,7 +165,6 @@ const Dashboard = () => {
     { label: 'Rejeitado', value: orders.filter(o => o.status === 'Rejeitado').length },
   ].filter(item => item.value > 0);
 
-  // Category data
   const categoryData = Object.entries(
     orders.reduce((acc, order) => {
       acc[order.category] = (acc[order.category] || 0) + 1;
@@ -284,283 +175,230 @@ const Dashboard = () => {
       label: category,
       value: count
     }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 5);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <div className="text-center space-y-6">
-          <div className="spinner-premium mx-auto"></div>
-          <div>
-            <p className="text-cyan-400 text-lg font-bold mb-2">INICIALIZANDO SISTEMA</p>
-            <p className="text-gray-500 text-sm">Carregando dados premium...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    .sort((a, b) => b.value - a.value);
 
   return (
-    <div className="space-y-8 animate-slide-in-luxury">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-cyan-500/50">
-                <Rocket className="h-8 w-8 text-white" />
-              </div>
-              <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500 to-pink-500 rounded-2xl blur-lg opacity-30"></div>
-            </div>
-            <div>
-              <h1 className="text-4xl lg:text-5xl font-black text-white mb-2">
-                BEM-VINDO, <span className="neon-text">{user?.name?.split(' ')[0]}</span>
-              </h1>
-              <p className="text-gray-400 text-lg">
-                Painel de controle <span className="text-cyan-400 font-bold">NEXUS</span>
-              </p>
-            </div>
-          </div>
+    <div className="space-y-6 animate-slide-in">
+      {/* Header Moderno */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-indigo-600 bg-clip-text text-transparent dark:from-white dark:to-indigo-400">
+            Olá, {user?.name}! 👋
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-lg">
+            Bem-vindo ao seu painel de controle
+          </p>
         </div>
         
-        <div className="mt-6 lg:mt-0">
-          <Link
-            to="/new-order"
-            className="btn-neon-primary flex items-center space-x-3 group"
-          >
-            <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" />
-            <span>NOVO PEDIDO</span>
-          </Link>
+        <div className="flex items-center space-x-3">
+          <div className="hidden sm:flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+            <Zap className="h-4 w-4 text-amber-500" />
+            <span>{orders.filter(o => o.status === 'Em andamento').length} projetos ativos</span>
+          </div>
         </div>
       </div>
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        <CyberMetricCard
-          title="Total de Pedidos"
+      {/* Métricas em Grid Responsiva */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <MetricCard
+          title="Total Pedidos"
           value={stats.totalOrders}
           icon={Package}
-          color="cyan"
+          color="indigo"
           change={12}
-          trend="up"
-          link="/orders"
+          loading={loading}
         />
-        <CyberMetricCard
+        <MetricCard
           title="Pendentes"
           value={stats.pendingOrders}
           icon={Clock}
           color="yellow"
-          change={-3}
-          trend="down"
-          link="/orders"
+          change={-2}
+          loading={loading}
         />
-        <CyberMetricCard
+        <MetricCard
           title="Concluídos"
           value={stats.completedOrders}
-          icon={Star}
+          icon={TrendingUp}
           color="green"
           change={8}
-          trend="up"
-          link="/orders"
+          loading={loading}
         />
-        <CyberMetricCard
+        <MetricCard
           title="Ticket Médio"
           value={`R$ ${stats.averageBudget}`}
-          icon={TrendingUp}
-          color="pink"
+          icon={BarChart3}
+          color="blue"
           change={15}
-          trend="up"
-          link="/orders"
+          loading={loading}
         />
       </div>
 
-      {/* Charts & Actions */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        <HolographicChart
-          data={statusData}
-          title="Status dos Pedidos"
-        />
-        
-        {/* Quick Actions */}
-        <div className="luxury-card p-8 relative overflow-hidden">
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-2xl font-bold text-white">Ações Rápidas</h3>
-              <div className="p-3 bg-pink-500/10 rounded-xl border border-pink-500/30">
-                <Activity className="h-6 w-6 text-pink-400" />
-              </div>
+      {/* Ações Rápidas Modernas */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        <Link
+          to="/new-order"
+          className="card group hover:transform hover:scale-105 transition-all duration-500 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-lg"
+        >
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <PlusCircle className="h-8 w-8 text-indigo-600 group-hover:text-indigo-700 dark:text-indigo-400 transform group-hover:scale-110 transition-transform duration-300" />
             </div>
-            
-            <div className="grid grid-cols-1 gap-4">
-              <QuickActionCard
-                title="Novo Pedido"
-                description="Solicitar orçamento"
-                icon={Plus}
-                color="cyan"
-                link="/new-order"
-              />
-
-              <QuickActionCard
-                title="Meus Pedidos"
-                description="Acompanhar pedidos"
-                icon={TrendingUp}
-                color="green"
-                link="/orders"
-              />
-
-              {isAdmin && (
-                <QuickActionCard
-                  title="Painel Admin"
-                  description="Gerenciar pedidos"
-                  icon={Users}
-                  color="pink"
-                  link="/admin/orders"
-                />
-              )}
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Novo Pedido</h3>
+              <p className="text-gray-500 dark:text-gray-400">Solicitar orçamento</p>
             </div>
           </div>
-        </div>
+        </Link>
+
+        <Link
+          to="/orders"
+          className="card group hover:transform hover:scale-105 transition-all duration-500"
+        >
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <Package className="h-8 w-8 text-emerald-600 group-hover:text-emerald-700 dark:text-emerald-400 transform group-hover:scale-110 transition-transform duration-300" />
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Meus Pedidos</h3>
+              <p className="text-gray-500 dark:text-gray-400">Acompanhar pedidos</p>
+            </div>
+          </div>
+        </Link>
+
+        {isAdmin && (
+          <Link
+            to="/admin/orders"
+            className="card group hover:transform hover:scale-105 transition-all duration-500"
+          >
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Users className="h-8 w-8 text-purple-600 group-hover:text-purple-700 dark:text-purple-400 transform group-hover:scale-110 transition-transform duration-300" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Painel Admin</h3>
+                <p className="text-gray-500 dark:text-gray-400">Gerenciar pedidos</p>
+              </div>
+            </div>
+          </Link>
+        )}
       </div>
 
-      {/* Recent Orders & Categories */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Orders */}
-        <div className="luxury-card p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-white">Pedidos Recentes</h2>
-            <Link 
-              to="/orders" 
-              className="btn-neon-secondary flex items-center space-x-2"
-            >
-              <span>VER TODOS</span>
-              <ArrowUpRight className="h-4 w-4" />
-            </Link>
+      {/* Gráficos Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <StatusChart
+          data={statusData}
+          title="Distribuição por Status"
+        />
+        
+        {/* Gráfico de Categorias */}
+        <div className="card group hover:transform hover:scale-105 transition-all duration-500">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Top Categorias</h3>
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
           </div>
           
           <div className="space-y-4">
-            {orders.slice(0, 5).map((order) => (
-              <div key={order.id} className="group">
-                <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-500/30 transition-all duration-300 hover:scale-105">
-                  <div className="flex items-center space-x-6 flex-1 min-w-0">
-                    <div className={`p-4 rounded-2xl ${getStatusBgClass(order.status)} border ${getStatusBorderClass(order.status)}`}>
-                      {getStatusIcon(order.status)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-white text-lg truncate mb-2">
-                        {order.category}
-                      </h4>
-                      <p className="text-gray-400 text-sm truncate">
-                        {order.description}
-                      </p>
-                    </div>
+            {categoryData.slice(0, 5).map((item, index) => (
+              <div key={index} className="flex items-center justify-between group/item hover:bg-white/50 dark:hover:bg-gray-700/50 p-2 rounded-xl transition-all duration-300">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate flex-1 pr-4">
+                  {item.label}
+                </span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-gradient-to-r from-emerald-500 to-green-500 h-2 rounded-full transition-all duration-1000 ease-out"
+                      style={{ 
+                        width: `${Math.min(item.value * 20, 100)}%`
+                      }}
+                    ></div>
                   </div>
-                  
-                  <div className="flex items-center space-x-8">
-                    <span className="text-xl font-black text-white whitespace-nowrap">
-                      R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })}
-                    </span>
-                    <span className={`status-badge ${getStatusClass(order.status)} group-hover:scale-110 transition-transform`}>
-                      {order.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {orders.length === 0 && (
-              <div className="text-center py-16">
-                <Zap className="h-20 w-20 text-gray-600 mx-auto mb-6" />
-                <p className="text-gray-500 text-xl mb-4">Nenhum pedido encontrado</p>
-                <Link 
-                  to="/new-order" 
-                  className="btn-neon-primary inline-flex items-center space-x-3"
-                >
-                  <Plus className="h-5 w-5" />
-                  <span>CRIAR PRIMEIRO PEDIDO</span>
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Top Categories */}
-        <div className="luxury-card p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-white">Top Categorias</h2>
-            <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/30">
-              <Package className="h-6 w-6 text-purple-400" />
-            </div>
-          </div>
-          
-          <div className="space-y-6">
-            {categoryData.map((category, index) => (
-              <div key={category.label} className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-300 group">
-                <div className="flex items-center space-x-4 flex-1">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center border border-purple-500/30">
-                    <span className="text-lg font-bold text-purple-400">
-                      {index + 1}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-white truncate">
-                      {category.label}
-                    </h4>
-                    <p className="text-gray-400 text-sm">
-                      {category.value} pedido{category.value !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                </div>
-                <div className="w-20 bg-gray-800 rounded-full h-2">
-                  <div 
-                    className="h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-1000"
-                    style={{ width: `${(category.value / Math.max(...categoryData.map(c => c.value))) * 100}%` }}
-                  ></div>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white w-6 text-right">
+                    {item.value}
+                  </span>
                 </div>
               </div>
             ))}
             
             {categoryData.length === 0 && (
-              <div className="text-center py-12">
-                <Package className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-500">Nenhuma categoria com pedidos</p>
+              <div className="text-center py-8">
+                <Package className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-500 dark:text-gray-400">Nenhuma categoria com pedidos</p>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Performance Stats */}
-      <div className="luxury-card p-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="text-3xl font-black text-cyan-400 mb-2">
-              {stats.totalOrders}
+      {/* Pedidos Recentes Moderno */}
+      <div className="card group hover:transform hover:scale-105 transition-all duration-500">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Pedidos Recentes</h2>
+          <Link 
+            to="/orders" 
+            className="btn-secondary flex items-center space-x-2 text-sm"
+          >
+            <span>Ver todos</span>
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        </div>
+        
+        <div className="space-y-3">
+          {orders.slice(0, 5).map((order) => (
+            <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-700/50 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group/item">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start space-x-3">
+                  <div className={`p-2 rounded-lg ${getStatusBgClass(order.status)}`}>
+                    {getStatusIcon(order.status)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-base truncate">
+                      {order.category}
+                    </h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
+                      {order.description}
+                    </p>
+                    <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      <span>{new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
+                      <span>•</span>
+                      <span>R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR')}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-3 sm:mt-0 sm:ml-4">
+                <span className={`status-badge transform group-hover/item:scale-105 transition-transform duration-300 ${getStatusClass(order.status)}`}>
+                  {order.status}
+                </span>
+              </div>
             </div>
-            <div className="text-gray-400 text-sm">Total de Pedidos</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-black text-green-400 mb-2">
-              {stats.completedOrders}
+          ))}
+          
+          {orders.length === 0 && (
+            <div className="text-center py-12">
+              <div className="p-4 bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl inline-block mb-4">
+                <Package className="h-12 w-12 text-gray-400 dark:text-gray-600" />
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">Nenhum pedido encontrado</p>
+              <Link 
+                to="/new-order" 
+                className="btn-primary inline-flex items-center space-x-2"
+              >
+                <PlusCircle className="h-4 w-4" />
+                <span>Criar primeiro pedido</span>
+              </Link>
             </div>
-            <div className="text-gray-400 text-sm">Concluídos</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-black text-yellow-400 mb-2">
-              {((stats.completedOrders / Math.max(stats.totalOrders, 1)) * 100).toFixed(1)}%
-            </div>
-            <div className="text-gray-400 text-sm">Taxa de Conclusão</div>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-// Helper functions
+// Helper functions atualizadas
 const getStatusClass = (status) => {
   const statusMap = {
     'Em análise': 'status-em-analise',
@@ -572,49 +410,40 @@ const getStatusClass = (status) => {
   return statusMap[status] || 'status-em-analise';
 };
 
-const getStatusGradient = (status) => {
-  const gradientMap = {
-    'Em análise': 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-    'Aprovado': 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-    'Rejeitado': 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-    'Em andamento': 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-    'Concluído': 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
-  };
-  return gradientMap[status] || 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
-};
-
 const getStatusBgClass = (status) => {
-  const bgMap = {
-    'Em análise': 'bg-yellow-500/10',
-    'Aprovado': 'bg-green-500/10',
-    'Rejeitado': 'bg-red-500/10',
-    'Em andamento': 'bg-blue-500/10',
-    'Concluído': 'bg-purple-500/10'
+  const statusMap = {
+    'Em análise': 'bg-amber-50 dark:bg-amber-500/10',
+    'Aprovado': 'bg-emerald-50 dark:bg-emerald-500/10',
+    'Rejeitado': 'bg-rose-50 dark:bg-rose-500/10',
+    'Em andamento': 'bg-blue-50 dark:bg-blue-500/10',
+    'Concluído': 'bg-gray-50 dark:bg-gray-500/10'
   };
-  return bgMap[status] || 'bg-yellow-500/10';
-};
-
-const getStatusBorderClass = (status) => {
-  const borderMap = {
-    'Em análise': 'border-yellow-500/30',
-    'Aprovado': 'border-green-500/30',
-    'Rejeitado': 'border-red-500/30',
-    'Em andamento': 'border-blue-500/30',
-    'Concluído': 'border-purple-500/30'
-  };
-  return borderMap[status] || 'border-yellow-500/30';
+  return statusMap[status] || 'bg-amber-50 dark:bg-amber-500/10';
 };
 
 const getStatusIcon = (status) => {
-  const iconClass = "h-6 w-6";
-  const icons = {
-    'Em análise': <Clock className={`${iconClass} text-yellow-400`} />,
-    'Aprovado': <TrendingUp className={`${iconClass} text-green-400`} />,
-    'Rejeitado': <div className={`${iconClass} text-red-400 font-black`}>✕</div>,
-    'Em andamento': <div className={`${iconClass} text-blue-400 font-black`}>⟳</div>,
-    'Concluído': <div className={`${iconClass} text-purple-400 font-black`}>✓</div>
+  const Icon = status === 'Em análise' ? Clock :
+               status === 'Aprovado' ? TrendingUp :
+               status === 'Em andamento' ? Zap :
+               status === 'Concluído' ? Package : Clock;
+  
+  const color = status === 'Em análise' ? 'text-amber-600 dark:text-amber-400' :
+                status === 'Aprovado' ? 'text-emerald-600 dark:text-emerald-400' :
+                status === 'Em andamento' ? 'text-blue-600 dark:text-blue-400' :
+                status === 'Concluído' ? 'text-gray-600 dark:text-gray-400' : 'text-amber-600 dark:text-amber-400';
+  
+  return <Icon className={`h-5 w-5 ${color}`} />;
+};
+
+const getStatusColor = (status) => {
+  const colorMap = {
+    'Em análise': '#eab308', // amber-500
+    'Aprovado': '#22c55e',   // emerald-500
+    'Rejeitado': '#ef4444',  // rose-500
+    'Em andamento': '#3b82f6', // blue-500
+    'Concluído': '#6b7280'   // gray-500
   };
-  return icons[status] || <Clock className={`${iconClass} text-yellow-400`} />;
+  return colorMap[status] || '#eab308';
 };
 
 export default Dashboard;

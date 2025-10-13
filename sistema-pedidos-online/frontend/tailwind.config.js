@@ -9,35 +9,64 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6',
+          600: '#0d9488',
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
+        },
+        cyber: {
+          cyan: '#22d3ee',
+          blue: '#3b82f6',
+          slate: '#0f172a'
         }
       },
       fontFamily: {
-        'sans': ['Figtree', 'system-ui', 'sans-serif'],
+        'mono': ['JetBrains Mono', 'monospace'],
+        'sans': ['Space Grotesk', 'system-ui', 'sans-serif'],
       },
       animation: {
-        'slide-up': 'slideUp 0.3s ease-out',
-        'fade-in': 'fadeIn 0.5s ease-out',
+        'cyber-float': 'cyber-float 6s ease-in-out infinite',
+        'cyber-glow': 'cyber-glow 2s ease-in-out infinite alternate',
+        'scan-line': 'scan-line 3s linear infinite',
+        'fade-in-up': 'fadeInUp 0.6s ease-out',
       },
       keyframes: {
-        slideUp: {
-          'from': { opacity: '0', transform: 'translateY(8px)' },
+        fadeInUp: {
+          'from': { opacity: '0', transform: 'translateY(20px)' },
           'to': { opacity: '1', transform: 'translateY(0)' },
         },
-        fadeIn: {
-          'from': { opacity: '0' },
-          'to': { opacity: '1' },
+        'cyber-float': {
+          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+          '50%': { transform: 'translateY(-5px) rotate(0.5deg)' },
+        },
+        'cyber-glow': {
+          'from': { 
+            boxShadow: '0 0 20px -5px rgb(34 211 238)',
+            borderColor: 'rgb(34 211 238 / 0.3)'
+          },
+          'to': { 
+            boxShadow: '0 0 25px 0px rgb(34 211 238)',
+            borderColor: 'rgb(34 211 238 / 0.5)'
+          },
+        },
+        'scan-line': {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(100vh)' },
         }
       },
+      backdropBlur: {
+        xs: '2px',
+      },
+      boxShadow: {
+        'cyber': '0 0 30px -10px rgb(34 211 238)',
+        'cyber-lg': '0 0 50px -15px rgb(34 211 238)',
+      }
     },
   },
   plugins: [],

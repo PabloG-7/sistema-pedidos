@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { Package, Plus, BarChart3, Users, TrendingUp, Clock, Calendar, ArrowUp, ArrowDown } from 'lucide-react';
+import { Package, Plus, BarChart3, Users, TrendingUp, Clock, Cpu, Activity, Zap } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, isAdmin } = useAuth();
@@ -54,127 +54,132 @@ const Dashboard = () => {
     }
   };
 
-  const statusData = [
-    { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length, color: 'yellow' },
-    { label: 'Aprovado', value: orders.filter(o => o.status === 'Aprovado').length, color: 'green' },
-    { label: 'Em andamento', value: orders.filter(o => o.status === 'Em andamento').length, color: 'blue' },
-    { label: 'Concluído', value: orders.filter(o => o.status === 'Concluído').length, color: 'gray' },
-    { label: 'Rejeitado', value: orders.filter(o => o.status === 'Rejeitado').length, color: 'red' },
-  ].filter(item => item.value > 0);
+  const MetricCard = ({ title, value, icon: Icon, change, color = 'cyan' }) => {
+    const colorClasses = {
+      cyan: 'from-cyan-500 to-blue-600',
+      green: 'from-emerald-500 to-green-600',
+      yellow: 'from-amber-500 to-yellow-600',
+      purple: 'from-purple-500 to-violet-600'
+    };
+
+    return (
+      <div className="metric-card group hover:animate-cyber-glow">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-slate-400">{title}</p>
+            <p className="metric-value mt-2">{value}</p>
+            {change && (
+              <div className="flex items-center mt-3">
+                <div className={`px-2 py-1 rounded text-xs font-mono ${
+                  change > 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+                }`}>
+                  {change > 0 ? '↑' : '↓'} {Math.abs(change)}%
+                </div>
+              </div>
+            )}
+          </div>
+          <div className={`p-3 rounded-xl bg-gradient-to-r ${colorClasses[color]} shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+            <Icon className="h-6 w-6 text-white" />
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+        <div className="cyber-spinner"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Visão geral do sistema
+          <h1 className="text-3xl font-bold cyber-text glow-text">Dashboard</h1>
+          <p className="text-slate-400 mt-2 font-mono">
+            {new Date().toLocaleDateString('pt-BR', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
           </p>
         </div>
         <Link
           to="/new-order"
-          className="btn-primary flex items-center space-x-2 mt-4 sm:mt-0"
+          className="btn-primary flex items-center space-x-2 mt-4 lg:mt-0"
         >
           <Plus className="h-4 w-4" />
           <span>Novo Pedido</span>
+          <Zap className="h-4 w-4" />
         </Link>
       </div>
 
-      {/* Métricas em Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total de Pedidos</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.totalOrders}</p>
-              <div className="flex items-center mt-2">
-                <ArrowUp className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-600 dark:text-green-400 ml-1">+12%</span>
-              </div>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/20 rounded-lg flex items-center justify-center">
-              <Package className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pendentes</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.pendingOrders}</p>
-              <div className="flex items-center mt-2">
-                <ArrowDown className="h-4 w-4 text-amber-500" />
-                <span className="text-sm text-amber-600 dark:text-amber-400 ml-1">-5%</span>
-              </div>
-            </div>
-            <div className="w-12 h-12 bg-amber-100 dark:bg-amber-500/20 rounded-lg flex items-center justify-center">
-              <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Concluídos</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.completedOrders}</p>
-              <div className="flex items-center mt-2">
-                <ArrowUp className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-600 dark:text-green-400 ml-1">+8%</span>
-              </div>
-            </div>
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-500/20 rounded-lg flex items-center justify-center">
-              <TrendingUp className="h-6 w-6 text-green-600 dark:text-green-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Ticket Médio</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">R$ {stats.averageBudget}</p>
-              <div className="flex items-center mt-2">
-                <ArrowUp className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-600 dark:text-green-400 ml-1">+15%</span>
-              </div>
-            </div>
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-500/20 rounded-lg flex items-center justify-center">
-              <BarChart3 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-            </div>
-          </div>
-        </div>
+      {/* Grid de Métricas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard
+          title="TOTAL DE PEDIDOS"
+          value={stats.totalOrders}
+          icon={Package}
+          change={12}
+          color="cyan"
+        />
+        <MetricCard
+          title="PENDENTES"
+          value={stats.pendingOrders}
+          icon={Clock}
+          change={-5}
+          color="yellow"
+        />
+        <MetricCard
+          title="CONCLUÍDOS"
+          value={stats.completedOrders}
+          icon={TrendingUp}
+          change={8}
+          color="green"
+        />
+        <MetricCard
+          title="TICKET MÉDIO"
+          value={`R$ ${stats.averageBudget}`}
+          icon={BarChart3}
+          change={15}
+          color="purple"
+        />
       </div>
 
       {/* Conteúdo Principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Distribuição de Status */}
-        <div className="lg:col-span-2 card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Distribuição por Status</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Status Distribution */}
+        <div className="lg:col-span-2 card-glow">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold cyber-text">Distribuição por Status</h3>
+            <Activity className="h-5 w-5 text-cyan-400" />
+          </div>
+          
           <div className="space-y-4">
-            {statusData.map((item, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className={`status-badge ${getStatusClass(item.label)}`}>
+            {[
+              { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length, color: 'amber' },
+              { label: 'Aprovado', value: orders.filter(o => o.status === 'Aprovado').length, color: 'emerald' },
+              { label: 'Em andamento', value: orders.filter(o => o.status === 'Em andamento').length, color: 'cyan' },
+              { label: 'Concluído', value: orders.filter(o => o.status === 'Concluído').length, color: 'slate' },
+              { label: 'Rejeitado', value: orders.filter(o => o.status === 'Rejeitado').length, color: 'rose' },
+            ].filter(item => item.value > 0).map((item, index) => (
+              <div key={index} className="flex items-center justify-between group hover:bg-slate-700/20 p-3 rounded-lg transition-all duration-300">
+                <div className="flex items-center space-x-4">
+                  <span className={`status-badge ${getStatusClass(item.label)} group-hover:scale-105 transition-transform duration-300`}>
                     {item.label}
                   </span>
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                  <span className="text-slate-300 font-mono text-sm">
                     {item.value}
                   </span>
                 </div>
-                <div className="w-32 bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                <div className="w-32 bg-slate-700/50 rounded-full h-2 overflow-hidden">
                   <div
-                    className="h-2 rounded-full transition-all duration-500"
+                    className="h-2 rounded-full transition-all duration-1000 ease-out"
                     style={{ 
                       width: `${(item.value / Math.max(1, orders.length)) * 100}%`,
                       backgroundColor: getStatusColor(item.label)
@@ -186,64 +191,74 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Ações Rápidas */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ações Rápidas</h3>
+        {/* Quick Actions */}
+        <div className="card-glow">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold cyber-text">Ações Rápidas</h3>
+            <Zap className="h-5 w-5 text-cyan-400" />
+          </div>
+          
           <div className="space-y-3">
             <Link
               to="/new-order"
-              className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center p-4 border border-slate-700/50 rounded-xl hover:border-cyan-500/30 hover:bg-slate-700/20 transition-all duration-300 group"
             >
-              <Plus className="h-5 w-5 text-gray-600 dark:text-gray-400 mr-3" />
-              <span className="font-medium text-gray-900 dark:text-white">Novo Pedido</span>
+              <Plus className="h-5 w-5 text-cyan-400 mr-3" />
+              <span className="font-medium text-slate-200">Novo Pedido</span>
             </Link>
             <Link
               to="/orders"
-              className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center p-4 border border-slate-700/50 rounded-xl hover:border-cyan-500/30 hover:bg-slate-700/20 transition-all duration-300 group"
             >
-              <Package className="h-5 w-5 text-gray-600 dark:text-gray-400 mr-3" />
-              <span className="font-medium text-gray-900 dark:text-white">Ver Pedidos</span>
+              <Package className="h-5 w-5 text-cyan-400 mr-3" />
+              <span className="font-medium text-slate-200">Ver Pedidos</span>
             </Link>
             {isAdmin && (
               <Link
                 to="/admin/orders"
-                className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex items-center p-4 border border-slate-700/50 rounded-xl hover:border-cyan-500/30 hover:bg-slate-700/20 transition-all duration-300 group"
               >
-                <Users className="h-5 w-5 text-gray-600 dark:text-gray-400 mr-3" />
-                <span className="font-medium text-gray-900 dark:text-white">Painel Admin</span>
+                <Users className="h-5 w-5 text-cyan-400 mr-3" />
+                <span className="font-medium text-slate-200">Painel Admin</span>
               </Link>
             )}
           </div>
         </div>
 
-        {/* Pedidos Recentes */}
-        <div className="lg:col-span-3 card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Pedidos Recentes</h3>
+        {/* Recent Orders */}
+        <div className="lg:col-span-3 card-glow">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold cyber-text">Pedidos Recentes</h3>
             <Link 
               to="/orders" 
-              className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              className="text-cyan-400 hover:text-cyan-300 text-sm font-mono transition-colors duration-300"
             >
-              Ver todos
+              VER_TUDO
             </Link>
           </div>
           
           <div className="space-y-3">
             {orders.slice(0, 5).map((order) => (
-              <div key={order.id} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+              <div key={order.id} className="flex items-center justify-between p-4 border border-slate-700/30 rounded-xl hover:border-slate-600/50 hover:bg-slate-700/10 transition-all duration-300 group">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-gray-900 dark:text-white truncate">
-                    {order.category}
-                  </h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
-                    {order.description}
-                  </p>
+                  <div className="flex items-center space-x-3">
+                    <Cpu className="h-4 w-4 text-cyan-400" />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-slate-200 truncate group-hover:text-cyan-300 transition-colors duration-300">
+                        {order.category}
+                      </h4>
+                      <p className="text-sm text-slate-400 truncate mt-1 font-mono">
+                        {order.description}
+                      </p>
+                    </div>
+                  </div>
                 </div>
+                
                 <div className="flex items-center space-x-4 ml-4">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                  <span className="text-sm font-bold text-slate-200 whitespace-nowrap font-mono">
                     R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR')}
                   </span>
-                  <span className={`status-badge ${getStatusClass(order.status)}`}>
+                  <span className={`status-badge ${getStatusClass(order.status)} group-hover:scale-105 transition-transform duration-300`}>
                     {order.status}
                   </span>
                 </div>
@@ -251,14 +266,14 @@ const Dashboard = () => {
             ))}
             
             {orders.length === 0 && (
-              <div className="text-center py-8">
-                <Package className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-500 dark:text-gray-400">Nenhum pedido encontrado</p>
+              <div className="text-center py-12">
+                <Package className="h-16 w-16 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400 font-mono">NENHUM_PEDIDO_ENCONTRADO</p>
                 <Link 
                   to="/new-order" 
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm mt-2 inline-block"
+                  className="text-cyan-400 hover:text-cyan-300 text-sm mt-3 inline-block font-mono transition-colors duration-300"
                 >
-                  Criar primeiro pedido
+                  CRIAR_PRIMEIRO_PEDIDO
                 </Link>
               </div>
             )}
@@ -283,13 +298,13 @@ const getStatusClass = (status) => {
 
 const getStatusColor = (status) => {
   const colorMap = {
-    'Em análise': '#eab308',
-    'Aprovado': '#22c55e',
+    'Em análise': '#f59e0b',
+    'Aprovado': '#10b981',
     'Rejeitado': '#ef4444',
-    'Em andamento': '#3b82f6',
-    'Concluído': '#6b7280'
+    'Em andamento': '#22d3ee',
+    'Concluído': '#64748b'
   };
-  return colorMap[status] || '#6b7280';
+  return colorMap[status] || '#f59e0b';
 };
 
 export default Dashboard;

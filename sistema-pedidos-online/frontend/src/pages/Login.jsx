@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Rocket, Eye, EyeOff, Sparkles, Package } from 'lucide-react';
+import { Zap, Eye, EyeOff, Shield, Sparkles } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -29,174 +29,174 @@ const Login = () => {
     setLoading(false);
   };
 
+  // Generate floating particles
+  const particles = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    style: {
+      left: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 6}s`,
+      animationDuration: `${3 + Math.random() * 4}s`
+    }
+  }));
+
   return (
-    <div className="min-h-screen flex">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 grid-pattern"></div>
+    <div className="min-h-screen flex relative overflow-hidden bg-black">
+      {/* Animated Background */}
+      <div className="absolute inset-0 binary-bg"></div>
       
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600"></div>
-        
-        {/* Animated Background Elements */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-purple-400/20 rounded-full blur-2xl animate-float" style={{animationDelay: '2s'}}></div>
-        
-        <div className="relative z-10 flex flex-col justify-center items-center text-white px-16">
-          <div className="text-center space-y-6">
-            <div className="flex justify-center items-center space-x-3">
-              <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                <Rocket className="h-12 w-12" />
+      {/* Floating Particles */}
+      <div className="particles">
+        {particles.map(particle => (
+          <div
+            key={particle.id}
+            className="particle"
+            style={particle.style}
+          />
+        ))}
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col justify-center items-center relative z-10 px-4">
+        {/* Animated Logo */}
+        <div className="text-center mb-12 animate-float3d">
+          <div className="flex items-center justify-center space-x-4 mb-6">
+            <div className="relative">
+              <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-cyan-500/50 neon-glow">
+                <Zap className="h-10 w-10 text-white" />
               </div>
-              <div>
-                <h1 className="text-5xl font-bold">Orion</h1>
-                <p className="text-indigo-100 text-lg">Sistema de Pedidos</p>
-              </div>
+              <div className="absolute -inset-4 bg-gradient-to-br from-cyan-500 to-pink-500 rounded-2xl blur-xl opacity-30"></div>
             </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 text-white/80">
-                <Sparkles className="h-5 w-5" />
-                <span className="text-lg">Experiência moderna e intuitiva</span>
-              </div>
-              <div className="flex items-center space-x-3 text-white/80">
-                <Package className="h-5 w-5" />
-                <span className="text-lg">Gestão completa de pedidos</span>
-              </div>
+            <div>
+              <h1 className="text-6xl font-black neon-text mb-2">NEXUS</h1>
+              <p className="text-gray-400 text-lg font-light tracking-widest">
+                PREMIUM SYSTEM
+              </p>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Right Side - Login Form */}
-      <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20">
-        <div className="mx-auto w-full max-w-md">
-          {/* Mobile Branding */}
-          <div className="lg:hidden flex justify-center items-center space-x-3 mb-8">
-            <div className="p-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl">
-              <Rocket className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold gradient-text">Orion</h1>
-              <p className="text-slate-600 dark:text-slate-400 text-sm">Sistema de Pedidos</p>
-            </div>
-          </div>
-
-          <div className="glass-card rounded-3xl p-8 space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
-                Bem-vindo de volta
-              </h2>
-              <p className="mt-2 text-slate-600 dark:text-slate-400">
-                Entre na sua conta para continuar
-              </p>
-            </div>
-
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              {error && (
-                <div className="bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 px-4 py-3 rounded-xl text-sm backdrop-blur-sm">
-                  {error}
+        {/* Login Form */}
+        <div className="w-full max-w-md">
+          <div className="luxury-card p-12 relative overflow-hidden">
+            {/* Holographic Effect */}
+            <div className="absolute -inset-1 holographic rounded-3xl"></div>
+            
+            <div className="relative z-10">
+              <div className="text-center mb-8">
+                <div className="flex items-center justify-center space-x-3 mb-4">
+                  <Shield className="h-6 w-6 text-cyan-400" />
+                  <h2 className="text-3xl font-bold text-white">ACESSO SEGURO</h2>
                 </div>
-              )}
-
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Email
-                </label>
-                <div className="relative">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="input-field pl-11 focus-ring"
-                    placeholder="seu@email.com"
-                  />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <div className="h-5 w-5 text-slate-400">
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
+                <p className="text-gray-400">Entre no sistema premium</p>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Senha
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="input-field pl-11 pr-10 focus-ring"
-                    placeholder="Sua senha"
-                  />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <div className="h-5 w-5 text-slate-400">
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    </div>
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm backdrop-blur-sm shadow-lg shadow-red-500/20">
+                    {error}
                   </div>
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full btn-primary flex items-center justify-center space-x-2 focus-ring"
-              >
-                {loading ? (
-                  <>
-                    <div className="spinner"></div>
-                    <span>Entrando...</span>
-                  </>
-                ) : (
-                  <>
-                    <Rocket className="h-5 w-5" />
-                    <span>Entrar na Plataforma</span>
-                  </>
                 )}
-              </button>
 
-              <div className="text-center">
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Não tem uma conta?{' '}
-                  <Link
-                    to="/register"
-                    className="font-semibold gradient-text hover:underline transition-all duration-300"
-                  >
-                    Criar conta agora
-                  </Link>
-                </span>
-              </div>
-            </form>
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-cyan-300">
+                    EMAIL
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="input-premium pl-12"
+                      placeholder="seu@email.com"
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <div className="h-5 w-5 text-cyan-400">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Demo Accounts */}
-            <div className="border-t border-slate-200 dark:border-gray-700 pt-6">
-              <div className="text-xs text-slate-500 dark:text-slate-400 space-y-2 text-center">
-                <p><strong>Admin Demo:</strong> admin@sistema.com / admin123</p>
-                <p><strong>Usuário:</strong> Crie uma conta para testar</p>
-              </div>
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-cyan-300">
+                    SENHA
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="input-premium pl-12 pr-12"
+                      placeholder="••••••••"
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <div className="h-5 w-5 text-cyan-400">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-cyan-400 hover:text-cyan-300 transition-colors"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full btn-neon-primary flex items-center justify-center space-x-3 mt-8"
+                >
+                  {loading ? (
+                    <>
+                      <div className="spinner-premium"></div>
+                      <span>INICIANDO SISTEMA...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="h-5 w-5" />
+                      <span>ACESSAR PLATAFORMA</span>
+                    </>
+                  )}
+                </button>
+
+                <div className="text-center pt-6 border-t border-gray-800">
+                  <span className="text-gray-400 text-sm">
+                    Não tem acesso?{' '}
+                    <Link
+                      to="/register"
+                      className="font-bold text-cyan-400 hover:text-cyan-300 transition-colors neon-text"
+                    >
+                      SOLICITAR CONTA
+                    </Link>
+                  </span>
+                </div>
+              </form>
             </div>
           </div>
+
+          {/* Demo Info */}
+          <div className="text-center mt-8">
+            <div className="text-xs text-gray-500 space-y-1">
+              <p><strong className="text-cyan-400">ADMIN:</strong> admin@sistema.com / admin123</p>
+              <p><strong className="text-pink-400">USUÁRIO:</strong> Crie uma conta premium</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="absolute bottom-8 text-center">
+          <p className="text-gray-600 text-sm tracking-widest">
+            NEXUS SYSTEM ® 2024 | PREMIUM EDITION
+          </p>
         </div>
       </div>
     </div>

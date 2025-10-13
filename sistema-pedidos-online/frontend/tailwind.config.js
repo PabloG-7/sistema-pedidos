@@ -19,11 +19,6 @@ export default {
           700: '#0f766e',
           800: '#115e59',
           900: '#134e4a',
-        },
-        cyber: {
-          cyan: '#22d3ee',
-          blue: '#3b82f6',
-          slate: '#0f172a'
         }
       },
       fontFamily: {
@@ -42,8 +37,8 @@ export default {
           'to': { opacity: '1', transform: 'translateY(0)' },
         },
         'cyber-float': {
-          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-          '50%': { transform: 'translateY(-5px) rotate(0.5deg)' },
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-5px)' },
         },
         'cyber-glow': {
           'from': { 
@@ -62,10 +57,6 @@ export default {
       },
       backdropBlur: {
         xs: '2px',
-      },
-      boxShadow: {
-        'cyber': '0 0 30px -10px rgb(34 211 238)',
-        'cyber-lg': '0 0 50px -15px rgb(34 211 238)',
       }
     },
   },

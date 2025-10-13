@@ -29,21 +29,21 @@ const Layout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 cyber-grid particles">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Scan Line Effect */}
       <div className="scan-line fixed inset-0 pointer-events-none z-50"></div>
       
       {/* Sidebar Desktop */}
       <div className="hidden lg:flex lg:w-80 lg:flex-col lg:fixed lg:inset-y-0">
-        <div className="flex-1 flex flex-col min-h-0 card-glow border-r border-slate-700/50 m-6 rounded-2xl">
-          <div className="flex-1 flex flex-col pt-8 pb-4 overflow-y-auto">
+        <div className="flex-1 flex flex-col min-h-0 bg-slate-800/30 backdrop-blur-lg border border-slate-700/50 rounded-xl p-6 m-6 shadow-2xl shadow-black/20">
+          <div className="flex-1 flex flex-col pt-4 pb-4 overflow-y-auto">
             {/* Logo Area */}
-            <div className="flex items-center space-x-3 px-6 mb-8">
-              <div className="p-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl shadow-lg shadow-cyan-500/25 animate-cyber-float">
+            <div className="flex items-center space-x-3 px-2 mb-8">
+              <div className="p-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl shadow-lg shadow-cyan-500/25">
                 <Cpu className="h-6 w-6 text-white" />
               </div>
               <div>
-                <span className="text-2xl font-bold cyber-text glow-text">
+                <span className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
                   PGSystem
                 </span>
                 <p className="text-xs text-slate-400 mt-1">v2.0.1</p>
@@ -51,7 +51,7 @@ const Layout = () => {
             </div>
             
             {/* User Info */}
-            <div className="px-6 mb-6">
+            <div className="px-2 mb-6">
               <div className="flex items-center space-x-3 p-3 border border-slate-700/50 rounded-lg bg-slate-800/30">
                 <div className="h-10 w-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
                   <User className="h-5 w-5 text-white" />
@@ -67,7 +67,7 @@ const Layout = () => {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-4 space-y-2">
+            <nav className="flex-1 px-2 space-y-2">
               {navigation.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.href;
@@ -75,10 +75,10 @@ const Layout = () => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden ${
+                    className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 relative overflow-hidden ${
                       isActive 
-                        ? 'nav-item-active animate-cyber-glow' 
-                        : 'nav-item'
+                        ? 'text-cyan-300 bg-slate-700/50 font-semibold border border-cyan-500/20 shadow-lg shadow-cyan-500/10' 
+                        : 'text-slate-400 hover:text-cyan-300 hover:bg-slate-700/30 border border-transparent hover:border-slate-600/30'
                     }`}
                   >
                     <Icon className={`mr-3 h-5 w-5 ${isActive ? 'text-cyan-300' : 'text-current'}`} />
@@ -93,7 +93,7 @@ const Layout = () => {
           </div>
           
           {/* Footer */}
-          <div className="flex-shrink-0 border-t border-slate-700/50 p-6">
+          <div className="flex-shrink-0 border-t border-slate-700/50 pt-6">
             <div className="flex items-center justify-between">
               <div className="text-xs text-slate-500 font-mono">
                 SYSTEM ONLINE
@@ -122,8 +122,8 @@ const Layout = () => {
       {/* Conteúdo Principal */}
       <div className="lg:pl-96 flex flex-col flex-1">
         {/* Header Mobile */}
-        <div className="lg:hidden card-glow m-4 rounded-2xl border border-slate-700/50">
-          <div className="flex items-center justify-between p-4">
+        <div className="lg:hidden bg-slate-800/30 backdrop-blur-lg border border-slate-700/50 rounded-xl p-4 m-4 shadow-2xl shadow-black/20">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setSidebarOpen(true)}
@@ -133,7 +133,7 @@ const Layout = () => {
               </button>
               <div className="flex items-center space-x-2">
                 <Cpu className="h-6 w-6 text-cyan-400" />
-                <span className="text-lg font-bold cyber-text">PGSystem</span>
+                <span className="text-lg font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">PGSystem</span>
               </div>
             </div>
             
@@ -152,12 +152,12 @@ const Layout = () => {
         {sidebarOpen && (
           <div className="lg:hidden fixed inset-0 z-50">
             <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-            <div className="relative flex-1 flex flex-col max-w-xs w-full card-glow border border-slate-700/50">
+            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-slate-800/30 backdrop-blur-lg border border-slate-700/50 rounded-xl m-4 shadow-2xl shadow-black/20">
               <div className="flex-1 h-0 pt-8 pb-4 overflow-y-auto">
                 <div className="flex items-center justify-between px-6 mb-8">
                   <div className="flex items-center space-x-3">
                     <Cpu className="h-6 w-6 text-cyan-400" />
-                    <span className="text-xl font-bold cyber-text">PGSystem</span>
+                    <span className="text-xl font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">PGSystem</span>
                   </div>
                   <button
                     onClick={() => setSidebarOpen(false)}
@@ -177,8 +177,8 @@ const Layout = () => {
                         to={item.href}
                         className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 ${
                           isActive 
-                            ? 'nav-item-active' 
-                            : 'nav-item'
+                            ? 'text-cyan-300 bg-slate-700/50 font-semibold border border-cyan-500/20 shadow-lg shadow-cyan-500/10' 
+                            : 'text-slate-400 hover:text-cyan-300 hover:bg-slate-700/30 border border-transparent hover:border-slate-600/30'
                         }`}
                         onClick={() => setSidebarOpen(false)}
                       >

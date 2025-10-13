@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { Zap, Plus, TrendingUp, Activity, Users, Clock, Star, Rocket } from 'lucide-react';
+import { Zap, Plus, TrendingUp, Activity, Users, Clock, Star, Rocket, ArrowUpRight, Package } from 'lucide-react';
 
 // Holographic Chart Component
 const HolographicChart = ({ data, title }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   
   return (
-    <div className="luxury-card p-8 relative overflow-hidden group">
+    <div className="luxury-card p-8 relative overflow-hidden group hover-scale">
       <div className="absolute -inset-1 holographic rounded-3xl opacity-50"></div>
       
       <div className="relative z-10">
@@ -26,28 +26,30 @@ const HolographicChart = ({ data, title }) => {
             const statusClass = getStatusClass(item.label);
             
             return (
-              <div key={index} className="flex items-center justify-between group/item p-3 rounded-xl hover:bg-white/5 transition-all duration-300">
-                <div className="flex items-center space-x-4 flex-1 min-w-0">
-                  <span className={`status-badge ${statusClass} group-hover/item:scale-110 transition-transform duration-300`}>
-                    {item.label}
-                  </span>
-                  <span className="text-lg font-bold text-white">
-                    {item.value}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-4 w-40">
-                  <div className="flex-1 bg-gray-800 rounded-full h-3 overflow-hidden">
-                    <div
-                      className="h-3 rounded-full transition-all duration-1000 ease-out"
-                      style={{ 
-                        width: `${percentage}%`,
-                        background: getStatusGradient(item.label)
-                      }}
-                    ></div>
+              <div key={index} className="group">
+                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-all duration-300">
+                  <div className="flex items-center space-x-4 flex-1 min-w-0">
+                    <span className={`status-badge ${statusClass} transition-transform duration-300 group-hover:scale-110`}>
+                      {item.label}
+                    </span>
+                    <span className="text-lg font-bold text-white">
+                      {item.value}
+                    </span>
                   </div>
-                  <span className="text-sm font-black text-cyan-400 w-12 text-right">
-                    {percentage.toFixed(0)}%
-                  </span>
+                  <div className="flex items-center space-x-4 w-40">
+                    <div className="flex-1 bg-gray-800 rounded-full h-3 overflow-hidden">
+                      <div
+                        className="h-3 rounded-full transition-all duration-1000 ease-out"
+                        style={{ 
+                          width: `${percentage}%`,
+                          background: getStatusGradient(item.label)
+                        }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-black text-cyan-400 w-12 text-right">
+                      {percentage.toFixed(0)}%
+                    </span>
+                  </div>
                 </div>
               </div>
             );
@@ -59,17 +61,41 @@ const HolographicChart = ({ data, title }) => {
 };
 
 // Cyber Metric Card
-const CyberMetricCard = ({ title, value, icon: Icon, change, trend, color = 'cyan' }) => {
+const CyberMetricCard = ({ title, value, icon: Icon, change, trend, color = 'cyan', link }) => {
   const colorConfig = {
-    cyan: { from: 'from-cyan-500', to: 'to-blue-500', glow: 'shadow-cyan-500/30' },
-    pink: { from: 'from-pink-500', to: 'to-purple-500', glow: 'shadow-pink-500/30' },
-    green: { from: 'from-green-500', to: 'to-emerald-500', glow: 'shadow-green-500/30' },
-    yellow: { from: 'from-yellow-500', to: 'to-amber-500', glow: 'shadow-yellow-500/30' }
+    cyan: { 
+      from: 'from-cyan-500', 
+      to: 'to-blue-500', 
+      glow: 'shadow-cyan-500/30',
+      bg: 'bg-cyan-500/10',
+      border: 'border-cyan-500/30'
+    },
+    pink: { 
+      from: 'from-pink-500', 
+      to: 'to-purple-500', 
+      glow: 'shadow-pink-500/30',
+      bg: 'bg-pink-500/10',
+      border: 'border-pink-500/30'
+    },
+    green: { 
+      from: 'from-green-500', 
+      to: 'to-emerald-500', 
+      glow: 'shadow-green-500/30',
+      bg: 'bg-green-500/10',
+      border: 'border-green-500/30'
+    },
+    yellow: { 
+      from: 'from-yellow-500', 
+      to: 'to-amber-500', 
+      glow: 'shadow-yellow-500/30',
+      bg: 'bg-yellow-500/10',
+      border: 'border-yellow-500/30'
+    }
   };
 
   const config = colorConfig[color];
 
-  return (
+  const CardContent = () => (
     <div className="metric-card-premium group">
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-6">
@@ -112,6 +138,70 @@ const CyberMetricCard = ({ title, value, icon: Icon, change, trend, color = 'cya
       <div className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r ${config.from} ${config.to} blur-sm -z-10`}></div>
     </div>
   );
+
+  if (link) {
+    return (
+      <Link to={link} className="block">
+        <CardContent />
+      </Link>
+    );
+  }
+
+  return <CardContent />;
+};
+
+// Quick Action Card
+const QuickActionCard = ({ title, description, icon: Icon, color, link }) => {
+  const colorConfig = {
+    cyan: { 
+      bg: 'from-cyan-500/10 to-blue-500/10',
+      border: 'border-cyan-500/20',
+      hoverBorder: 'border-cyan-500/40',
+      iconBg: 'bg-cyan-500/20',
+      iconBorder: 'border-cyan-500/30',
+      iconColor: 'text-cyan-400',
+      textColor: 'text-cyan-300'
+    },
+    green: { 
+      bg: 'from-green-500/10 to-emerald-500/10',
+      border: 'border-green-500/20',
+      hoverBorder: 'border-green-500/40',
+      iconBg: 'bg-green-500/20',
+      iconBorder: 'border-green-500/30',
+      iconColor: 'text-green-400',
+      textColor: 'text-green-300'
+    },
+    pink: { 
+      bg: 'from-pink-500/10 to-purple-500/10',
+      border: 'border-pink-500/20',
+      hoverBorder: 'border-pink-500/40',
+      iconBg: 'bg-pink-500/20',
+      iconBorder: 'border-pink-500/30',
+      iconColor: 'text-pink-400',
+      textColor: 'text-pink-300'
+    }
+  };
+
+  const config = colorConfig[color] || colorConfig.cyan;
+
+  return (
+    <Link to={link} className="block group">
+      <div className={`flex items-center justify-between p-6 bg-gradient-to-r ${config.bg} rounded-2xl border ${config.border} hover:${config.hoverBorder} transition-all duration-300 hover:scale-105`}>
+        <div className="flex items-center space-x-4">
+          <div className={`p-3 rounded-xl ${config.iconBg} border ${config.iconBorder}`}>
+            <Icon className={`h-6 w-6 ${config.iconColor}`} />
+          </div>
+          <div>
+            <h4 className="font-bold text-white text-lg">{title}</h4>
+            <p className={`text-sm ${config.textColor}`}>{description}</p>
+          </div>
+        </div>
+        <div className={`${config.iconColor} group-hover:scale-110 transition-transform`}>
+          <ArrowUpRight className="h-5 w-5" />
+        </div>
+      </div>
+    </Link>
+  );
 };
 
 const Dashboard = () => {
@@ -120,7 +210,8 @@ const Dashboard = () => {
     totalOrders: 0,
     pendingOrders: 0,
     completedOrders: 0,
-    averageBudget: 0
+    averageBudget: 0,
+    totalRevenue: 0
   });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -144,8 +235,13 @@ const Dashboard = () => {
       const completedOrders = ordersData.filter(order => 
         order.status === 'Concluído'
       ).length;
+      
+      const totalBudget = ordersData.reduce((sum, order) => 
+        sum + parseFloat(order.estimated_budget || 0), 0
+      );
+      
       const averageBudget = ordersData.length > 0 
-        ? ordersData.reduce((sum, order) => sum + parseFloat(order.estimated_budget || 0), 0) / ordersData.length
+        ? totalBudget / ordersData.length
         : 0;
 
       setStats({
@@ -153,6 +249,10 @@ const Dashboard = () => {
         pendingOrders,
         completedOrders,
         averageBudget: averageBudget.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }),
+        totalRevenue: totalBudget.toLocaleString('pt-BR', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         })
@@ -172,6 +272,20 @@ const Dashboard = () => {
     { label: 'Concluído', value: orders.filter(o => o.status === 'Concluído').length },
     { label: 'Rejeitado', value: orders.filter(o => o.status === 'Rejeitado').length },
   ].filter(item => item.value > 0);
+
+  // Category data
+  const categoryData = Object.entries(
+    orders.reduce((acc, order) => {
+      acc[order.category] = (acc[order.category] || 0) + 1;
+      return acc;
+    }, {})
+  )
+    .map(([category, count]) => ({
+      label: category,
+      value: count
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
 
   if (loading) {
     return (
@@ -201,7 +315,7 @@ const Dashboard = () => {
             </div>
             <div>
               <h1 className="text-4xl lg:text-5xl font-black text-white mb-2">
-                BEM-VINDO, <span className="neon-text">{user?.name}</span>
+                BEM-VINDO, <span className="neon-text">{user?.name?.split(' ')[0]}</span>
               </h1>
               <p className="text-gray-400 text-lg">
                 Painel de controle <span className="text-cyan-400 font-bold">NEXUS</span>
@@ -226,10 +340,11 @@ const Dashboard = () => {
         <CyberMetricCard
           title="Total de Pedidos"
           value={stats.totalOrders}
-          icon={Zap}
+          icon={Package}
           color="cyan"
           change={12}
           trend="up"
+          link="/orders"
         />
         <CyberMetricCard
           title="Pendentes"
@@ -238,6 +353,7 @@ const Dashboard = () => {
           color="yellow"
           change={-3}
           trend="down"
+          link="/orders"
         />
         <CyberMetricCard
           title="Concluídos"
@@ -246,6 +362,7 @@ const Dashboard = () => {
           color="green"
           change={8}
           trend="up"
+          link="/orders"
         />
         <CyberMetricCard
           title="Ticket Médio"
@@ -254,6 +371,7 @@ const Dashboard = () => {
           color="pink"
           change={15}
           trend="up"
+          link="/orders"
         />
       </div>
 
@@ -275,123 +393,167 @@ const Dashboard = () => {
             </div>
             
             <div className="grid grid-cols-1 gap-4">
-              <Link
-                to="/new-order"
-                className="flex items-center justify-between p-6 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl border border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300 group hover:scale-105"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-cyan-500/20 rounded-xl border border-cyan-500/30">
-                    <Plus className="h-6 w-6 text-cyan-400" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-lg">Novo Pedido</h4>
-                    <p className="text-cyan-300 text-sm">Solicitar orçamento</p>
-                  </div>
-                </div>
-                <div className="text-cyan-400 group-hover:scale-110 transition-transform">
-                  →
-                </div>
-              </Link>
+              <QuickActionCard
+                title="Novo Pedido"
+                description="Solicitar orçamento"
+                icon={Plus}
+                color="cyan"
+                link="/new-order"
+              />
 
-              <Link
-                to="/orders"
-                className="flex items-center justify-between p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-500/20 hover:border-green-500/40 transition-all duration-300 group hover:scale-105"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-green-500/20 rounded-xl border border-green-500/30">
-                    <TrendingUp className="h-6 w-6 text-green-400" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-lg">Meus Pedidos</h4>
-                    <p className="text-green-300 text-sm">Acompanhar pedidos</p>
-                  </div>
-                </div>
-                <div className="text-green-400 group-hover:scale-110 transition-transform">
-                  →
-                </div>
-              </Link>
+              <QuickActionCard
+                title="Meus Pedidos"
+                description="Acompanhar pedidos"
+                icon={TrendingUp}
+                color="green"
+                link="/orders"
+              />
 
               {isAdmin && (
-                <Link
-                  to="/admin/orders"
-                  className="flex items-center justify-between p-6 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-2xl border border-pink-500/20 hover:border-pink-500/40 transition-all duration-300 group hover:scale-105"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-pink-500/20 rounded-xl border border-pink-500/30">
-                      <Users className="h-6 w-6 text-pink-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-white text-lg">Painel Admin</h4>
-                      <p className="text-pink-300 text-sm">Gerenciar pedidos</p>
-                    </div>
-                  </div>
-                  <div className="text-pink-400 group-hover:scale-110 transition-transform">
-                    →
-                  </div>
-                </Link>
+                <QuickActionCard
+                  title="Painel Admin"
+                  description="Gerenciar pedidos"
+                  icon={Users}
+                  color="pink"
+                  link="/admin/orders"
+                />
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Recent Orders */}
-      <div className="luxury-card p-8">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-white">Pedidos Recentes</h2>
-          <Link 
-            to="/orders" 
-            className="btn-neon-secondary flex items-center space-x-2"
-          >
-            <span>VER TODOS</span>
-            <div>→</div>
-          </Link>
-        </div>
-        
-        <div className="space-y-4">
-          {orders.slice(0, 5).map((order) => (
-            <div key={order.id} className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-500/30 transition-all duration-300 group hover:scale-105">
-              <div className="flex items-center space-x-6 flex-1 min-w-0">
-                <div className={`p-4 rounded-2xl ${getStatusBgClass(order.status)} border ${getStatusBorderClass(order.status)}`}>
-                  {getStatusIcon(order.status)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-white text-lg truncate mb-2">
-                    {order.category}
-                  </h4>
-                  <p className="text-gray-400 text-sm truncate">
-                    {order.description}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-8">
-                <span className="text-xl font-black text-white whitespace-nowrap">
-                  R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })}
-                </span>
-                <span className={`status-badge ${getStatusClass(order.status)} group-hover:scale-110 transition-transform`}>
-                  {order.status}
-                </span>
-              </div>
-            </div>
-          ))}
+      {/* Recent Orders & Categories */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Orders */}
+        <div className="luxury-card p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold text-white">Pedidos Recentes</h2>
+            <Link 
+              to="/orders" 
+              className="btn-neon-secondary flex items-center space-x-2"
+            >
+              <span>VER TODOS</span>
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          </div>
           
-          {orders.length === 0 && (
-            <div className="text-center py-16">
-              <Zap className="h-20 w-20 text-gray-600 mx-auto mb-6" />
-              <p className="text-gray-500 text-xl mb-4">Nenhum pedido encontrado</p>
-              <Link 
-                to="/new-order" 
-                className="btn-neon-primary inline-flex items-center space-x-3"
-              >
-                <Plus className="h-5 w-5" />
-                <span>CRIAR PRIMEIRO PEDIDO</span>
-              </Link>
+          <div className="space-y-4">
+            {orders.slice(0, 5).map((order) => (
+              <div key={order.id} className="group">
+                <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-500/30 transition-all duration-300 hover:scale-105">
+                  <div className="flex items-center space-x-6 flex-1 min-w-0">
+                    <div className={`p-4 rounded-2xl ${getStatusBgClass(order.status)} border ${getStatusBorderClass(order.status)}`}>
+                      {getStatusIcon(order.status)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-white text-lg truncate mb-2">
+                        {order.category}
+                      </h4>
+                      <p className="text-gray-400 text-sm truncate">
+                        {order.description}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-8">
+                    <span className="text-xl font-black text-white whitespace-nowrap">
+                      R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })}
+                    </span>
+                    <span className={`status-badge ${getStatusClass(order.status)} group-hover:scale-110 transition-transform`}>
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {orders.length === 0 && (
+              <div className="text-center py-16">
+                <Zap className="h-20 w-20 text-gray-600 mx-auto mb-6" />
+                <p className="text-gray-500 text-xl mb-4">Nenhum pedido encontrado</p>
+                <Link 
+                  to="/new-order" 
+                  className="btn-neon-primary inline-flex items-center space-x-3"
+                >
+                  <Plus className="h-5 w-5" />
+                  <span>CRIAR PRIMEIRO PEDIDO</span>
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Top Categories */}
+        <div className="luxury-card p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold text-white">Top Categorias</h2>
+            <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/30">
+              <Package className="h-6 w-6 text-purple-400" />
             </div>
-          )}
+          </div>
+          
+          <div className="space-y-6">
+            {categoryData.map((category, index) => (
+              <div key={category.label} className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-300 group">
+                <div className="flex items-center space-x-4 flex-1">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center border border-purple-500/30">
+                    <span className="text-lg font-bold text-purple-400">
+                      {index + 1}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-white truncate">
+                      {category.label}
+                    </h4>
+                    <p className="text-gray-400 text-sm">
+                      {category.value} pedido{category.value !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
+                <div className="w-20 bg-gray-800 rounded-full h-2">
+                  <div 
+                    className="h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-1000"
+                    style={{ width: `${(category.value / Math.max(...categoryData.map(c => c.value))) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+            
+            {categoryData.length === 0 && (
+              <div className="text-center py-12">
+                <Package className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-500">Nenhuma categoria com pedidos</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Performance Stats */}
+      <div className="luxury-card p-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center">
+            <div className="text-3xl font-black text-cyan-400 mb-2">
+              {stats.totalOrders}
+            </div>
+            <div className="text-gray-400 text-sm">Total de Pedidos</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-black text-green-400 mb-2">
+              {stats.completedOrders}
+            </div>
+            <div className="text-gray-400 text-sm">Concluídos</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-black text-yellow-400 mb-2">
+              {((stats.completedOrders / Math.max(stats.totalOrders, 1)) * 100).toFixed(1)}%
+            </div>
+            <div className="text-gray-400 text-sm">Taxa de Conclusão</div>
+          </div>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import {
-  Menu, X, BarChart3, Package, Plus, Settings, LogOut, User, Moon, Sun, Crown, Sparkles
+  Menu, X, BarChart3, Package, Plus, Settings, LogOut, User, Moon, Sun, ChevronRight
 } from 'lucide-react';
 
 const Layout = () => {
@@ -20,45 +20,34 @@ const Layout = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: BarChart3 },
-    { name: 'Meus Pedidos', href: '/orders', icon: Package },
+    { name: 'Pedidos', href: '/orders', icon: Package },
     { name: 'Novo Pedido', href: '/new-order', icon: Plus },
   ];
 
   if (isAdmin) {
-    navigation.push({ name: 'Administração', href: '/admin/orders', icon: Settings });
+    navigation.push({ name: 'Admin', href: '/admin/orders', icon: Settings });
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-purple-900/20 gold-particles">
-      {/* Sidebar Mobile */}
-      <div className={`fixed inset-0 flex z-50 lg:hidden transition-opacity duration-500 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-lg" 
-          onClick={() => setSidebarOpen(false)} 
-        />
-        <div className={`relative flex-1 flex flex-col max-w-xs w-full card transform transition-transform duration-500 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          <div className="flex-1 h-0 pt-8 pb-4 overflow-y-auto">
-            <div className="flex items-center justify-between px-6 mb-8">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-premium-gradient rounded-xl shadow-2xl shadow-purple-500/30 animate-float">
-                  <Crown className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <span className="text-xl font-bold premium-text font-serif">
-                    PGSystem
-                  </span>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Premium Edition</p>
-                </div>
+    <div className="min-h-screen bg-white dark:bg-gray-950 flex">
+      {/* Sidebar Desktop - Minimalista */}
+      <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className="flex-1 flex flex-col min-h-0">
+          {/* Header */}
+          <div className="flex items-center h-16 flex-shrink-0 px-6 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-black dark:bg-white rounded flex items-center justify-center">
+                <BarChart3 className="h-4 w-4 text-white dark:text-black" />
               </div>
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="p-2 text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-xl transition-all duration-500 hover:bg-white/50 dark:hover:bg-slate-700/50"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
+                PGSystem
+              </span>
             </div>
-            
-            <nav className="mt-8 px-4 space-y-2">
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-4 py-6">
+            <div className="space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.href;
@@ -66,164 +55,163 @@ const Layout = () => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`flex items-center px-4 py-3 rounded-2xl transition-all duration-500 group hover-lift ${
+                    className={`flex items-center px-3 py-2 rounded-lg transition-colors duration-200 group ${
                       isActive 
-                        ? 'nav-item-active animate-glow' 
-                        : 'nav-item'
+                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' 
+                        : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
-                    onClick={() => setSidebarOpen(false)}
                   >
-                    <Icon className={`mr-3 h-5 w-5 ${isActive ? 'text-purple-600 dark:text-white' : 'text-current'}`} />
-                    <span className="font-medium">{item.name}</span>
+                    <Icon className="mr-3 h-4 w-4" />
+                    <span className="text-sm font-medium">{item.name}</span>
                     {isActive && (
-                      <Sparkles className="ml-auto h-4 w-4 text-purple-500 animate-pulse" />
+                      <ChevronRight className="ml-auto h-4 w-4 text-gray-400" />
                     )}
                   </Link>
                 );
               })}
-            </nav>
-          </div>
-          
-          <div className="flex-shrink-0 border-t border-slate-200/50 dark:border-slate-700/50 p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="h-10 w-10 bg-premium-gradient rounded-full flex items-center justify-center shadow-lg">
-                  <User className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">{user?.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{user?.email}</p>
-                </div>
-              </div>
-              
-              <button
-                onClick={handleLogout}
-                className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-all duration-500 hover:bg-white/50 dark:hover:bg-slate-700/50"
-                title="Sair"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
             </div>
-          </div>
-        </div>
-      </div>
+          </nav>
 
-      {/* Sidebar Desktop */}
-      <div className="hidden lg:flex lg:w-80 lg:flex-col lg:fixed lg:inset-y-0">
-        <div className="flex-1 flex flex-col min-h-0 card border-r border-slate-200/50 dark:border-slate-700/50 m-6 rounded-2xl">
-          <div className="flex-1 flex flex-col pt-8 pb-4 overflow-y-auto">
-            <div className="flex items-center space-x-3 px-6 mb-8">
-              <div className="p-2 bg-premium-gradient rounded-xl shadow-2xl shadow-purple-500/30 animate-float">
-                <Crown className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <span className="text-2xl font-bold premium-text font-serif">
-                  PGSystem
-                </span>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Sistema Premium</p>
-              </div>
-            </div>
-            
-            {/* User Info */}
-            <div className="px-6 mb-6">
-              <div className="flex items-center space-x-3 p-4 border border-slate-200/50 dark:border-slate-700/50 rounded-xl bg-white/50 dark:bg-slate-800/30 backdrop-blur-sm">
-                <div className="h-12 w-12 bg-premium-gradient rounded-full flex items-center justify-center shadow-lg">
-                  <User className="h-6 w-6 text-white" />
+          {/* User Info */}
+          <div className="flex-shrink-0 border-t border-gray-100 dark:border-gray-800 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center min-w-0">
+                <div className="flex-shrink-0">
+                  <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{user?.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.email}</p>
-                  <p className="text-xs premium-text font-medium mt-1">
-                    {user?.role === 'admin' ? '👑 Administrador' : '💎 Usuário Premium'}
+                <div className="ml-3 min-w-0 flex-1">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {user?.name}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {user?.email}
                   </p>
                 </div>
               </div>
-            </div>
-
-            <nav className="mt-4 flex-1 px-4 space-y-2">
-              {navigation.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`flex items-center px-4 py-3 rounded-2xl transition-all duration-500 group hover-lift ${
-                      isActive 
-                        ? 'nav-item-active animate-glow' 
-                        : 'nav-item hover-glow'
-                    }`}
-                  >
-                    <Icon className={`mr-3 h-5 w-5 ${isActive ? 'text-purple-600 dark:text-white' : 'text-current'}`} />
-                    <span className="font-medium">{item.name}</span>
-                    {isActive && (
-                      <Sparkles className="ml-auto h-4 w-4 text-purple-500 animate-pulse" />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-          
-          <div className="flex-shrink-0 border-t border-slate-200/50 dark:border-slate-700/50 p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-1 ml-2">
                 <button
                   onClick={toggleTheme}
-                  className="p-2 text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-xl transition-all duration-500 hover:bg-white/50 dark:hover:bg-slate-700/50"
-                  title={isDark ? 'Modo claro' : 'Modo escuro'}
+                  className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors"
+                  title={isDark ? 'Light mode' : 'Dark mode'}
                 >
-                  {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                  {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors"
+                  title="Sair"
+                >
+                  <LogOut className="h-4 w-4" />
                 </button>
               </div>
-              
-              <button
-                onClick={handleLogout}
-                className="btn-secondary flex items-center space-x-2 text-sm"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Sair</span>
-              </button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Conteúdo Principal */}
-      <div className="lg:pl-96 flex flex-col flex-1">
+      <div className="lg:pl-64 flex flex-col flex-1 min-w-0">
         {/* Header Mobile */}
-        <div className="lg:hidden card m-4 rounded-2xl border border-slate-200/50 dark:border-slate-700/50">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-3">
+        <header className="sticky top-0 z-10 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 lg:hidden">
+          <div className="flex items-center justify-between h-14 px-4">
+            <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2 text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 rounded-xl transition-all duration-500 hover:bg-white/50 dark:hover:bg-slate-700/50"
+                className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-white rounded-lg transition-colors"
               >
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               </button>
-              
-              <div className="flex items-center space-x-2">
-                <Crown className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                <span className="text-lg font-bold premium-text font-serif">PGSystem</span>
+              <div className="flex items-center ml-3">
+                <div className="w-6 h-6 bg-black dark:bg-white rounded flex items-center justify-center">
+                  <BarChart3 className="h-3 w-3 text-white dark:text-black" />
+                </div>
+                <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
+                  PGSystem
+                </span>
               </div>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={toggleTheme}
-                className="p-2 text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-xl transition-all duration-500 hover:bg-white/50 dark:hover:bg-slate-700/50"
-                title={isDark ? 'Modo claro' : 'Modo escuro'}
-              >
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </button>
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-white rounded-lg transition-colors"
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+          </div>
+        </header>
+
+        {/* Sidebar Mobile */}
+        {sidebarOpen && (
+          <div className="lg:hidden fixed inset-0 z-50">
+            <div className="fixed inset-0 bg-gray-600/75" onClick={() => setSidebarOpen(false)} />
+            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-900">
+              <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
+                <div className="flex items-center justify-between px-4 mb-8">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 bg-black dark:bg-white rounded flex items-center justify-center">
+                      <BarChart3 className="h-4 w-4 text-white dark:text-black" />
+                    </div>
+                    <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
+                      PGSystem
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                
+                <nav className="px-4 space-y-1">
+                  {navigation.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.href;
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={`flex items-center px-3 py-2 rounded-lg transition-colors duration-200 ${
+                          isActive 
+                            ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' 
+                            : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+                        }`}
+                        onClick={() => setSidebarOpen(false)}
+                      >
+                        <Icon className="mr-3 h-4 w-4" />
+                        <span className="text-sm font-medium">{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+              
+              <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-800 p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                      <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <main className="flex-1 p-4 lg:p-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="animate-fade-in-up">
-              <Outlet />
+        {/* Main Content */}
+        <main className="flex-1 relative overflow-y-auto focus:outline-none">
+          <div className="py-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="animate-fade-in">
+                <Outlet />
+              </div>
             </div>
           </div>
         </main>

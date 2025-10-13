@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { Package, Plus, BarChart3, Users, TrendingUp, Clock, Cpu, Activity, Zap } from 'lucide-react';
+import { Package, Plus, BarChart3, Users, TrendingUp, Clock, Crown, Sparkles, Zap } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, isAdmin } = useAuth();
@@ -10,8 +10,7 @@ const Dashboard = () => {
     totalOrders: 0,
     pendingOrders: 0,
     completedOrders: 0,
-    averageBudget: 0,
-    revenue: 0
+    averageBudget: 0
   });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,14 +37,15 @@ const Dashboard = () => {
       const averageBudget = ordersData.length > 0 
         ? ordersData.reduce((sum, order) => sum + parseFloat(order.estimated_budget || 0), 0) / ordersData.length
         : 0;
-      const revenue = ordersData.reduce((sum, order) => sum + parseFloat(order.estimated_budget || 0), 0);
 
       setStats({
         totalOrders,
         pendingOrders,
         completedOrders,
-        averageBudget: averageBudget.toFixed(2),
-        revenue: revenue.toFixed(2)
+        averageBudget: averageBudget.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })
       });
     } catch (error) {
       console.error('Erro ao buscar dados do dashboard:', error);
@@ -54,31 +54,33 @@ const Dashboard = () => {
     }
   };
 
-  const MetricCard = ({ title, value, icon: Icon, change, color = 'cyan' }) => {
+  const MetricCard = ({ title, value, icon: Icon, change, color = 'purple' }) => {
     const colorClasses = {
-      cyan: 'from-cyan-500 to-blue-600',
-      green: 'from-emerald-500 to-green-600',
-      yellow: 'from-amber-500 to-yellow-600',
-      purple: 'from-purple-500 to-violet-600'
+      purple: 'from-purple-500 to-purple-700',
+      gold: 'from-gold-500 to-gold-700',
+      emerald: 'from-emerald-500 to-emerald-700',
+      blue: 'from-blue-500 to-blue-700'
     };
 
     return (
-      <div className="metric-card group hover:animate-cyber-glow">
+      <div className="metric-card group">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-slate-400">{title}</p>
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{title}</p>
             <p className="metric-value mt-2">{value}</p>
             {change && (
               <div className="flex items-center mt-3">
-                <div className={`px-2 py-1 rounded text-xs font-mono ${
-                  change > 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+                <div className={`px-2 py-1 rounded-lg text-xs font-semibold ${
+                  change > 0 
+                    ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' 
+                    : 'bg-rose-500/20 text-rose-700 dark:text-rose-300'
                 }`}>
-                  {change > 0 ? '↑' : '↓'} {Math.abs(change)}%
+                  {change > 0 ? '↗' : '↘'} {Math.abs(change)}%
                 </div>
               </div>
             )}
           </div>
-          <div className={`p-3 rounded-xl bg-gradient-to-r ${colorClasses[color]} shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+          <div className={`p-3 rounded-xl bg-gradient-to-r ${colorClasses[color]} shadow-2xl transform group-hover:scale-110 transition-transform duration-500`}>
             <Icon className="h-6 w-6 text-white" />
           </div>
         </div>
@@ -89,7 +91,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="cyber-spinner"></div>
+        <div className="premium-spinner border-purple-500"></div>
       </div>
     );
   }
@@ -99,87 +101,84 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold cyber-text glow-text">Dashboard</h1>
-          <p className="text-slate-400 mt-2 font-mono">
-            {new Date().toLocaleDateString('pt-BR', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
+          <h1 className="text-4xl font-bold premium-text font-serif glow-text">
+            Bem-vindo, {user?.name}! 👑
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-2 text-lg">
+            Seu painel de controle premium
           </p>
         </div>
         <Link
           to="/new-order"
-          className="btn-primary flex items-center space-x-2 mt-4 lg:mt-0"
+          className="btn-primary flex items-center space-x-2 mt-4 lg:mt-0 group"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-5 w-5" />
           <span>Novo Pedido</span>
-          <Zap className="h-4 w-4" />
+          <Sparkles className="h-4 w-4 group-hover:animate-spin" />
         </Link>
       </div>
 
       {/* Grid de Métricas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
-          title="TOTAL DE PEDIDOS"
+          title="Total de Pedidos"
           value={stats.totalOrders}
           icon={Package}
           change={12}
-          color="cyan"
+          color="purple"
         />
         <MetricCard
-          title="PENDENTES"
+          title="Pendentes"
           value={stats.pendingOrders}
           icon={Clock}
           change={-5}
-          color="yellow"
+          color="gold"
         />
         <MetricCard
-          title="CONCLUÍDOS"
+          title="Concluídos"
           value={stats.completedOrders}
           icon={TrendingUp}
           change={8}
-          color="green"
+          color="emerald"
         />
         <MetricCard
-          title="TICKET MÉDIO"
+          title="Ticket Médio"
           value={`R$ ${stats.averageBudget}`}
           icon={BarChart3}
           change={15}
-          color="purple"
+          color="blue"
         />
       </div>
 
       {/* Conteúdo Principal */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Status Distribution */}
-        <div className="lg:col-span-2 card-glow">
+        {/* Distribuição de Status */}
+        <div className="lg:col-span-2 card-hover">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold cyber-text">Distribuição por Status</h3>
-            <Activity className="h-5 w-5 text-cyan-400" />
+            <h3 className="text-xl font-bold premium-text font-serif">Distribuição por Status</h3>
+            <BarChart3 className="h-6 w-6 text-purple-500" />
           </div>
           
           <div className="space-y-4">
             {[
               { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length, color: 'amber' },
               { label: 'Aprovado', value: orders.filter(o => o.status === 'Aprovado').length, color: 'emerald' },
-              { label: 'Em andamento', value: orders.filter(o => o.status === 'Em andamento').length, color: 'cyan' },
+              { label: 'Em andamento', value: orders.filter(o => o.status === 'Em andamento').length, color: 'blue' },
               { label: 'Concluído', value: orders.filter(o => o.status === 'Concluído').length, color: 'slate' },
               { label: 'Rejeitado', value: orders.filter(o => o.status === 'Rejeitado').length, color: 'rose' },
             ].filter(item => item.value > 0).map((item, index) => (
-              <div key={index} className="flex items-center justify-between group hover:bg-slate-700/20 p-3 rounded-lg transition-all duration-300">
+              <div key={index} className="flex items-center justify-between group p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-700/20 transition-all duration-500">
                 <div className="flex items-center space-x-4">
-                  <span className={`status-badge ${getStatusClass(item.label)} group-hover:scale-105 transition-transform duration-300`}>
+                  <span className={`status-badge group-hover:scale-105 transition-transform duration-500 ${getStatusClass(item.label)}`}>
                     {item.label}
                   </span>
-                  <span className="text-slate-300 font-mono text-sm">
+                  <span className="text-slate-700 dark:text-slate-300 font-semibold">
                     {item.value}
                   </span>
                 </div>
-                <div className="w-32 bg-slate-700/50 rounded-full h-2 overflow-hidden">
+                <div className="w-32 bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
                   <div
-                    className="h-2 rounded-full transition-all duration-1000 ease-out"
+                    className="h-3 rounded-full transition-all duration-1000 ease-out"
                     style={{ 
                       width: `${(item.value / Math.max(1, orders.length)) * 100}%`,
                       backgroundColor: getStatusColor(item.label)
@@ -191,63 +190,66 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="card-glow">
+        {/* Ações Rápidas */}
+        <div className="card-hover">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold cyber-text">Ações Rápidas</h3>
-            <Zap className="h-5 w-5 text-cyan-400" />
+            <h3 className="text-xl font-bold premium-text font-serif">Ações Rápidas</h3>
+            <Zap className="h-6 w-6 text-gold-500" />
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Link
               to="/new-order"
-              className="flex items-center p-4 border border-slate-700/50 rounded-xl hover:border-cyan-500/30 hover:bg-slate-700/20 transition-all duration-300 group"
+              className="flex items-center p-4 border border-slate-200/50 dark:border-slate-700/50 rounded-xl hover:border-purple-500/30 hover:bg-white/50 dark:hover:bg-slate-700/20 transition-all duration-500 group hover-lift"
             >
-              <Plus className="h-5 w-5 text-cyan-400 mr-3" />
-              <span className="font-medium text-slate-200">Novo Pedido</span>
+              <Plus className="h-5 w-5 text-purple-500 mr-3" />
+              <span className="font-semibold text-slate-900 dark:text-white">Novo Pedido</span>
             </Link>
             <Link
               to="/orders"
-              className="flex items-center p-4 border border-slate-700/50 rounded-xl hover:border-cyan-500/30 hover:bg-slate-700/20 transition-all duration-300 group"
+              className="flex items-center p-4 border border-slate-200/50 dark:border-slate-700/50 rounded-xl hover:border-purple-500/30 hover:bg-white/50 dark:hover:bg-slate-700/20 transition-all duration-500 group hover-lift"
             >
-              <Package className="h-5 w-5 text-cyan-400 mr-3" />
-              <span className="font-medium text-slate-200">Ver Pedidos</span>
+              <Package className="h-5 w-5 text-purple-500 mr-3" />
+              <span className="font-semibold text-slate-900 dark:text-white">Ver Pedidos</span>
             </Link>
             {isAdmin && (
               <Link
                 to="/admin/orders"
-                className="flex items-center p-4 border border-slate-700/50 rounded-xl hover:border-cyan-500/30 hover:bg-slate-700/20 transition-all duration-300 group"
+                className="flex items-center p-4 border border-slate-200/50 dark:border-slate-700/50 rounded-xl hover:border-purple-500/30 hover:bg-white/50 dark:hover:bg-slate-700/20 transition-all duration-500 group hover-lift"
               >
-                <Users className="h-5 w-5 text-cyan-400 mr-3" />
-                <span className="font-medium text-slate-200">Painel Admin</span>
+                <Users className="h-5 w-5 text-purple-500 mr-3" />
+                <span className="font-semibold text-slate-900 dark:text-white">Painel Admin</span>
               </Link>
             )}
           </div>
         </div>
 
-        {/* Recent Orders */}
-        <div className="lg:col-span-3 card-glow">
+        {/* Pedidos Recentes */}
+        <div className="lg:col-span-3 card-hover">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold cyber-text">Pedidos Recentes</h3>
+            <h3 className="text-xl font-bold premium-text font-serif">Pedidos Recentes</h3>
             <Link 
               to="/orders" 
-              className="text-cyan-400 hover:text-cyan-300 text-sm font-mono transition-colors duration-300"
+              className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 text-sm font-semibold transition-colors duration-500 flex items-center space-x-1"
             >
-              VER_TUDO
+              <span>Ver todos</span>
+              <TrendingUp className="h-4 w-4" />
             </Link>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             {orders.slice(0, 5).map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-4 border border-slate-700/30 rounded-xl hover:border-slate-600/50 hover:bg-slate-700/10 transition-all duration-300 group">
+              <div key={order.id} className="flex items-center justify-between p-4 border border-slate-200/50 dark:border-slate-700/50 rounded-xl hover:border-purple-500/30 hover:bg-white/50 dark:hover:bg-slate-700/20 transition-all duration-500 group hover-lift">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-3">
-                    <Cpu className="h-4 w-4 text-cyan-400" />
+                    <div className="p-2 bg-slate-100 dark:bg-slate-700 rounded-lg">
+                      <Package className="h-4 w-4 text-purple-500" />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-slate-200 truncate group-hover:text-cyan-300 transition-colors duration-300">
+                      <h4 className="font-semibold text-slate-900 dark:text-white truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-500">
                         {order.category}
                       </h4>
-                      <p className="text-sm text-slate-400 truncate mt-1 font-mono">
+                      <p className="text-sm text-slate-600 dark:text-slate-400 truncate mt-1">
                         {order.description}
                       </p>
                     </div>
@@ -255,10 +257,10 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="flex items-center space-x-4 ml-4">
-                  <span className="text-sm font-bold text-slate-200 whitespace-nowrap font-mono">
+                  <span className="text-lg font-bold text-slate-900 dark:text-white whitespace-nowrap">
                     R$ {parseFloat(order.estimated_budget).toLocaleString('pt-BR')}
                   </span>
-                  <span className={`status-badge ${getStatusClass(order.status)} group-hover:scale-105 transition-transform duration-300`}>
+                  <span className={`status-badge group-hover:scale-105 transition-transform duration-500 ${getStatusClass(order.status)}`}>
                     {order.status}
                   </span>
                 </div>
@@ -267,13 +269,14 @@ const Dashboard = () => {
             
             {orders.length === 0 && (
               <div className="text-center py-12">
-                <Package className="h-16 w-16 text-slate-600 mx-auto mb-4" />
-                <p className="text-slate-400 font-mono">NENHUM_PEDIDO_ENCONTRADO</p>
+                <Crown className="h-16 w-16 text-slate-400 dark:text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-500 dark:text-slate-400 mb-4">Nenhum pedido encontrado</p>
                 <Link 
                   to="/new-order" 
-                  className="text-cyan-400 hover:text-cyan-300 text-sm mt-3 inline-block font-mono transition-colors duration-300"
+                  className="btn-primary inline-flex items-center space-x-2"
                 >
-                  CRIAR_PRIMEIRO_PEDIDO
+                  <Plus className="h-4 w-4" />
+                  <span>Criar primeiro pedido</span>
                 </Link>
               </div>
             )}
@@ -301,7 +304,7 @@ const getStatusColor = (status) => {
     'Em análise': '#f59e0b',
     'Aprovado': '#10b981',
     'Rejeitado': '#ef4444',
-    'Em andamento': '#22d3ee',
+    'Em andamento': '#3b82f6',
     'Concluído': '#64748b'
   };
   return colorMap[status] || '#f59e0b';

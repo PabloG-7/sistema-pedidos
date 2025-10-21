@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Configurar storage do multer
+// Configurar onde salvar os arquivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = 'uploads/';
@@ -15,22 +15,28 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    // Nome único para o arquivo
+    // Nome único: timestamp + random + extensão
     const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
     cb(null, uniqueName);
   }
 });
 
-// Filtro de arquivos
+// Tipos de arquivo permitidos
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|pdf|doc|docx|txt/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+  const allowedTypes = [
+    'image/jpeg', 
+    'image/jpg', 
+    'image/png', 
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/plain'
+  ];
 
-  if (mimetype && extname) {
-    return cb(null, true);
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
   } else {
-    cb(new Error('Tipo de arquivo não permitido'));
+    cb(new Error('Tipo de arquivo não permitido. Use: JPG, PNG, PDF, DOC, DOCX, TXT'), false);
   }
 };
 
@@ -42,9 +48,11 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-// Controller de upload
+// Controller principal
 const uploadFile = async (req, res) => {
   try {
+    console.log('📤 Recebendo upload...', req.file);
+
     if (!req.file) {
       return res.status(400).json({ 
         success: false, 
@@ -52,14 +60,18 @@ const uploadFile = async (req, res) => {
       });
     }
 
+    // Informações do arquivo
     const fileInfo = {
       filename: req.file.filename,
       originalName: req.file.originalname,
       mimetype: req.file.mimetype,
       size: req.file.size,
       path: req.file.path,
-      url: `/uploads/${req.file.filename}`
+      url: `/api/uploads/${req.file.filename}`,
+      uploadedAt: new Date()
     };
+
+    console.log('✅ Upload realizado:', fileInfo.originalName);
 
     res.json({
       success: true,
@@ -68,15 +80,43 @@ const uploadFile = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro no upload:', error);
+    console.error('❌ Erro no upload:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Erro interno no servidor' 
+      message: 'Erro interno no servidor: ' + error.message 
     });
+  }
+};
+
+// Listar arquivos (opcional)
+const getFiles = async (req, res) => {
+  try {
+    const uploadDir = 'uploads/';
+    
+    if (!fs.existsSync(uploadDir)) {
+      return res.json({ files: [] });
+    }
+
+    const files = fs.readdirSync(uploadDir).map(filename => {
+      const filePath = path.join(uploadDir, filename);
+      const stats = fs.statSync(filePath);
+      
+      return {
+        filename,
+        size: stats.size,
+        uploadedAt: stats.birthtime
+      };
+    });
+
+    res.json({ files });
+  } catch (error) {
+    console.error('Erro ao listar arquivos:', error);
+    res.status(500).json({ error: 'Erro ao listar arquivos' });
   }
 };
 
 module.exports = {
   upload,
-  uploadFile
+  uploadFile,
+  getFiles
 };

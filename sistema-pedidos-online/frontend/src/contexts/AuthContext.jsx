@@ -15,17 +15,16 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Carregar usuário do localStorage na inicialização
+  // Carregar usuário do localStorage (SEM verificar com backend)
   useEffect(() => {
-    const loadUser = async () => {
+    const loadUser = () => {
       try {
         const token = localStorage.getItem('token');
         const userData = localStorage.getItem('user');
         
         if (token && userData) {
-          // Verificar se o token ainda é válido
-          const response = await api.get('/auth/me');
-          setUser(response.data.user);
+          // Usa os dados do localStorage diretamente
+          setUser(JSON.parse(userData));
         }
       } catch (error) {
         console.error('Erro ao carregar usuário:', error);

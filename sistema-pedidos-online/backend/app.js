@@ -1,5 +1,14 @@
-// 👇 IMPORTE ISSO (no topo com outros imports)
-const uploadRoutes = require('./routes/upload');
+const express = require('express');
+// ... outras importações
 
-// 👇 E ISSO (depois de outros app.use)
+// 👇 ADICIONA ESTA LINHA:
+const uploadRoutes = require('./src/routes/upload');
+
+const app = express();
+
+// ... middlewares e outras configurações
+
+// 👇 ADICIONA ESTA LINHA (depois das outras rotas):
 app.use('/api', uploadRoutes);
+
+// ... resto do código

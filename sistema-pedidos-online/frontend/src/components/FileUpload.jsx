@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, File, Image, Check, AlertCircle } from 'lucide-react';
+import { Upload, X, File, Image, Check, AlertCircle, Loader } from 'lucide-react';
 import { api } from '../services/api';
 
 const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
@@ -16,7 +16,7 @@ const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
       return;
     }
 
-    // Validar tamanho dos arquivos (5MB)
+    // Validar tamanho (5MB)
     const oversizedFiles = selectedFiles.filter(file => file.size > 5 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
       setError('Alguns arquivos excedem 5MB');
@@ -35,6 +35,7 @@ const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          timeout: 30000, // 30 segundos timeout
         });
 
         return {
@@ -53,33 +54,20 @@ const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
 
     } catch (error) {
       console.error('Erro no upload:', error);
-      setError('Erro ao fazer upload dos arquivos. Tente novamente.');
+      if (error.code === 'ECONNABORTED') {
+        setError('Timeout - servidor demorou muito para responder');
+      } else if (error.response?.status === 413) {
+        setError('Arquivo muito grande');
+      } else if (error.response?.status === 415) {
+        setError('Tipo de arquivo não permitido');
+      } else {
+        setError('Erro ao fazer upload. Tente novamente.');
+      }
     } finally {
       setUploading(false);
-      // Limpar input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    if (droppedFiles.length > 0) {
-      const event = {
-        target: {
-          files: e.dataTransfer.files
-        }
-      };
-      handleFileSelect(event);
     }
   };
 
@@ -90,14 +78,10 @@ const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
     setError('');
   };
 
-  const getFileIcon = (mimetype) => {
-    if (mimetype.startsWith('image/')) {
-      return <Image className="h-4 w-4 text-blue-500" />;
-    }
-    if (mimetype.includes('pdf')) {
-      return <File className="h-4 w-4 text-red-500" />;
-    }
-    if (mimetype.includes('word') || mimetype.includes('document')) {
+  const getFileIcon = (type) => {
+    if (type.startsWith('image/')) return <Image className="h-4 w-4 text-blue-500" />;
+    if (type.includes('pdf')) return <File className="h-4 w-4 text-red-500" />;
+    if (type.includes('word') || type.includes('document')) {
       return <File className="h-4 w-4 text-blue-600" />;
     }
     return <File className="h-4 w-4 text-gray-500" />;
@@ -106,7 +90,7 @@ const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ['Bytes', 'KB', 'MB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
@@ -116,8 +100,6 @@ const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
       <div
         className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
       >
         <input
           type="file"
@@ -138,8 +120,8 @@ const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
       </div>
 
       {error && (
-        <div className="flex items-center space-x-2 text-red-600 dark:text-red-400 text-sm">
-          <AlertCircle className="h-4 w-4" />
+        <div className="flex items-center space-x-2 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -151,24 +133,24 @@ const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
           </h4>
           {files.map((file, index) => (
             <div
-              key={file.id || index}
+              key={file.filename || index}
               className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
             >
               <div className="flex items-center space-x-3 flex-1 min-w-0">
                 {getFileIcon(file.type || file.mimetype)}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {file.originalName || file.filename}
+                    {file.originalName}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {formatFileSize(file.size)}
                   </p>
                 </div>
-                <Check className="h-4 w-4 text-green-500" />
+                <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
               </div>
               <button
                 onClick={() => removeFile(index)}
-                className="p-1 text-gray-400 hover:text-red-500 transition-colors ml-2"
+                className="p-1 text-gray-400 hover:text-red-500 transition-colors ml-2 flex-shrink-0"
                 type="button"
               >
                 <X className="h-4 w-4" />
@@ -179,9 +161,9 @@ const FileUpload = ({ onFilesChange, maxFiles = 5 }) => {
       )}
 
       {uploading && (
-        <div className="flex items-center justify-center py-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-          <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center justify-center py-4 space-x-2">
+          <Loader className="h-5 w-5 text-blue-500 animate-spin" />
+          <span className="text-sm text-gray-600 dark:text-gray-400">
             Fazendo upload...
           </span>
         </div>

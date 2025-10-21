@@ -1,12 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { authAPI } from '../services/api';
+import { api } from '../services/api';
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -15,60 +15,67 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Carregar usuário do localStorage na inicialização
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
+    const loadUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+        
+        if (token && userData) {
+          // Verificar se o token ainda é válido
+          const response = await api.get('/auth/me');
+          setUser(response.data.user);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar usuário:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-      authAPI.defaults.headers.Authorization = `Bearer ${token}`;
-    }
-
-    setLoading(false);
+    loadUser();
   }, []);
 
   const login = async (email, password) => {
     try {
-      const response = await authAPI.post('/auth/login', { email, password });
-      const { token, user } = response.data;
-
+      const response = await api.post('/auth/login', { email, password });
+      
+      const { user, token } = response.data;
+      
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      authAPI.defaults.headers.Authorization = `Bearer ${token}`;
       setUser(user);
-
+      
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Erro ao fazer login' 
-      };
+      const message = error.response?.data?.message || 'Erro ao fazer login';
+      return { success: false, message };
     }
   };
 
   const register = async (name, email, password) => {
     try {
-      const response = await authAPI.post('/auth/register', { name, email, password });
-      const { token, user } = response.data;
-
+      const response = await api.post('/auth/register', { name, email, password });
+      
+      const { user, token } = response.data;
+      
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      authAPI.defaults.headers.Authorization = `Bearer ${token}`;
       setUser(user);
-
+      
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Erro ao criar conta' 
-      };
+      const message = error.response?.data?.message || 'Erro ao criar conta';
+      return { success: false, message };
     }
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    delete authAPI.defaults.headers.Authorization;
     setUser(null);
   };
 
@@ -87,4 +94,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-

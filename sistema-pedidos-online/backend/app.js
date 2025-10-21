@@ -1,16 +1,5 @@
+// 👇 IMPORTE ISSO (no topo com outros imports)
 const uploadRoutes = require('./routes/upload');
 
-// ... outras configurações
-
-// 👇 ESTA LINHA É ESSENCIAL:
+// 👇 E ISSO (depois de outros app.use)
 app.use('/api', uploadRoutes);
-
-// Rota de teste para upload
-app.post('/api/upload', (req, res) => {
-  console.log('📤 Upload recebido!');
-  res.json({ 
-    success: true, 
-    message: 'Upload funcionando!',
-    file: { filename: 'teste.jpg' }
-  });
-});

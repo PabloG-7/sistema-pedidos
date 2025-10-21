@@ -1,7 +1,6 @@
-// ... outras importações
 const uploadRoutes = require('./routes/upload');
 
-// ... outro código
+// ... outras configurações
 
-// Usar rotas de upload
+// 👇 ESTA LINHA É ESSENCIAL:
 app.use('/api', uploadRoutes);

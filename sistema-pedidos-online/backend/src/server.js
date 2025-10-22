@@ -7,6 +7,9 @@ import authRoutes from './routes/auth.js';
 import orderRoutes from './routes/orders.js';
 import userRoutes from './routes/users.js';
 
+// ⬇️ COMENTA TEMPORARIAMENTE:
+// import uploadRoutes from './routes/upload.js';
+
 // ⬇️ CORREÇÃO: Importar o arquivo CORRETO que existe
 import uploadRoutes from './routes/upload.js';
 
@@ -109,3 +112,7 @@ app.listen(PORT, () => {
   console.log(`✅ CORS configurado para: ${allowedOrigins.join(', ')}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
 });
+
+
+// ⬇️ COMENTA ESTA LINHA TAMBÉM:
+// app.use('/api', uploadRoutes);

@@ -7,8 +7,8 @@ import authRoutes from './routes/auth.js';
 import orderRoutes from './routes/orders.js';
 import userRoutes from './routes/users.js';
 
-// ⬇️ ADICIONAR ESTE IMPORT PARA UPLOAD
-import uploadRoutes from './routes/uploadRoutes.js';
+// ⬇️ CORREÇÃO: Importar o arquivo CORRETO que existe
+import uploadRoutes from './routes/upload.js';
 
 dotenv.config();
 
@@ -26,8 +26,8 @@ const allowedOrigins = [
   'https://sistema-pedidos-online.netlify.app',
   'https://*.netlify.app',
   'https://sistema-pedidos-backend.onrender.com',
-  'https://sistema-pedidos-online.vercel.app', // ⬅️ NOVO: DOMÍNIO VERCEL
-  'https://*.vercel.app' // ⬅️ NOVO: TODOS OS SUBDOMÍNIOS VERCEL
+  'https://sistema-pedidos-online.vercel.app',
+  'https://*.vercel.app'
 ];
 
 // Configuração CORS
@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/upload', uploadRoutes); // ⬅️ ADICIONAR UPLOAD ROUTES
+app.use('/api', uploadRoutes); // ⬅️ CORREÇÃO: Usar '/api' em vez de '/api/upload'
 
 // Servir arquivos estáticos da pasta uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

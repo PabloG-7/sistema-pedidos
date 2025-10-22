@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { Package, Clock, CheckCircle, XCircle, PlayCircle, Plus } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, PlayCircle, Plus, Search, Filter, Download } from 'lucide-react';
 import SearchFilters from '../components/SearchFilters';
 
 const Orders = () => {
@@ -9,7 +9,7 @@ const Orders = () => {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({});
-  const [error, setError] = useState('');
+  const [exporting, setExporting] = useState(false);
 
   const statusIcons = {
     'Em análise': <Clock className="h-5 w-5 text-yellow-500" />,
@@ -20,22 +20,14 @@ const Orders = () => {
   };
 
   const statusColors = {
-    'Em análise': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-300',
-    'Aprovado': 'bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-green-300',
-    'Rejeitado': 'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-300',
-    'Em andamento': 'bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-300',
-    'Concluído': 'bg-gray-100 text-gray-800 dark:bg-gray-500/20 dark:text-gray-300'
+    'Em análise': 'status-em-analise',
+    'Aprovado': 'status-aprovado',
+    'Rejeitado': 'status-rejeitado',
+    'Em andamento': 'status-andamento',
+    'Concluído': 'status-concluido'
   };
 
   useEffect(() => {
-    // ✅ CORREÇÃO: Verificar autenticação antes de buscar
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('❌ Usuário não autenticado');
-      window.location.href = '/login';
-      return;
-    }
-    
     fetchOrders();
   }, []);
 
@@ -43,34 +35,12 @@ const Orders = () => {
     applyFilters();
   }, [filters, orders]);
 
-  // ✅ CORREÇÃO: Função fetchOrders melhorada
   const fetchOrders = async () => {
     try {
-      setError('');
-      console.log('🔄 Buscando pedidos...');
-      
       const response = await api.get('/orders/my-orders');
-      
-      // ✅ CORREÇÃO: Verificar estrutura da resposta
-      if (response.data && response.data.orders) {
-        setOrders(response.data.orders);
-        console.log('✅ Pedidos carregados:', response.data.orders.length);
-      } else {
-        console.warn('⚠️ Estrutura de resposta inesperada:', response.data);
-        setOrders([]);
-      }
+      setOrders(response.data.orders || []);
     } catch (error) {
-      console.error('❌ Erro ao buscar pedidos:', error);
-      setError(error.message || 'Erro ao carregar pedidos');
-      
-      // ✅ CORREÇÃO: Mostrar erro específico
-      if (error.status === 401) {
-        setError('Sessão expirada. Faça login novamente.');
-      } else if (error.status === 404) {
-        setError('Rota não encontrada. Verifique a configuração do servidor.');
-      } else {
-        setError('Erro ao conectar com o servidor.');
-      }
+      console.error('Erro ao buscar pedidos:', error);
     } finally {
       setLoading(false);
     }
@@ -124,47 +94,73 @@ const Orders = () => {
     setFilteredOrders(filtered);
   };
 
+  const exportToCSV = async () => {
+    setExporting(true);
+    try {
+      const csvContent = [
+        ['Categoria', 'Descrição', 'Status', 'Orçamento', 'Data Criação'],
+        ...filteredOrders.map(order => [
+          order.category,
+          order.description,
+          order.status,
+          `R$ ${order.estimated_budget}`,
+          new Date(order.created_at).toLocaleDateString('pt-BR')
+        ])
+      ].map(row => row.join(',')).join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `pedidos-${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Erro ao exportar:', error);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white"></div>
-        <span className="ml-3 text-gray-600">Carregando pedidos...</span>
+      <div className="flex justify-center items-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando pedidos...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Meus Pedidos</h1>
-          <p className="text-gray-600 dark:text-gray-400">Acompanhe todos os seus pedidos</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Meus Pedidos</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-lg">
+            Gerencie e acompanhe todos os seus pedidos
+          </p>
         </div>
-        <Link
-          to="/new-order"
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Novo Pedido</span>
-        </Link>
-      </div>
-
-      {/* Mensagem de erro */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded">
-          <div className="flex items-center">
-            <XCircle className="h-5 w-5 mr-2" />
-            {error}
-          </div>
-          <button 
-            onClick={fetchOrders}
-            className="mt-2 text-sm underline hover:no-underline"
+        <div className="flex items-center space-x-3 mt-6 lg:mt-0">
+          <button
+            onClick={exportToCSV}
+            disabled={exporting || filteredOrders.length === 0}
+            className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
           >
-            Tentar novamente
+            <Download className="h-4 w-4" />
+            <span>{exporting ? 'Exportando...' : 'Exportar CSV'}</span>
           </button>
+          <Link
+            to="/new-order"
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Novo Pedido</span>
+          </Link>
         </div>
-      )}
+      </div>
 
       {/* Busca e Filtros */}
       <SearchFilters 
@@ -173,41 +169,41 @@ const Orders = () => {
       />
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="card text-center">
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="metric-card text-center">
+          <div className="text-3xl font-bold text-gray-900 dark:text-white">
             {orders.length}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">Total</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Total</div>
         </div>
-        <div className="card text-center">
-          <div className="text-2xl font-bold text-yellow-600">
+        <div className="metric-card text-center">
+          <div className="text-3xl font-bold text-yellow-600">
             {orders.filter(o => o.status === 'Em análise').length}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">Em Análise</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Em Análise</div>
         </div>
-        <div className="card text-center">
-          <div className="text-2xl font-bold text-green-600">
+        <div className="metric-card text-center">
+          <div className="text-3xl font-bold text-green-600">
             {orders.filter(o => o.status === 'Aprovado').length}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">Aprovados</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Aprovados</div>
         </div>
-        <div className="card text-center">
-          <div className="text-2xl font-bold text-gray-600">
+        <div className="metric-card text-center">
+          <div className="text-3xl font-bold text-blue-600">
             {filteredOrders.length}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">Filtrados</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Filtrados</div>
         </div>
       </div>
 
       {/* Lista de Pedidos */}
       {filteredOrders.length === 0 ? (
-        <div className="card text-center">
-          <Package className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+        <div className="card text-center py-16">
+          <Package className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+          <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
             {orders.length === 0 ? 'Nenhum pedido encontrado' : 'Nenhum pedido com esses filtros'}
           </h3>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">
+          <p className="text-gray-400 dark:text-gray-500 mb-6">
             {orders.length === 0 
               ? 'Você ainda não fez nenhum pedido.' 
               : 'Tente ajustar os filtros de busca.'
@@ -216,7 +212,7 @@ const Orders = () => {
           {orders.length === 0 && (
             <Link
               to="/new-order"
-              className="btn-primary inline-flex items-center space-x-2 mt-4"
+              className="btn-primary inline-flex items-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Criar Primeiro Pedido</span>
@@ -226,20 +222,29 @@ const Orders = () => {
       ) : (
         <div className="space-y-4">
           {filteredOrders.map((order) => (
-            <div key={order.id} className="card">
-              <div className="flex justify-between items-start">
+            <div key={order.id} className="card hover:scale-105 transition-transform duration-300">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
+                  <div className="flex items-center space-x-3 mb-3">
                     {statusIcons[order.status]}
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[order.status]}`}>
+                    <span className={`status-badge ${statusColors[order.status]}`}>
                       {order.status}
                     </span>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">{order.category}</h3>
-                  <p className="mt-1 text-gray-600 dark:text-gray-400">{order.description}</p>
-                  <div className="mt-3 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span>Orçamento: R$ {order.estimated_budget}</span>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    {order.category}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                    {order.description}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                      Orçamento: <span className="text-green-600">R$ {order.estimated_budget}</span>
+                    </span>
+                    <span>•</span>
                     <span>Criado em: {new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
+                    <span>•</span>
+                    <span>{new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 </div>
               </div>

@@ -171,3 +171,83 @@
 .gradient-text {
   @apply bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent;
 }
+
+/* Animações para o menu mobile */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Classes de animação */
+.sidebar-enter {
+  animation: slideInFromLeft 0.3s ease-out;
+}
+
+.sidebar-exit {
+  animation: slideOutToLeft 0.3s ease-in;
+}
+
+.overlay-enter {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.overlay-exit {
+  animation: fadeOut 0.3s ease-in;
+}
+
+/* Melhorias para mobile */
+@media (max-width: 1023px) {
+  .mobile-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .mobile-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .mobile-overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .mobile-overlay.open {
+    opacity: 1;
+  }
+}
+
+/* Prevenir scroll do body quando menu está aberto */
+body.menu-open {
+  overflow: hidden;
+}

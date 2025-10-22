@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import {
-  Menu, X, Home, Package, Plus, Settings, LogOut, User, Moon, Sun, Sparkles
+  Menu, X, BarChart3, Package, Plus, Settings, LogOut, User, Moon, Sun
 } from 'lucide-react';
 
 const Layout = () => {
@@ -19,7 +19,7 @@ const Layout = () => {
   };
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: Home },
+    { name: 'Dashboard', href: '/', icon: BarChart3 },
     { name: 'Pedidos', href: '/orders', icon: Package },
     { name: 'Novo Pedido', href: '/new-order', icon: Plus },
   ];
@@ -29,57 +29,54 @@ const Layout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-slate-800 transition-all duration-500">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
       {/* Sidebar Desktop */}
-      <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200/60 dark:border-gray-700/60 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80">
+      <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800">
         <div className="flex-1 flex flex-col min-h-0">
-          {/* Header */}
-          <div className="flex items-center h-16 flex-shrink-0 px-6 border-b border-gray-200/60 dark:border-gray-700/60">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg animate-float">
-                <Sparkles className="h-5 w-5 text-white" />
+          <div className="flex items-center h-16 flex-shrink-0 px-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-black dark:bg-white rounded flex items-center justify-center">
+                <BarChart3 className="h-4 w-4 text-white dark:text-black" />
               </div>
-              <div>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">
-                  Nexus
-                </span>
-                <p className="text-xs text-gray-500 dark:text-gray-400">System</p>
-              </div>
+              <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
+                PGSystem
+              </span>
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`nav-item group relative overflow-hidden ${
-                    isActive ? 'active' : ''
-                  }`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <Icon className="mr-3 h-5 w-5 relative z-10" />
-                  <span className="text-sm relative z-10">{item.name}</span>
-                </Link>
-              );
-            })}
+          <nav className="flex-1 px-4 py-4">
+            <div className="space-y-1">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`flex items-center px-3 py-2 rounded-lg transition-colors duration-200 ${
+                      isActive 
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' 
+                        : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <Icon className="mr-3 h-4 w-4" />
+                    <span className="text-sm font-medium">{item.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
           </nav>
 
-          {/* User Info */}
-          <div className="flex-shrink-0 border-t border-gray-200/60 dark:border-gray-700/60 p-4">
+          <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center min-w-0">
                 <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-md">
-                    <User className="h-5 w-5 text-white" />
+                  <div className="h-8 w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                   </div>
                 </div>
                 <div className="ml-3 min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                     {user?.name}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -90,13 +87,13 @@ const Layout = () => {
               <div className="flex items-center space-x-1 ml-2">
                 <button
                   onClick={toggleTheme}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-xl transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors"
                 >
                   {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-xl transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                 </button>
@@ -106,67 +103,61 @@ const Layout = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Conteúdo Principal */}
       <div className="lg:pl-64 flex flex-col flex-1 min-w-0">
-        {/* Mobile Header */}
-        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200/60 dark:bg-gray-800/80 dark:border-gray-700/60 lg:hidden">
-          <div className="flex items-center justify-between h-16 px-4">
-            <div className="flex items-center space-x-3">
+        {/* Header Mobile */}
+        <header className="sticky top-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 lg:hidden">
+          <div className="flex items-center justify-between h-14 px-4">
+            <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-xl transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-white rounded-lg"
               >
                 <Menu className="h-5 w-5" />
               </button>
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Sparkles className="h-4 w-4 text-white" />
+              <div className="flex items-center ml-3">
+                <div className="w-6 h-6 bg-black dark:bg-white rounded flex items-center justify-center">
+                  <BarChart3 className="h-3 w-3 text-white dark:text-black" />
                 </div>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">
-                  Nexus
+                <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
+                  PGSystem
                 </span>
               </div>
             </div>
             
             <button
               onClick={toggleTheme}
-              className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-xl transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-white rounded-lg"
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
           </div>
         </header>
 
-        {/* Mobile Sidebar */}
+        {/* Sidebar Mobile */}
         {sidebarOpen && (
           <div className="lg:hidden fixed inset-0 z-50">
-            <div 
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
-              onClick={() => setSidebarOpen(false)}
-            />
-            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white/95 backdrop-blur-sm dark:bg-gray-800/95 transform transition-transform duration-300">
+            <div className="fixed inset-0 bg-gray-600/75" onClick={() => setSidebarOpen(false)} />
+            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800">
               <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
-                <div className="flex items-center justify-between px-6 mb-8">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                      <Sparkles className="h-5 w-5 text-white" />
+                <div className="flex items-center justify-between px-4 mb-8">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 bg-black dark:bg-white rounded flex items-center justify-center">
+                      <BarChart3 className="h-4 w-4 text-white dark:text-black" />
                     </div>
-                    <div>
-                      <span className="text-lg font-bold text-gray-900 dark:text-white">
-                        Nexus
-                      </span>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">System</p>
-                    </div>
+                    <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
+                      PGSystem
+                    </span>
                   </div>
                   <button
                     onClick={() => setSidebarOpen(false)}
-                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-xl transition-all duration-300"
+                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg"
                   >
                     <X className="h-5 w-5" />
                   </button>
                 </div>
                 
-                <nav className="px-4 space-y-2">
+                <nav className="px-4 space-y-1">
                   {navigation.map((item) => {
                     const Icon = item.icon;
                     const isActive = location.pathname === item.href;
@@ -174,24 +165,30 @@ const Layout = () => {
                       <Link
                         key={item.name}
                         to={item.href}
-                        className={`nav-item ${isActive ? 'active' : ''}`}
+                        className={`flex items-center px-3 py-2 rounded-lg transition-colors duration-200 ${
+                          isActive 
+                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' 
+                            : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+                        }`}
                         onClick={() => setSidebarOpen(false)}
                       >
-                        <Icon className="mr-3 h-5 w-5" />
-                        <span className="text-sm">{item.name}</span>
+                        <Icon className="mr-3 h-4 w-4" />
+                        <span className="text-sm font-medium">{item.name}</span>
                       </Link>
                     );
                   })}
                 </nav>
               </div>
               
-              <div className="flex-shrink-0 border-t border-gray-200/60 dark:border-gray-700/60 p-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
-                    <User className="h-5 w-5 text-white" />
+              <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="h-10 w-10 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                      <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{user?.name}</p>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
                   </div>
                 </div>
@@ -204,7 +201,7 @@ const Layout = () => {
         <main className="flex-1 relative overflow-y-auto">
           <div className="py-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="animate-slide-in">
+              <div className="animate-fade-in">
                 <Outlet />
               </div>
             </div>

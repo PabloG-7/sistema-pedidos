@@ -25,6 +25,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
 
+// ✅ CORREÇÃO: Função de upload
 const uploadFile = (req, res) => {
   try {
     if (!req.file) {
@@ -40,7 +41,7 @@ const uploadFile = (req, res) => {
       mimetype: req.file.mimetype,
       size: req.file.size,
       path: req.file.path,
-      url: `/api/uploads/${req.file.filename}`
+      url: `/uploads/${req.file.filename}`
     };
 
     res.json({
@@ -58,10 +59,10 @@ const uploadFile = (req, res) => {
   }
 };
 
-// Rota de upload
-router.post('/upload', upload.single('file'), uploadFile);
+// ✅ CORREÇÃO: Rota de upload
+router.post('/', upload.single('file'), uploadFile);
 
 // Rota para servir arquivos
-router.use('/uploads', express.static('uploads'));
+router.use('/', express.static('uploads'));
 
-export default router; // ⬅️ ES6 export
+export default router;

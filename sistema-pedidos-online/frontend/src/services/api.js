@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// ✅ CORREÇÃO: URL correta
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://sistema-pedidos-backend.onrender.com/api';
 
 // DEBUG - Verificar a URL configurada
 console.log('🚀 =================================');
@@ -23,25 +24,28 @@ export const api = axios.create({
   },
 });
 
-// Interceptor para adicionar token automaticamente
+// ✅ CORREÇÃO MELHORADA: Interceptor para adicionar token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) {
+    
+    // ✅ CORREÇÃO: Verificar se é uma requisição que precisa de token
+    if (token && !config.url.includes('/auth/')) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     
     console.log('🔧 Fazendo requisição para:', config.url);
-    console.log('🔧 Headers:', config.headers);
+    console.log('🔧 Headers Authorization:', config.headers.Authorization ? 'PRESENTE' : 'AUSENTE');
     
     return config;
   },
   (error) => {
+    console.error('❌ Erro no interceptor de request:', error);
     return Promise.reject(error);
   }
 );
 
-// Interceptor para tratar erros de autenticação
+// ✅ CORREÇÃO MELHORADA: Interceptor de resposta
 api.interceptors.response.use(
   (response) => {
     console.log('✅ Resposta recebida:', response.status, response.config.url);
@@ -52,10 +56,21 @@ api.interceptors.response.use(
     console.log('❌ Detalhes do erro:', error.response?.data);
     
     if (error.response?.status === 401) {
+      console.log('🔐 Token inválido ou expirado - redirecionando para login');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      
+      // ✅ CORREÇÃO: Só redirecionar se não estiver na página de login
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
     }
-    return Promise.reject(error);
+    
+    // ✅ CORREÇÃO: Retornar erro formatado
+    return Promise.reject({
+      message: error.response?.data?.message || 'Erro de conexão',
+      status: error.response?.status,
+      data: error.response?.data
+    });
   }
 );

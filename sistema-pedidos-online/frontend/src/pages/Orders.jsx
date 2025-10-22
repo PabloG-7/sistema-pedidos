@@ -9,6 +9,7 @@ const Orders = () => {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({});
+  const [error, setError] = useState('');
 
   const statusIcons = {
     'Em análise': <Clock className="h-5 w-5 text-yellow-500" />,
@@ -27,6 +28,14 @@ const Orders = () => {
   };
 
   useEffect(() => {
+    // ✅ CORREÇÃO: Verificar autenticação antes de buscar
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('❌ Usuário não autenticado');
+      window.location.href = '/login';
+      return;
+    }
+    
     fetchOrders();
   }, []);
 
@@ -34,12 +43,34 @@ const Orders = () => {
     applyFilters();
   }, [filters, orders]);
 
+  // ✅ CORREÇÃO: Função fetchOrders melhorada
   const fetchOrders = async () => {
     try {
+      setError('');
+      console.log('🔄 Buscando pedidos...');
+      
       const response = await api.get('/orders/my-orders');
-      setOrders(response.data.orders || []);
+      
+      // ✅ CORREÇÃO: Verificar estrutura da resposta
+      if (response.data && response.data.orders) {
+        setOrders(response.data.orders);
+        console.log('✅ Pedidos carregados:', response.data.orders.length);
+      } else {
+        console.warn('⚠️ Estrutura de resposta inesperada:', response.data);
+        setOrders([]);
+      }
     } catch (error) {
-      console.error('Erro ao buscar pedidos:', error);
+      console.error('❌ Erro ao buscar pedidos:', error);
+      setError(error.message || 'Erro ao carregar pedidos');
+      
+      // ✅ CORREÇÃO: Mostrar erro específico
+      if (error.status === 401) {
+        setError('Sessão expirada. Faça login novamente.');
+      } else if (error.status === 404) {
+        setError('Rota não encontrada. Verifique a configuração do servidor.');
+      } else {
+        setError('Erro ao conectar com o servidor.');
+      }
     } finally {
       setLoading(false);
     }
@@ -48,40 +79,34 @@ const Orders = () => {
   const applyFilters = () => {
     let filtered = [...orders];
 
-    // Filtro de busca textual
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       filtered = filtered.filter(order => 
-        order.description.toLowerCase().includes(searchLower) ||
-        order.category.toLowerCase().includes(searchLower)
+        order.description?.toLowerCase().includes(searchLower) ||
+        order.category?.toLowerCase().includes(searchLower)
       );
     }
 
-    // Filtro por status
     if (filters.status) {
       filtered = filtered.filter(order => order.status === filters.status);
     }
 
-    // Filtro por categoria
     if (filters.category) {
       filtered = filtered.filter(order => order.category === filters.category);
     }
 
-    // Filtro por orçamento mínimo
     if (filters.minBudget) {
       filtered = filtered.filter(order => 
         parseFloat(order.estimated_budget) >= parseFloat(filters.minBudget)
       );
     }
 
-    // Filtro por orçamento máximo
     if (filters.maxBudget) {
       filtered = filtered.filter(order => 
         parseFloat(order.estimated_budget) <= parseFloat(filters.maxBudget)
       );
     }
 
-    // Filtro por data
     if (filters.startDate) {
       filtered = filtered.filter(order => 
         new Date(order.created_at) >= new Date(filters.startDate)
@@ -103,6 +128,7 @@ const Orders = () => {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white"></div>
+        <span className="ml-3 text-gray-600">Carregando pedidos...</span>
       </div>
     );
   }
@@ -123,6 +149,22 @@ const Orders = () => {
           <span>Novo Pedido</span>
         </Link>
       </div>
+
+      {/* Mensagem de erro */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded">
+          <div className="flex items-center">
+            <XCircle className="h-5 w-5 mr-2" />
+            {error}
+          </div>
+          <button 
+            onClick={fetchOrders}
+            className="mt-2 text-sm underline hover:no-underline"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
 
       {/* Busca e Filtros */}
       <SearchFilters 

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Zap, Eye, EyeOff } from 'lucide-react';
+import { Crown, Eye, EyeOff, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { isDark, toggleTheme } = useTheme();
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -57,21 +59,35 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-white dark:bg-gray-950 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-yellow-900/20 transition-colors duration-500">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-800/40 transition-colors duration-300"
+        >
+          {isDark ? (
+            <Sun className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          ) : (
+            <Moon className="h-5 w-5 text-amber-600" />
+          )}
+        </button>
+      </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-black dark:bg-white rounded-2xl flex items-center justify-center shadow-lg">
-            <Zap className="h-8 w-8 text-white dark:text-black" />
+          <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-2xl animate-float">
+            <Crown className="h-10 w-10 text-white" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+        <h2 className="mt-6 text-center text-4xl font-bold text-gradient bg-gradient-to-r from-amber-600 to-yellow-700 dark:from-amber-400 dark:to-yellow-500">
           Criar Conta
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-center text-sm text-amber-600 dark:text-amber-400">
           Ou{' '}
           <Link
             to="/login"
-            className="font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
+            className="font-semibold text-amber-700 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200"
           >
             entre na sua conta existente
           </Link>
@@ -79,16 +95,16 @@ const Register = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="card shadow-xl">
+        <div className="card bg-white/90 backdrop-blur-sm border-amber-200 dark:bg-gray-800/90 dark:border-amber-700/30 shadow-2xl">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded-lg">
+              <div className="bg-rose-50 border border-rose-200 text-rose-600 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400 px-4 py-3 rounded-xl">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="name" className="block text-sm font-medium text-amber-700 dark:text-amber-300">
                 Nome completo
               </label>
               <div className="mt-1">
@@ -100,14 +116,14 @@ const Register = () => {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="input-field"
+                  className="input-field border-amber-300 dark:border-amber-600"
                   placeholder="Seu nome completo"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="email" className="block text-sm font-medium text-amber-700 dark:text-amber-300">
                 Email
               </label>
               <div className="mt-1">
@@ -119,14 +135,14 @@ const Register = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="input-field"
+                  className="input-field border-amber-300 dark:border-amber-600"
                   placeholder="seu@email.com"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="password" className="block text-sm font-medium text-amber-700 dark:text-amber-300">
                 Senha
               </label>
               <div className="mt-1 relative">
@@ -138,12 +154,12 @@ const Register = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="input-field pr-10"
+                  className="input-field border-amber-300 dark:border-amber-600 pr-10"
                   placeholder="Mínimo 6 caracteres"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-amber-400 hover:text-amber-600 dark:hover:text-amber-300"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -152,7 +168,7 @@ const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-amber-700 dark:text-amber-300">
                 Confirmar senha
               </label>
               <div className="mt-1 relative">
@@ -164,12 +180,12 @@ const Register = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="input-field pr-10"
+                  className="input-field border-amber-300 dark:border-amber-600 pr-10"
                   placeholder="Digite a senha novamente"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-amber-400 hover:text-amber-600 dark:hover:text-amber-300"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -181,15 +197,15 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary flex items-center justify-center py-3"
+                className="w-full btn-primary bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 flex items-center justify-center py-3 text-lg"
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white dark:border-black mr-2"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     Criando conta...
                   </>
                 ) : (
-                  'Criar conta'
+                  'Criar Conta Premium'
                 )}
               </button>
             </div>

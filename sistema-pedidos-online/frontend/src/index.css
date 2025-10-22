@@ -7,60 +7,32 @@
 @layer base {
   html {
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 16px;
   }
   
-  /* Ajustes de fonte responsiva */
-  @media (max-width: 640px) {
-    html {
-      font-size: 14px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    html {
-      font-size: 13px;
-    }
-  }
-
   body {
-    @apply bg-gray-50 text-gray-900 antialiased min-h-screen dark:bg-gray-900 dark:text-gray-100;
-    -webkit-text-size-adjust: 100%;
+    @apply bg-gray-50 text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100;
   }
 }
 
 @layer components {
-  /* Botões responsivos */
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 text-sm sm:text-base;
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
   
   .btn-secondary {
-    @apply bg-white text-gray-700 hover:bg-gray-50 font-medium py-2 px-4 rounded-lg transition-colors duration-200 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 text-sm sm:text-base;
+    @apply bg-white text-gray-700 hover:bg-gray-50 font-medium py-2 px-4 rounded-lg transition-colors duration-200 border border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700;
   }
 
-  /* Inputs responsivos */
   .input-field {
-    @apply w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder:text-gray-400 dark:bg-gray-800 dark:border-gray-700 dark:text-white text-sm sm:text-base;
+    @apply w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white;
   }
 
-  /* Cards responsivos */
   .card {
-    @apply bg-white border border-gray-200 rounded-lg p-4 sm:p-6 dark:bg-gray-800 dark:border-gray-700;
+    @apply bg-white border border-gray-200 rounded-lg p-6 dark:bg-gray-800 dark:border-gray-700;
   }
 
-  /* Navigation responsiva */
-  .nav-item {
-    @apply flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 rounded-lg transition-colors duration-200 font-medium dark:text-gray-400 dark:hover:text-white text-sm sm:text-base;
-  }
-
-  .nav-item-active {
-    @apply flex items-center px-3 py-2 text-gray-900 bg-gray-50 rounded-lg font-medium dark:text-white dark:bg-gray-700 text-sm sm:text-base;
-  }
-
-  /* Status badges responsivos */
   .status-badge {
-    @apply inline-flex items-center px-2 py-1 rounded text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
 
   .status-em-analise {
@@ -81,74 +53,5 @@
 
   .status-concluido {
     @apply bg-gray-100 text-gray-800 dark:bg-gray-500/20 dark:text-gray-300;
-  }
-}
-
-@layer utilities {
-  /* Utilitários para breakpoints customizados */
-  .text-responsive {
-    font-size: clamp(0.875rem, 2vw, 1rem);
-  }
-  
-  .text-responsive-lg {
-    font-size: clamp(1.125rem, 3vw, 1.5rem);
-  }
-  
-  .text-responsive-xl {
-    font-size: clamp(1.5rem, 4vw, 2rem);
-  }
-
-  /* Para containers responsivos */
-  .container-responsive {
-    @apply w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto;
-  }
-
-  /* Para grids responsivos */
-  .grid-responsive {
-    @apply grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
-  }
-}
-
-/* Melhorias de acessibilidade em mobile */
-@media (max-width: 640px) {
-  /* Aumenta área de toque para botões */
-  button, a {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  /* Melhora legibilidade do texto */
-  p, span {
-    line-height: 1.5;
-  }
-
-  /* Ajusta espaçamento para touch */
-  .space-y-responsive > * + * {
-    margin-top: 1rem;
-  }
-}
-
-/* Prevenir zoom em inputs no iOS */
-@media screen and (max-width: 768px) {
-  input, select, textarea {
-    font-size: 16px !important;
-  }
-}
-
-/* Scroll suave para mobile */
-@media (max-width: 768px) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-/* Otimizações para telas muito pequenas */
-@media (max-width: 360px) {
-  .container-responsive {
-    @apply px-3;
-  }
-  
-  .text-responsive {
-    font-size: 0.8125rem;
   }
 }

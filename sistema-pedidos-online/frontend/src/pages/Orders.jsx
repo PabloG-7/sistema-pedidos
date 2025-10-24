@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { Package, Clock, CheckCircle, XCircle, PlayCircle, Plus, Search, Filter, Download } from 'lucide-react';
 import SearchFilters from '../components/SearchFilters';
-import OrderFiles from '../components/OrderFiles';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -256,41 +255,5 @@ const Orders = () => {
     </div>
   );
 };
-
-// No mapa dos pedidos:
-{orders.map((order) => (
-  <div key={order.id} className="card hover:shadow-lg transition-all duration-300">
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-      <div className="flex-1">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {order.category}
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              {order.description}
-            </p>
-            
-            {/* MOSTRAR ARQUIVOS COMPLETOS AQUI */}
-            {order.files && order.files.length > 0 && (
-              <div className="mt-3">
-                <OrderFiles files={order.files} />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end gap-3 lg:gap-2">
-        <span className="text-xl font-bold text-gray-900 dark:text-white">
-          R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR')}
-        </span>
-        <span className={`status-badge ${getStatusClass(order.status)}`}>
-          {order.status}
-        </span>
-      </div>
-    </div>
-  </div>
-))}
 
 export default Orders;

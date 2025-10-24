@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+// contexts/AuthContext.tsx
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 
 const AuthContext = createContext();
@@ -23,7 +24,6 @@ export const AuthProvider = ({ children }) => {
         const userData = localStorage.getItem('user');
         
         if (token && userData) {
-          // Usa os dados do localStorage diretamente
           setUser(JSON.parse(userData));
         }
       } catch (error) {
@@ -38,8 +38,9 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     try {
+      setLoading(true);
       const response = await api.post('/auth/login', { email, password });
       
       const { user, token } = response.data;
@@ -52,11 +53,14 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       const message = error.response?.data?.message || 'Erro ao fazer login';
       return { success: false, message };
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const register = async (name, email, password) => {
+  const register = useCallback(async (name, email, password) => {
     try {
+      setLoading(true);
       const response = await api.post('/auth/register', { name, email, password });
       
       const { user, token } = response.data;
@@ -69,14 +73,16 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       const message = error.response?.data?.message || 'Erro ao criar conta';
       return { success: false, message };
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
-  };
+  }, []);
 
   const value = {
     user,

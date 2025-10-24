@@ -1,3 +1,4 @@
+// pages/Login.tsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,24 +12,30 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { isDark, toggleTheme } = useTheme();
-
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      setError('Preencha todos os campos');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
       const result = await login(email, password);
       if (result.success) {
-        navigate('/');
+        navigate('/', { replace: true });
       } else {
         setError(result.message);
       }
     } catch (error) {
-      setError('Erro ao fazer login. Tente novamente.');
+      setError('Erro inesperado. Tente novamente.');
+      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }
@@ -61,7 +68,7 @@ const Login = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="card bg-white dark:bg-slate-800 shadow-2xl hover:shadow-3xl transition-all duration-300">
+        <div className="card bg-white dark:bg-slate-800 shadow-2xl">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
@@ -73,26 +80,25 @@ const Login = () => {
               <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Email
               </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input-field w-full"
-                  placeholder="seu@email.com"
-                />
-              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input-field w-full"
+                placeholder="seu@email.com"
+                disabled={loading}
+              />
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Senha
               </label>
-              <div className="mt-1 relative">
+              <div className="relative">
                 <input
                   id="password"
                   name="password"
@@ -103,11 +109,13 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="input-field w-full pr-10"
                   placeholder="Sua senha"
+                  disabled={loading}
                 />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -118,13 +126,13 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary flex items-center justify-center py-3 text-base font-semibold"
+                className="w-full btn-primary flex items-center justify-center py-3 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
                 {loading ? (
-                  <>
+                  <div className="flex items-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     Entrando...
-                  </>
+                  </div>
                 ) : (
                   'Entrar'
                 )}

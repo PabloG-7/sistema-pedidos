@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// pages/Dashboard.tsx
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
@@ -15,18 +16,16 @@ const Dashboard = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
+      setLoading(true);
       const endpoint = isAdmin ? '/orders' : '/orders/my-orders';
       const response = await api.get(endpoint);
       const ordersData = response.data.orders || [];
       
       setOrders(ordersData);
 
+      // Cálculos otimizados
       const totalOrders = ordersData.length;
       const pendingOrders = ordersData.filter(order => 
         ['Em análise', 'Em andamento'].includes(order.status)
@@ -34,9 +33,11 @@ const Dashboard = () => {
       const completedOrders = ordersData.filter(order => 
         order.status === 'Concluído'
       ).length;
-      const averageBudget = ordersData.length > 0 
-        ? ordersData.reduce((sum, order) => sum + parseFloat(order.estimated_budget || 0), 0) / ordersData.length
-        : 0;
+      
+      const totalBudget = ordersData.reduce((sum, order) => 
+        sum + parseFloat(order.estimated_budget || 0), 0
+      );
+      const averageBudget = totalOrders > 0 ? totalBudget / totalOrders : 0;
 
       setStats({
         totalOrders,
@@ -52,7 +53,11 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'blue' }) => (
     <div className="card hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group">
@@ -231,7 +236,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Pedidos Recentes - AGORA RESPONSIVO */}
+        {/* Pedidos Recentes */}
         <div className="xl:col-span-3 card hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
@@ -252,7 +257,6 @@ const Dashboard = () => {
           <div className="space-y-4">
             {orders.slice(0, 5).map((order) => (
               <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-300 group gap-4 sm:gap-6">
-                {/* Informações do Pedido */}
                 <div className="flex items-center space-x-4 flex-1 min-w-0">
                   <div className="w-10 h-10 bg-gradient-to-r from-slate-500 to-slate-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     <FileText className="h-5 w-5 text-white" />
@@ -275,7 +279,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Detalhes do Pedido */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 ml-0 sm:ml-4 w-full sm:w-auto">
                   <span className="text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap text-sm sm:text-base">
                     R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', {

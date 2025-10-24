@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { Package, Plus, BarChart3, Users, TrendingUp, Clock, ArrowUp, ArrowDown, FileText } from 'lucide-react';
-import OrderFiles from '../components/OrderFiles';
 
 const Dashboard = () => {
   const { user, isAdmin } = useAuth();
@@ -237,7 +236,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Pedidos Recentes com Arquivos */}
+        {/* Pedidos Recentes */}
         <div className="xl:col-span-3 card hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
@@ -258,7 +257,6 @@ const Dashboard = () => {
           <div className="space-y-4">
             {orders.slice(0, 5).map((order) => (
               <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-300 group gap-4 sm:gap-6">
-                {/* Informações do Pedido */}
                 <div className="flex items-center space-x-4 flex-1 min-w-0">
                   <div className="w-10 h-10 bg-gradient-to-r from-slate-500 to-slate-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     <FileText className="h-5 w-5 text-white" />
@@ -270,15 +268,17 @@ const Dashboard = () => {
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
                       {order.description}
                     </p>
-                    
-                    {/* MOSTRAR ARQUIVOS COMPACTOS */}
                     {order.files && order.files.length > 0 && (
-                      <OrderFiles files={order.files} compact={true} />
+                      <div className="flex items-center mt-2">
+                        <FileText className="h-3 w-3 text-indigo-500 mr-1" />
+                        <span className="text-xs text-indigo-600 dark:text-indigo-400">
+                          {order.files.length} arquivo(s)
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>
 
-                {/* Detalhes do Pedido */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 ml-0 sm:ml-4 w-full sm:w-auto">
                   <span className="text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap text-sm sm:text-base">
                     R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', {

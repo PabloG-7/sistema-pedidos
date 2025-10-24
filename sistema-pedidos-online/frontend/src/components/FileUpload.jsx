@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, File, Image, Check, AlertCircle, Loader, Download } from 'lucide-react';
+import { Upload, X, File, Image, Check, AlertCircle, Loader, Download, FileText, FileImage } from 'lucide-react';
 import { api } from '../services/api';
 
 const FileUpload = ({ onFilesChange, maxFiles = 5, existingFiles = [] }) => {
@@ -100,12 +100,16 @@ const FileUpload = ({ onFilesChange, maxFiles = 5, existingFiles = [] }) => {
   };
 
   const getFileIcon = (type) => {
-    if (type?.startsWith('image/')) return <Image className="h-5 w-5 text-blue-500" />;
-    if (type?.includes('pdf')) return <File className="h-5 w-5 text-red-500" />;
-    if (type?.includes('word') || type?.includes('document')) {
-      return <File className="h-5 w-5 text-blue-600" />;
+    if (type?.startsWith('image/')) {
+      return <FileImage className="h-4 w-4 text-blue-500" />;
     }
-    return <File className="h-5 w-5 text-gray-500" />;
+    if (type?.includes('pdf')) {
+      return <FileText className="h-4 w-4 text-red-500" />;
+    }
+    if (type?.includes('word') || type?.includes('document')) {
+      return <FileText className="h-4 w-4 text-blue-600" />;
+    }
+    return <File className="h-4 w-4 text-gray-500" />;
   };
 
   const formatFileSize = (bytes) => {
@@ -123,7 +127,7 @@ const FileUpload = ({ onFilesChange, maxFiles = 5, existingFiles = [] }) => {
   return (
     <div className="space-y-4">
       <div
-        className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 cursor-pointer bg-gray-50/50 dark:bg-gray-800/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/20"
+        className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 cursor-pointer bg-gray-50/50 dark:bg-gray-800/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/20"
         onClick={() => fileInputRef.current?.click()}
       >
         <input
@@ -141,6 +145,9 @@ const FileUpload = ({ onFilesChange, maxFiles = 5, existingFiles = [] }) => {
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-500">
           PNG, JPG, PDF, DOC (Máx. 5MB por arquivo) • Máximo {maxFiles} arquivos
+        </p>
+        <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+          Adicione imagens, PDFs ou documentos para melhorar seu orçamento (Máx. 5MB por arquivo)
         </p>
       </div>
 
@@ -173,7 +180,7 @@ const FileUpload = ({ onFilesChange, maxFiles = 5, existingFiles = [] }) => {
                       </p>
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                     </div>
-                    <div className="flex items-center space-x-4 mt-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-1">
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {formatFileSize(file.size)}
                       </p>

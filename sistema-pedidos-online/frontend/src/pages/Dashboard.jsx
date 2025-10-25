@@ -1,3 +1,4 @@
+// pages/Dashboard.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -59,11 +60,11 @@ const Dashboard = () => {
   }, [fetchDashboardData]);
 
   const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'blue' }) => (
-    <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/20 rounded-2xl p-6 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] group">
+    <div className="card hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">{title}</p>
-          <p className="text-3xl font-bold text-slate-900 dark:text-white mb-3">{value}</p>
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{value}</p>
           {change && (
             <div className="flex items-center">
               {trend === 'up' ? (
@@ -74,12 +75,12 @@ const Dashboard = () => {
               <span className={`text-sm ml-1 ${trend === 'up' ? 'text-emerald-600' : 'text-rose-600'}`}>
                 {Math.abs(change)}%
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">vs último mês</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">vs último mês</span>
             </div>
           )}
         </div>
-        <div className={`w-14 h-14 bg-gradient-to-br ${getMetricColor(color)} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
-          <Icon className="h-7 w-7 text-white" />
+        <div className={`w-12 h-12 bg-gradient-to-br ${getMetricColor(color)} rounded-xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300`}>
+          <Icon className="h-6 w-6 text-white" />
         </div>
       </div>
     </div>
@@ -88,7 +89,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
       </div>
     );
   }
@@ -98,19 +99,19 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
             Dashboard
           </h1>
-          <p className="text-slate-600 dark:text-slate-300 mt-3 text-xl">
-            Bem-vindo de volta, <span className="font-semibold text-blue-600 dark:text-blue-400">{user?.name}</span>!
+          <p className="text-gray-600 dark:text-gray-300 mt-2 text-lg">
+            Bem-vindo de volta, <span className="font-semibold text-indigo-600 dark:text-indigo-400">{user?.name}</span>!
           </p>
         </div>
         <Link
           to="/new-order"
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-500 hover:shadow-2xl transform hover:scale-105 flex items-center space-x-3 mt-4 sm:mt-0 group"
+          className="btn-primary flex items-center space-x-3 mt-4 sm:mt-0 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group"
         >
-          <Plus className="h-6 w-6 group-hover:scale-110 transition-transform duration-300" />
-          <span className="text-lg">Novo Pedido</span>
+          <Plus className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+          <span className="font-semibold">Novo Pedido</span>
         </Link>
       </div>
 
@@ -122,7 +123,7 @@ const Dashboard = () => {
           icon={Package}
           change={12}
           trend="up"
-          color="blue"
+          color="indigo"
         />
         <MetricCard
           title="Pendentes"
@@ -153,14 +154,14 @@ const Dashboard = () => {
       {/* Conteúdo Principal */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Distribuição de Status */}
-        <div className="xl:col-span-2 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/20 rounded-2xl p-8 hover:shadow-2xl transition-all duration-500">
-          <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-8 flex items-center">
-            <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mr-4">
-              <BarChart3 className="h-5 w-5 text-white" />
+        <div className="xl:col-span-2 card hover:shadow-lg transition-all duration-300">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mr-3">
+              <BarChart3 className="h-4 w-4 text-white" />
             </div>
             Distribuição por Status
           </h3>
-          <div className="space-y-6">
+          <div className="space-y-5">
             {[
               { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length, color: 'amber' },
               { label: 'Aprovado', value: orders.filter(o => o.status === 'Aprovado').length, color: 'emerald' },
@@ -170,15 +171,15 @@ const Dashboard = () => {
             ].filter(item => item.value > 0).map((item, index) => (
               <div key={index} className="flex items-center justify-between group">
                 <div className="flex items-center space-x-4 flex-1">
-                  <span className={`status-badge ${getStatusClass(item.label)} min-w-[120px] justify-center text-sm`}>
+                  <span className={`status-badge ${getStatusClass(item.label)} min-w-[100px] justify-center`}>
                     {item.label}
                   </span>
-                  <span className="text-base font-semibold text-slate-900 dark:text-white min-w-[50px]">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white min-w-[40px]">
                     {item.value}
                   </span>
-                  <div className="flex-1 bg-slate-100 dark:bg-slate-700 rounded-full h-4 shadow-inner">
+                  <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-3 shadow-inner">
                     <div
-                      className="h-4 rounded-full transition-all duration-1000 ease-out group-hover:scale-y-110"
+                      className="h-3 rounded-full transition-all duration-1000 ease-out group-hover:scale-y-110"
                       style={{ 
                         width: `${(item.value / Math.max(1, orders.length)) * 100}%`,
                         backgroundColor: getStatusColor(item.label)
@@ -186,7 +187,7 @@ const Dashboard = () => {
                     ></div>
                   </div>
                 </div>
-                <span className="text-base font-medium text-slate-600 dark:text-slate-400 min-w-[60px] text-right">
+                <span className="text-sm text-gray-500 dark:text-gray-400 min-w-[50px] text-right">
                   {((item.value / Math.max(1, orders.length)) * 100).toFixed(1)}%
                 </span>
               </div>
@@ -195,97 +196,97 @@ const Dashboard = () => {
         </div>
 
         {/* Ações Rápidas */}
-        <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/20 rounded-2xl p-8 hover:shadow-2xl transition-all duration-500">
-          <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-8 flex items-center">
-            <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center mr-4">
-              <TrendingUp className="h-5 w-5 text-white" />
+        <div className="card hover:shadow-lg transition-all duration-300">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mr-3">
+              <TrendingUp className="h-4 w-4 text-white" />
             </div>
             Ações Rápidas
           </h3>
           <div className="space-y-4">
             <Link
               to="/new-order"
-              className="flex items-center p-5 border-2 border-dashed border-blue-200 dark:border-blue-800 rounded-2xl hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-500 group"
+              className="flex items-center p-4 border-2 border-dashed border-indigo-200 dark:border-indigo-800 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-300 group"
             >
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                <Plus className="h-6 w-6 text-white" />
+              <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Plus className="h-5 w-5 text-white" />
               </div>
-              <span className="font-semibold text-slate-900 dark:text-white ml-4 text-lg">Novo Pedido</span>
+              <span className="font-semibold text-gray-900 dark:text-white ml-4">Novo Pedido</span>
             </Link>
             <Link
               to="/orders"
-              className="flex items-center p-5 border-2 border-dashed border-emerald-200 dark:border-emerald-800 rounded-2xl hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 transition-all duration-500 group"
+              className="flex items-center p-4 border-2 border-dashed border-blue-200 dark:border-blue-800 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 group"
             >
-              <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                <Package className="h-6 w-6 text-white" />
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Package className="h-5 w-5 text-white" />
               </div>
-              <span className="font-semibold text-slate-900 dark:text-white ml-4 text-lg">Ver Pedidos</span>
+              <span className="font-semibold text-gray-900 dark:text-white ml-4">Ver Pedidos</span>
             </Link>
             {isAdmin && (
               <Link
                 to="/admin/orders"
-                className="flex items-center p-5 border-2 border-dashed border-purple-200 dark:border-purple-800 rounded-2xl hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-all duration-500 group"
+                className="flex items-center p-4 border-2 border-dashed border-purple-200 dark:border-purple-800 rounded-xl hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 group"
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                  <Users className="h-6 w-6 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-semibold text-slate-900 dark:text-white ml-4 text-lg">Painel Admin</span>
+                <span className="font-semibold text-gray-900 dark:text-white ml-4">Painel Admin</span>
               </Link>
             )}
           </div>
         </div>
 
         {/* Pedidos Recentes */}
-        <div className="xl:col-span-3 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-white/20 dark:border-slate-700/20 rounded-2xl p-8 hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-2xl font-semibold text-slate-900 dark:text-white flex items-center">
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl flex items-center justify-center mr-4">
-                <Clock className="h-5 w-5 text-white" />
+        <div className="xl:col-span-3 card hover:shadow-lg transition-all duration-300">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg flex items-center justify-center mr-3">
+                <Clock className="h-4 w-4 text-white" />
               </div>
               Pedidos Recentes
             </h3>
             <Link 
               to="/orders" 
-              className="text-base font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-300 flex items-center group"
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200 flex items-center group"
             >
               Ver todos
-              <ArrowUp className="h-5 w-5 ml-2 rotate-45 group-hover:translate-x-1 transition-transform duration-300" />
+              <ArrowUp className="h-4 w-4 ml-1 rotate-45 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
           </div>
           
           <div className="space-y-4">
             {orders.slice(0, 5).map((order) => (
-              <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border border-slate-100 dark:border-slate-700 rounded-2xl hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-all duration-500 group gap-4 sm:gap-6">
+              <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-300 group gap-4 sm:gap-6">
                 <div className="flex items-center space-x-4 flex-1 min-w-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 flex-shrink-0">
-                    <FileText className="h-6 w-6 text-white" />
+                  <div className="w-10 h-10 bg-gradient-to-r from-slate-500 to-slate-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                    <FileText className="h-5 w-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-slate-900 dark:text-white truncate text-base sm:text-lg">
+                    <h4 className="font-semibold text-gray-900 dark:text-white truncate text-sm sm:text-base">
                       {order.category}
                     </h4>
-                    <p className="text-slate-600 dark:text-slate-400 truncate mt-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
                       {order.description}
                     </p>
                     {order.files && order.files.length > 0 && (
-                      <div className="flex items-center mt-3">
-                        <FileText className="h-4 w-4 text-blue-500 mr-2" />
-                        <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                          {order.files.length} arquivo(s) anexado(s)
+                      <div className="flex items-center mt-2">
+                        <FileText className="h-3 w-3 text-indigo-500 mr-1" />
+                        <span className="text-xs text-indigo-600 dark:text-indigo-400">
+                          {order.files.length} arquivo(s)
                         </span>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 ml-0 sm:ml-4 w-full sm:w-auto">
-                  <span className="text-xl font-bold text-slate-900 dark:text-white whitespace-nowrap text-base sm:text-lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 ml-0 sm:ml-4 w-full sm:w-auto">
+                  <span className="text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap text-sm sm:text-base">
                     R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2
                     })}
                   </span>
-                  <span className={`status-badge ${getStatusClass(order.status)} justify-center text-sm min-w-[140px]`}>
+                  <span className={`status-badge ${getStatusClass(order.status)} justify-center text-xs sm:text-sm min-w-[100px] sm:min-w-[120px]`}>
                     {order.status}
                   </span>
                 </div>
@@ -293,17 +294,17 @@ const Dashboard = () => {
             ))}
             
             {orders.length === 0 && (
-              <div className="text-center py-16">
-                <div className="w-20 h-20 bg-gradient-to-r from-slate-400 to-slate-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Package className="h-10 w-10 text-white" />
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Package className="h-8 w-8 text-white" />
                 </div>
-                <p className="text-slate-500 dark:text-slate-400 text-xl mb-6">Nenhum pedido encontrado</p>
+                <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">Nenhum pedido encontrado</p>
                 <Link 
                   to="/new-order" 
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-500 hover:shadow-2xl transform hover:scale-105 inline-flex items-center space-x-3 group"
+                  className="btn-primary inline-flex items-center space-x-2 px-6 py-3 rounded-xl group"
                 >
-                  <Plus className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                  <span className="text-lg">Criar primeiro pedido</span>
+                  <Plus className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                  <span>Criar primeiro pedido</span>
                 </Link>
               </div>
             )}
@@ -317,13 +318,14 @@ const Dashboard = () => {
 // Helper functions
 const getMetricColor = (color) => {
   const colorMap = {
-    blue: 'from-blue-500 to-indigo-500',
-    amber: 'from-amber-500 to-orange-500',
+    indigo: 'from-indigo-500 to-purple-500',
+    blue: 'from-blue-500 to-cyan-500',
     emerald: 'from-emerald-500 to-green-500',
+    amber: 'from-amber-500 to-orange-500',
     violet: 'from-violet-500 to-purple-500',
     rose: 'from-rose-500 to-pink-500'
   };
-  return colorMap[color] || 'from-blue-500 to-indigo-500';
+  return colorMap[color] || 'from-indigo-500 to-purple-500';
 };
 
 const getStatusClass = (status) => {

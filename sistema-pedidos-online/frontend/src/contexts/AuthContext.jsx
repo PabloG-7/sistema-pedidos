@@ -1,5 +1,4 @@
-// contexts/AuthContext.tsx
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { api } from '../services/api';
 
 const AuthContext = createContext();
@@ -16,7 +15,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Carregar usuário do localStorage (SEM verificar com backend)
   useEffect(() => {
     const loadUser = () => {
       try {
@@ -38,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
-  const login = useCallback(async (email, password) => {
+  const login = async (email, password) => {
     try {
       setLoading(true);
       const response = await api.post('/auth/login', { email, password });
@@ -56,9 +54,9 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const register = useCallback(async (name, email, password) => {
+  const register = async (name, email, password) => {
     try {
       setLoading(true);
       const response = await api.post('/auth/register', { name, email, password });
@@ -76,13 +74,13 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const logout = useCallback(() => {
+  const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
-  }, []);
+  };
 
   const value = {
     user,

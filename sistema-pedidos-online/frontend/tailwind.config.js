@@ -28,11 +28,15 @@ export default {
         'rajdhani': ['Rajdhani', 'sans-serif'],
       },
       animation: {
+        'fade-in': 'fadeIn 0.5s ease-out',
         'float': 'float 6s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite alternate',
-        'text-shine': 'text-shine 3s ease-in-out infinite alternate',
       },
       keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
         float: {
           '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
           '50%': { transform: 'translateY(-20px) rotate(5deg)' },
@@ -46,21 +50,8 @@ export default {
             boxShadow: '0 0 30px #00ffff, 0 0 60px #00ffff, 0 0 90px #00ffff',
             opacity: '1'
           },
-        },
-        'text-shine': {
-          '0%': { 
-            'background-position': '0% 50%',
-            'text-shadow': '0 0 10px #ff00ff, 0 0 20px #ff00ff'
-          },
-          '100%': { 
-            'background-position': '100% 50%',
-            'text-shadow': '0 0 20px #00ffff, 0 0 40px #00ffff'
-          },
         }
       },
-      backgroundImage: {
-        'cyber-grid': "url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')",
-      }
     },
   },
   plugins: [],

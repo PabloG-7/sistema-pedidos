@@ -1,9 +1,11 @@
-// pages/Dashboard.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { Package, Plus, BarChart3, Users, TrendingUp, Clock, ArrowUp, ArrowDown, FileText, Cpu, Zap, Binary } from 'lucide-react';
+import { 
+  Package, Plus, BarChart3, Users, TrendingUp, Clock, 
+  ArrowUp, ArrowDown, FileText, Sparkles, Zap 
+} from 'lucide-react';
 
 const Dashboard = () => {
   const { user, isAdmin } = useAuth();
@@ -58,292 +60,258 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'pink' }) => (
-    <div className="group relative">
-      <div className="absolute inset-0 bg-gradient-to-r from-neon-pink to-neon-blue rounded-sm blur-lg opacity-30 group-hover:opacity-50 transition-all duration-500"></div>
-      <div className="relative card-cyber border-2 hover:border-neon-green hover:shadow-[0_0_30px_#00ff00] transition-all duration-500">
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex-1">
-              <p className="text-sm font-rajdhani font-semibold text-gray-300 mb-3 uppercase tracking-wider">{title}</p>
-              <p className="text-4xl font-orbitron font-bold text-white mb-4">{value}</p>
-              {change && (
-                <div className="flex items-center">
-                  {trend === 'up' ? (
-                    <ArrowUp className="h-5 w-5 text-neon-green" />
-                  ) : (
-                    <ArrowDown className="h-5 w-5 text-neon-pink" />
-                  )}
-                  <span className={`text-sm ml-2 font-orbitron ${trend === 'up' ? 'text-neon-green' : 'text-neon-pink'}`}>
-                    {Math.abs(change)}%
-                  </span>
-                  <span className="text-xs text-gray-400 ml-2 font-rajdhani">vs último mês</span>
-                </div>
+  const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'indigo' }) => (
+    <div className="metric-card group hover-lift">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{value}</p>
+          {change && (
+            <div className="flex items-center">
+              {trend === 'up' ? (
+                <ArrowUp className="h-4 w-4 text-emerald-500 animate-bounce" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-rose-500 animate-bounce" />
               )}
+              <span className={`text-sm ml-1 ${trend === 'up' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {Math.abs(change)}%
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">vs último mês</span>
             </div>
-            <div className={`relative w-16 h-16 border-2 ${getMetricBorderColor(color)} flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-500`}>
-              <Icon className="h-8 w-8 text-white" />
-              <div className="absolute inset-0 border-2 border-white/20 animate-ping"></div>
-            </div>
-          </div>
-          <div className="scanline"></div>
+          )}
+        </div>
+        <div className={`w-14 h-14 bg-gradient-to-br ${getMetricColor(color)} rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500 icon-3d`}>
+          <Icon className="h-6 w-6 text-white" />
         </div>
       </div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
     </div>
   );
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-96">
-        <div className="text-center">
-          <div className="spinner-cyber w-20 h-20 mx-auto mb-6"></div>
-          <p className="text-neon-blue font-orbitron text-lg">CARREGANDO SISTEMA...</p>
-          <div className="mt-4 flex space-x-2 justify-center">
-            <div className="w-2 h-2 bg-neon-pink rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-neon-blue rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-            <div className="w-2 h-2 bg-neon-green rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-          </div>
-        </div>
+      <div className="flex justify-center items-center h-64">
+        <div className="spinner-modern w-12 h-12"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fade-in bg-circuit">
-      {/* Header Cyberpunk */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative">
-          <div className="absolute -left-6 -top-6 w-12 h-12 bg-neon-pink rounded-full blur-xl opacity-50"></div>
-          <h1 className="text-5xl font-orbitron font-bold text-white relative glitch-text" data-text="DASHBOARD">
-            DASHBOARD
+    <div className="space-y-8 animate-slide-in-up">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-4xl font-bold gradient-text mb-2">
+            Dashboard
           </h1>
-          <p className="text-xl font-rajdhani text-gray-300 mt-4">
-            BEM-VINDO, <span className="text-neon-green font-bold">{user?.name?.toUpperCase()}</span>!
+          <p className="text-gray-600 dark:text-gray-300 text-lg">
+            Bem-vindo de volta, <span className="font-semibold text-indigo-600 dark:text-indigo-400">{user?.name}</span>!
+            <Sparkles className="inline h-5 w-5 text-yellow-500 ml-2 animate-float" />
           </p>
-          <div className="flex items-center mt-3 space-x-4">
-            <div className="w-3 h-3 bg-neon-green rounded-full animate-pulse"></div>
-            <span className="text-sm text-gray-400 font-rajdhani">SISTEMA ONLINE</span>
-          </div>
         </div>
         <Link
           to="/new-order"
-          className="btn-cyber flex items-center space-x-4 mt-6 lg:mt-0 group relative overflow-hidden"
+          className="btn-primary flex items-center space-x-3 mt-4 sm:mt-0 px-6 py-3 rounded-xl group"
         >
-          <Binary className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-          <span className="font-orbitron tracking-wider">NOVO PEDIDO</span>
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-            <div className="w-2 h-2 bg-neon-blue rounded-full animate-ping"></div>
-          </div>
+          <Plus className="h-5 w-5 group-hover:scale-110 transition-transform duration-500" />
+          <span className="font-semibold">Novo Pedido</span>
+          <Zap className="h-4 w-4 animate-pulse" />
         </Link>
       </div>
 
-      {/* Grid de Métricas Cyberpunk */}
+      {/* Grid de Métricas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
-          title="TOTAL DE PEDIDOS"
+          title="Total de Pedidos"
           value={stats.totalOrders}
           icon={Package}
           change={12}
           trend="up"
-          color="pink"
+          color="indigo"
         />
         <MetricCard
-          title="PENDENTES"
+          title="Pendentes"
           value={stats.pendingOrders}
           icon={Clock}
           change={5}
           trend="down"
-          color="orange"
+          color="amber"
         />
         <MetricCard
-          title="CONCLUÍDOS"
+          title="Concluídos"
           value={stats.completedOrders}
           icon={TrendingUp}
           change={8}
           trend="up"
-          color="green"
+          color="emerald"
         />
         <MetricCard
-          title="TICKET MÉDIO"
+          title="Ticket Médio"
           value={`R$ ${stats.averageBudget}`}
           icon={BarChart3}
           change={15}
           trend="up"
-          color="blue"
+          color="violet"
         />
       </div>
 
       {/* Conteúdo Principal */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Distribuição de Status */}
-        <div className="xl:col-span-2 group">
-          <div className="absolute inset-0 bg-gradient-to-r from-neon-blue to-neon-green rounded-sm blur-lg opacity-20 group-hover:opacity-30 transition-all duration-500"></div>
-          <div className="relative card-cyber border-2 border-neon-blue">
-            <h3 className="text-2xl font-orbitron font-bold text-neon-blue mb-8 flex items-center">
-              <div className="w-12 h-12 border-2 border-neon-blue flex items-center justify-center mr-4">
-                <BarChart3 className="h-6 w-6 text-neon-blue" />
-              </div>
-              DISTRIBUIÇÃO POR STATUS
-            </h3>
-            <div className="space-y-6">
-              {[
-                { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length, color: 'orange' },
-                { label: 'Aprovado', value: orders.filter(o => o.status === 'Aprovado').length, color: 'green' },
-                { label: 'Em andamento', value: orders.filter(o => o.status === 'Em andamento').length, color: 'blue' },
-                { label: 'Concluído', value: orders.filter(o => o.status === 'Concluído').length, color: 'purple' },
-                { label: 'Rejeitado', value: orders.filter(o => o.status === 'Rejeitado').length, color: 'pink' },
-              ].filter(item => item.value > 0).map((item, index) => (
-                <div key={index} className="flex items-center justify-between group/item">
-                  <div className="flex items-center space-x-4 flex-1">
-                    <span className={`status-neon ${getStatusClass(item.label)} min-w-[140px] justify-center`}>
-                      {item.label}
-                    </span>
-                    <span className="text-lg font-orbitron text-white min-w-[40px]">
-                      {item.value}
-                    </span>
-                    <div className="flex-1 bg-exotic-300/30 h-4 border border-neon-blue/30">
-                      <div
-                        className="h-full transition-all duration-1000 ease-out group-hover/item:scale-y-110 relative overflow-hidden"
-                        style={{ 
-                          width: `${(item.value / Math.max(1, orders.length)) * 100}%`,
-                          background: `linear-gradient(90deg, ${getStatusColor(item.label)}, ${getStatusColor(item.label)}80)`
-                        }}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-sm font-orbitron text-neon-blue min-w-[60px] text-right">
-                    {((item.value / Math.max(1, orders.length)) * 100).toFixed(1)}%
-                  </span>
-                </div>
-              ))}
+        <div className="xl:col-span-2 card particle-effect">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mr-3 shadow-lg icon-3d">
+              <BarChart3 className="h-5 w-5 text-white" />
             </div>
-            <div className="scanline"></div>
+            Distribuição por Status
+          </h3>
+          <div className="space-y-5">
+            {[
+              { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length, color: 'amber' },
+              { label: 'Aprovado', value: orders.filter(o => o.status === 'Aprovado').length, color: 'emerald' },
+              { label: 'Em andamento', value: orders.filter(o => o.status === 'Em andamento').length, color: 'blue' },
+              { label: 'Concluído', value: orders.filter(o => o.status === 'Concluído').length, color: 'violet' },
+              { label: 'Rejeitado', value: orders.filter(o => o.status === 'Rejeitado').length, color: 'rose' },
+            ].filter(item => item.value > 0).map((item, index) => (
+              <div key={index} className="flex items-center justify-between group">
+                <div className="flex items-center space-x-4 flex-1">
+                  <span className={`status-badge ${getStatusClass(item.label)} min-w-[100px] justify-center hover-lift`}>
+                    {item.label}
+                  </span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white min-w-[40px]">
+                    {item.value}
+                  </span>
+                  <div className="progress-bar flex-1">
+                    <div
+                      className="progress-fill"
+                      style={{ 
+                        width: `${(item.value / Math.max(1, orders.length)) * 100}%`,
+                        backgroundColor: getStatusColor(item.label)
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <span className="text-sm text-gray-500 dark:text-gray-400 min-w-[50px] text-right">
+                  {((item.value / Math.max(1, orders.length)) * 100).toFixed(1)}%
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Ações Rápidas */}
-        <div className="group">
-          <div className="absolute inset-0 bg-gradient-to-r from-neon-green to-neon-blue rounded-sm blur-lg opacity-20 group-hover:opacity-30 transition-all duration-500"></div>
-          <div className="relative card-cyber border-2 border-neon-green">
-            <h3 className="text-2xl font-orbitron font-bold text-neon-green mb-8 flex items-center">
-              <div className="w-12 h-12 border-2 border-neon-green flex items-center justify-center mr-4">
-                <Zap className="h-6 w-6 text-neon-green" />
-              </div>
-              AÇÕES RÁPIDAS
-            </h3>
-            <div className="space-y-4">
-              <Link
-                to="/new-order"
-                className="flex items-center p-6 border-2 border-dashed border-neon-pink hover:border-neon-pink hover:bg-neon-pink/10 transition-all duration-500 group/action"
-              >
-                <div className="w-14 h-14 border-2 border-neon-pink flex items-center justify-center group-hover/action:scale-110 transition-transform duration-500">
-                  <Plus className="h-6 w-6 text-neon-pink" />
-                </div>
-                <span className="font-orbitron text-white ml-6 text-lg">NOVO PEDIDO</span>
-              </Link>
-              <Link
-                to="/orders"
-                className="flex items-center p-6 border-2 border-dashed border-neon-blue hover:border-neon-blue hover:bg-neon-blue/10 transition-all duration-500 group/action"
-              >
-                <div className="w-14 h-14 border-2 border-neon-blue flex items-center justify-center group-hover/action:scale-110 transition-transform duration-500">
-                  <Package className="h-6 w-6 text-neon-blue" />
-                </div>
-                <span className="font-orbitron text-white ml-6 text-lg">VER PEDIDOS</span>
-              </Link>
-              {isAdmin && (
-                <Link
-                  to="/admin/orders"
-                  className="flex items-center p-6 border-2 border-dashed border-neon-purple hover:border-neon-purple hover:bg-neon-purple/10 transition-all duration-500 group/action"
-                >
-                  <div className="w-14 h-14 border-2 border-neon-purple flex items-center justify-center group-hover/action:scale-110 transition-transform duration-500">
-                    <Users className="h-6 w-6 text-neon-purple" />
-                  </div>
-                  <span className="font-orbitron text-white ml-6 text-lg">PAINEL ADMIN</span>
-                </Link>
-              )}
+        <div className="card">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mr-3 shadow-lg icon-3d">
+              <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <div className="scanline"></div>
+            Ações Rápidas
+          </h3>
+          <div className="space-y-4">
+            <Link
+              to="/new-order"
+              className="flex items-center p-4 glass-card border-2 border-indigo-200/50 dark:border-indigo-800/50 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-all duration-500 group hover-lift"
+            >
+              <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 icon-3d">
+                <Plus className="h-6 w-6 text-white" />
+              </div>
+              <span className="font-semibold text-gray-900 dark:text-white ml-4">Novo Pedido</span>
+            </Link>
+            <Link
+              to="/orders"
+              className="flex items-center p-4 glass-card border-2 border-blue-200/50 dark:border-blue-800/50 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-500 group hover-lift"
+            >
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 icon-3d">
+                <Package className="h-6 w-6 text-white" />
+              </div>
+              <span className="font-semibold text-gray-900 dark:text-white ml-4">Ver Pedidos</span>
+            </Link>
+            {isAdmin && (
+              <Link
+                to="/admin/orders"
+                className="flex items-center p-4 glass-card border-2 border-purple-200/50 dark:border-purple-800/50 rounded-xl hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-all duration-500 group hover-lift"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 icon-3d">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <span className="font-semibold text-gray-900 dark:text-white ml-4">Painel Admin</span>
+              </Link>
+            )}
           </div>
         </div>
 
         {/* Pedidos Recentes */}
-        <div className="xl:col-span-3 group">
-          <div className="absolute inset-0 bg-gradient-to-r from-neon-orange to-neon-pink rounded-sm blur-lg opacity-20 group-hover:opacity-30 transition-all duration-500"></div>
-          <div className="relative card-cyber border-2 border-neon-orange">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-2xl font-orbitron font-bold text-neon-orange flex items-center">
-                <div className="w-12 h-12 border-2 border-neon-orange flex items-center justify-center mr-4">
-                  <Clock className="h-6 w-6 text-neon-orange" />
-                </div>
-                PEDIDOS RECENTES
-              </h3>
-              <Link 
-                to="/orders" 
-                className="btn-cyber-secondary flex items-center space-x-3 group/link"
-              >
-                <span>VER TODOS</span>
-                <ArrowUp className="h-4 w-4 rotate-45 group-hover/link:translate-x-1 transition-transform duration-300" />
-              </Link>
-            </div>
-            
-            <div className="space-y-4">
-              {orders.slice(0, 5).map((order) => (
-                <div key={order.id} className="flex flex-col lg:flex-row lg:items-center justify-between p-6 border-2 border-neon-blue/30 hover:border-neon-green hover:bg-neon-green/5 transition-all duration-500 group/item">
-                  <div className="flex items-center space-x-4 flex-1 min-w-0">
-                    <div className="w-14 h-14 border-2 border-neon-blue flex items-center justify-center group-hover/item:scale-110 transition-transform duration-500">
-                      <FileText className="h-6 w-6 text-neon-blue" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-orbitron font-bold text-white text-lg truncate">
-                        {order.category}
-                      </h4>
-                      <p className="font-rajdhani text-gray-300 truncate mt-2">
-                        {order.description}
-                      </p>
-                      {order.files && order.files.length > 0 && (
-                        <div className="flex items-center mt-3">
-                          <FileText className="h-4 w-4 text-neon-blue mr-2" />
-                          <span className="text-sm text-neon-blue font-rajdhani">
-                            {order.files.length} ARQUIVO(S)
-                          </span>
-                        </div>
-                      )}
-                    </div>
+        <div className="xl:col-span-3 card">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl flex items-center justify-center mr-3 shadow-lg icon-3d">
+                <Clock className="h-5 w-5 text-white" />
+              </div>
+              Pedidos Recentes
+            </h3>
+            <Link 
+              to="/orders" 
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200 flex items-center group"
+            >
+              Ver todos
+              <ArrowUp className="h-4 w-4 ml-1 rotate-45 group-hover:translate-x-1 transition-transform duration-300" />
+            </Link>
+          </div>
+          
+          <div className="space-y-4">
+            {orders.slice(0, 5).map((order) => (
+              <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 glass-card border border-gray-100/50 dark:border-gray-700/50 rounded-xl hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-all duration-500 group hover-lift gap-4 sm:gap-6">
+                <div className="flex items-center space-x-4 flex-1 min-w-0">
+                  <div className="w-12 h-12 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 icon-3d flex-shrink-0">
+                    <FileText className="h-6 w-6 text-white" />
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-gray-900 dark:text-white truncate text-sm sm:text-base">
+                      {order.category}
+                    </h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
+                      {order.description}
+                    </p>
+                    {order.files && order.files.length > 0 && (
+                      <div className="flex items-center mt-2">
+                        <FileText className="h-3 w-3 text-indigo-500 mr-1" />
+                        <span className="text-xs text-indigo-600 dark:text-indigo-400">
+                          {order.files.length} arquivo(s)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-                  <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-8 mt-4 lg:mt-0 w-full lg:w-auto">
-                    <span className="text-xl font-orbitron font-bold text-neon-green whitespace-nowrap">
-                      R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })}
-                    </span>
-                    <span className={`status-neon ${getStatusClass(order.status)} justify-center min-w-[140px]`}>
-                      {order.status}
-                    </span>
-                  </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 ml-0 sm:ml-4 w-full sm:w-auto">
+                  <span className="text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap text-sm sm:text-base">
+                    R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
+                  </span>
+                  <span className={`status-badge ${getStatusClass(order.status)} justify-center text-xs sm:text-sm min-w-[100px] sm:min-w-[120px] hover-lift`}>
+                    {order.status}
+                  </span>
                 </div>
-              ))}
-              
-              {orders.length === 0 && (
-                <div className="text-center py-16">
-                  <div className="w-24 h-24 border-2 border-neon-blue rounded-full flex items-center justify-center mx-auto mb-8">
-                    <Package className="h-10 w-10 text-neon-blue" />
-                  </div>
-                  <p className="text-gray-400 font-rajdhani text-xl mb-6">NENHUM PEDIDO ENCONTRADO</p>
-                  <Link 
-                    to="/new-order" 
-                    className="btn-cyber inline-flex items-center space-x-4 group"
-                  >
-                    <Plus className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                    <span>CRIAR PRIMEIRO PEDIDO</span>
-                  </Link>
+              </div>
+            ))}
+            
+            {orders.length === 0 && (
+              <div className="text-center py-12">
+                <div className="w-20 h-20 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg icon-3d">
+                  <Package className="h-8 w-8 text-white" />
                 </div>
-              )}
-            </div>
-            <div className="scanline"></div>
+                <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">Nenhum pedido encontrado</p>
+                <Link 
+                  to="/new-order" 
+                  className="btn-primary inline-flex items-center space-x-2 px-6 py-3 rounded-xl group"
+                >
+                  <Plus className="h-4 w-4 group-hover:scale-110 transition-transform duration-500" />
+                  <span>Criar primeiro pedido</span>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -351,16 +319,17 @@ const Dashboard = () => {
   );
 };
 
-// Helper functions
-const getMetricBorderColor = (color) => {
+// Helper functions atualizadas
+const getMetricColor = (color) => {
   const colorMap = {
-    pink: 'border-neon-pink',
-    blue: 'border-neon-blue',
-    green: 'border-neon-green',
-    orange: 'border-neon-orange',
-    purple: 'border-neon-purple'
+    indigo: 'from-indigo-500 to-purple-500',
+    blue: 'from-blue-500 to-cyan-500',
+    emerald: 'from-emerald-500 to-green-500',
+    amber: 'from-amber-500 to-orange-500',
+    violet: 'from-violet-500 to-purple-500',
+    rose: 'from-rose-500 to-pink-500'
   };
-  return colorMap[color] || 'border-neon-pink';
+  return colorMap[color] || 'from-indigo-500 to-purple-500';
 };
 
 const getStatusClass = (status) => {
@@ -376,11 +345,11 @@ const getStatusClass = (status) => {
 
 const getStatusColor = (status) => {
   const colorMap = {
-    'Em análise': '#ff6b00',
-    'Aprovado': '#00ff00',
-    'Rejeitado': '#ff00ff',
-    'Em andamento': '#00ffff',
-    'Concluído': '#bf00ff'
+    'Em análise': '#f59e0b',
+    'Aprovado': '#10b981',
+    'Rejeitado': '#ef4444',
+    'Em andamento': '#3b82f6',
+    'Concluído': '#8b5cf6'
   };
   return colorMap[status] || '#6b7280';
 };

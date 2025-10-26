@@ -1,8 +1,7 @@
-// pages/Register.tsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, Sun, Moon, Sparkles, User, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, Sun, Moon, Sparkles, UserPlus } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Register = () => {
@@ -60,62 +59,59 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-animated relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-grid"></div>
-      <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-blob"></div>
-      <div className="absolute bottom-1/3 left-1/4 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-      <div className="absolute top-1/2 right-1/2 w-72 h-72 bg-pink-500/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background animado */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-blue-900/20 dark:to-purple-900/20">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(139,92,246,0.1)_1px,transparent_0)] bg-[length:20px_20px]"></div>
+      </div>
 
-      {/* Theme Toggle Premium */}
-      <div className="absolute top-8 right-8">
+      {/* Theme Toggle */}
+      <div className="absolute top-6 right-6 z-10">
         <button
           onClick={toggleTheme}
-          className="p-3 bg-white/10 backdrop-blur-md border border-white/20 text-white/80 hover:text-white rounded-2xl transition-all duration-500 hover:scale-110 shadow-2xl hover:shadow-3xl"
+          className="p-3 glass-card border border-white/20 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 rounded-xl transition-all duration-500 hover:scale-110 shadow-lg hover:shadow-xl backdrop-blur-sm"
         >
           {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
       </div>
 
-      <div className="relative sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="flex justify-center">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur-lg opacity-75 animate-pulse"></div>
-            <div className="relative w-24 h-24 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl">
-              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                <User className="h-6 w-6 text-white" />
-              </div>
+          <div className="w-24 h-24 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl animate-float">
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <UserPlus className="h-6 w-6 text-white" />
             </div>
+            <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-yellow-400 animate-pulse" />
           </div>
         </div>
         <h2 className="mt-8 text-center text-4xl font-bold gradient-text">
           Criar Conta
         </h2>
-        <p className="mt-4 text-center text-lg text-white/60">
+        <p className="mt-2 text-center text-lg text-slate-600 dark:text-slate-400">
           Ou{' '}
           <Link
             to="/login"
-            className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 hover:from-indigo-300 hover:to-purple-300 transition-all duration-300"
+            className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200"
           >
             entre na sua conta existente
           </Link>
         </p>
       </div>
 
-      <div className="relative mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="card border-0 bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-2xl shadow-2xl hover:shadow-3xl transition-all duration-500">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="glass-card border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500">
+          <form className="space-y-6 p-8" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-6 py-4 rounded-2xl text-sm backdrop-blur-md">
+              <div className="bg-red-50/80 dark:bg-red-900/20 border border-red-200/50 dark:border-red-800/50 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl backdrop-blur-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-white/80 mb-3">
+              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Nome completo
               </label>
-              <div className="relative">
+              <div className="mt-1">
                 <input
                   id="name"
                   name="name"
@@ -124,22 +120,17 @@ const Register = () => {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="input-field pl-12"
+                  className="input-field w-full"
                   placeholder="Seu nome completo"
                 />
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <div className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-                    <User className="h-3 w-3 text-white" />
-                  </div>
-                </div>
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-3">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Email
               </label>
-              <div className="relative">
+              <div className="mt-1">
                 <input
                   id="email"
                   name="email"
@@ -148,22 +139,17 @@ const Register = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="input-field pl-12"
+                  className="input-field w-full"
                   placeholder="seu@email.com"
                 />
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <div className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-                    <Mail className="h-3 w-3 text-white" />
-                  </div>
-                </div>
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-3">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Senha
               </label>
-              <div className="relative">
+              <div className="mt-1 relative">
                 <input
                   id="password"
                   name="password"
@@ -172,17 +158,12 @@ const Register = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="input-field pl-12 pr-12"
+                  className="input-field w-full pr-10"
                   placeholder="Mínimo 6 caracteres"
                 />
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <div className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-                    <Lock className="h-3 w-3 text-white" />
-                  </div>
-                </div>
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white/60 transition-colors duration-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -191,10 +172,10 @@ const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/80 mb-3">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Confirmar senha
               </label>
-              <div className="relative">
+              <div className="mt-1 relative">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -203,17 +184,12 @@ const Register = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="input-field pl-12 pr-12"
+                  className="input-field w-full pr-10"
                   placeholder="Digite a senha novamente"
                 />
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <div className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-                    <Lock className="h-3 w-3 text-white" />
-                  </div>
-                </div>
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white/60 transition-colors duration-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -225,17 +201,17 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary flex items-center justify-center py-4 text-base font-semibold group"
+                className="w-full btn-primary flex items-center justify-center py-3 text-base font-semibold group"
               >
                 {loading ? (
                   <>
-                    <div className="spinner-premium h-5 w-5 border-2 mr-3"></div>
+                    <div className="spinner-modern h-5 w-5 border-2 mr-2"></div>
                     Criando conta...
                   </>
                 ) : (
                   <>
-                    <span>Criar Conta</span>
-                    <Sparkles className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <UserPlus className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform duration-500" />
+                    Criar Conta
                   </>
                 )}
               </button>

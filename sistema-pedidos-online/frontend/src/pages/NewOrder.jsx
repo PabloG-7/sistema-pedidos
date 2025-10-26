@@ -1,7 +1,9 @@
+// pages/NewOrder.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import FileUpload from '../components/FileUpload';
+import { Sparkles, ArrowLeft } from 'lucide-react';
 
 const NewOrder = () => {
   const [formData, setFormData] = useState({
@@ -55,109 +57,139 @@ const NewOrder = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Novo Pedido</h1>
-        <p className="text-gray-600 dark:text-gray-400">Preencha os detalhes do seu pedido abaixo</p>
+    <div className="max-w-4xl mx-auto animate-fade-in">
+      {/* Header Premium */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="relative">
+          <div className="absolute -left-4 -top-4 w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur-sm"></div>
+          <h1 className="text-4xl font-bold gradient-text relative">
+            Novo Pedido
+          </h1>
+          <p className="text-white/60 mt-3 text-lg">
+            Preencha os detalhes do seu pedido abaixo
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/orders')}
+          className="btn-secondary flex items-center space-x-3 group"
+        >
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300" />
+          <span>Voltar</span>
+        </button>
       </div>
 
-      <div className="card">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded">
-              {error}
+      <div className="group">
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur-lg opacity-20 group-hover:opacity-30 transition-all duration-500"></div>
+        <div className="relative card border-0 bg-gradient-to-br from-slate-800 to-slate-900">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {error && (
+              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-6 py-4 rounded-2xl text-sm backdrop-blur-md">
+                {error}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-white/80 mb-3">
+                  Categoria *
+                </label>
+                <select
+                  id="category"
+                  name="category"
+                  required
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="input-field"
+                >
+                  <option value="">Selecione uma categoria</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="estimated_budget" className="block text-sm font-medium text-white/80 mb-3">
+                  Orçamento Estimado (R$) *
+                </label>
+                <input
+                  type="number"
+                  id="estimated_budget"
+                  name="estimated_budget"
+                  min="0"
+                  step="0.01"
+                  required
+                  value={formData.estimated_budget}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="0.00"
+                />
+              </div>
             </div>
-          )}
 
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Categoria *
-            </label>
-            <select
-              id="category"
-              name="category"
-              required
-              value={formData.category}
-              onChange={handleChange}
-              className="input-field"
-            >
-              <option value="">Selecione uma categoria</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-white/80 mb-3">
+                Descrição do Pedido *
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                rows={8}
+                required
+                value={formData.description}
+                onChange={handleChange}
+                className="input-field resize-none"
+                placeholder="Descreva detalhadamente o que você precisa..."
+              />
+              <p className="mt-3 text-sm text-white/40">
+                Mínimo de 10 caracteres. Seja o mais detalhado possível para obter um orçamento preciso.
+              </p>
+            </div>
 
-          <div>
-            <label htmlFor="estimated_budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Orçamento Estimado (R$) *
-            </label>
-            <input
-              type="number"
-              id="estimated_budget"
-              name="estimated_budget"
-              min="0"
-              step="0.01"
-              required
-              value={formData.estimated_budget}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="0.00"
-            />
-          </div>
+            {/* SEÇÃO DE UPLOAD PREMIUM */}
+            <div>
+              <label className="block text-sm font-medium text-white/80 mb-4">
+                Anexos do Pedido (Opcional)
+              </label>
+              <FileUpload 
+                onFilesChange={setAttachments}
+                maxFiles={5}
+              />
+              <p className="mt-3 text-sm text-white/40">
+                Adicione imagens, PDFs ou documentos para melhorar seu orçamento (Máx. 5MB por arquivo)
+              </p>
+            </div>
 
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Descrição do Pedido *
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={6}
-              required
-              value={formData.description}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="Descreva detalhadamente o que você precisa..."
-            />
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Mínimo de 10 caracteres. Seja o mais detalhado possível para obter um orçamento preciso.
-            </p>
-          </div>
-
-          {/* SEÇÃO DE UPLOAD - NOVA */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Anexos do Pedido (Opcional)
-            </label>
-            <FileUpload 
-              onFilesChange={setAttachments}
-              maxFiles={5}
-            />
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Adicione imagens, PDFs ou documentos para melhorar seu orçamento (Máx. 5MB por arquivo)
-            </p>
-          </div>
-
-          <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={() => navigate('/orders')}
-              className="btn-secondary"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Enviando...' : 'Enviar Pedido'}
-            </button>
-          </div>
-        </form>
+            <div className="flex justify-end space-x-4 pt-6 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => navigate('/orders')}
+                className="btn-secondary flex items-center space-x-3 group"
+              >
+                <span>Cancelar</span>
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary flex items-center space-x-3 group disabled:opacity-50"
+              >
+                {loading ? (
+                  <>
+                    <div className="spinner-premium h-5 w-5 border-2"></div>
+                    <span>Enviando...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Enviar Pedido</span>
+                    <Sparkles className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

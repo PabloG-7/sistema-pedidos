@@ -61,7 +61,7 @@ const Dashboard = () => {
   }, [fetchDashboardData]);
 
   const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'indigo' }) => (
-    <div className="metric-card group hover-lift">
+    <div className="metric-card group">
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">{title}</p>
@@ -80,7 +80,7 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-        <div className={`w-14 h-14 bg-gradient-to-br ${getMetricColor(color)} rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500 icon-3d`}>
+        <div className={`w-14 h-14 bg-gradient-to-br ${getMetricColor(color)} rounded-2xl flex items-center justify-center shadow-2xl transition-transform duration-500 icon-3d group-hover:scale-110`}>
           <Icon className="h-6 w-6 text-white" />
         </div>
       </div>
@@ -113,7 +113,7 @@ const Dashboard = () => {
           to="/new-order"
           className="btn-primary flex items-center space-x-3 mt-4 sm:mt-0 px-6 py-3 rounded-xl group"
         >
-          <Plus className="h-5 w-5 group-hover:scale-110 transition-transform duration-500" />
+          <Plus className="h-5 w-5 transition-transform duration-500 group-hover:scale-110" />
           <span className="font-semibold">Novo Pedido</span>
           <Zap className="h-4 w-4 animate-pulse" />
         </Link>
@@ -175,7 +175,7 @@ const Dashboard = () => {
             ].filter(item => item.value > 0).map((item, index) => (
               <div key={index} className="flex items-center justify-between group">
                 <div className="flex items-center space-x-4 flex-1">
-                  <span className={`status-badge ${getStatusClass(item.label)} min-w-[100px] justify-center hover-lift`}>
+                  <span className={`status-badge ${getStatusClass(item.label)} min-w-[100px] justify-center`}>
                     {item.label}
                   </span>
                   <span className="text-sm font-medium text-gray-900 dark:text-white min-w-[40px]">
@@ -210,18 +210,18 @@ const Dashboard = () => {
           <div className="space-y-4">
             <Link
               to="/new-order"
-              className="flex items-center p-4 glass-card border-2 border-indigo-200/50 dark:border-indigo-800/50 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-all duration-500 group hover-lift"
+              className="flex items-center p-4 glass-card border-2 border-indigo-200/50 dark:border-indigo-800/50 rounded-xl transition-all duration-500 group hover-lift"
             >
-              <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 icon-3d">
+              <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center transition-transform duration-500 icon-3d group-hover:scale-110">
                 <Plus className="h-6 w-6 text-white" />
               </div>
               <span className="font-semibold text-gray-900 dark:text-white ml-4">Novo Pedido</span>
             </Link>
             <Link
               to="/orders"
-              className="flex items-center p-4 glass-card border-2 border-blue-200/50 dark:border-blue-800/50 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-500 group hover-lift"
+              className="flex items-center p-4 glass-card border-2 border-blue-200/50 dark:border-blue-800/50 rounded-xl transition-all duration-500 group hover-lift"
             >
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 icon-3d">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-transform duration-500 icon-3d group-hover:scale-110">
                 <Package className="h-6 w-6 text-white" />
               </div>
               <span className="font-semibold text-gray-900 dark:text-white ml-4">Ver Pedidos</span>
@@ -229,9 +229,9 @@ const Dashboard = () => {
             {isAdmin && (
               <Link
                 to="/admin/orders"
-                className="flex items-center p-4 glass-card border-2 border-purple-200/50 dark:border-purple-800/50 rounded-xl hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-all duration-500 group hover-lift"
+                className="flex items-center p-4 glass-card border-2 border-purple-200/50 dark:border-purple-800/50 rounded-xl transition-all duration-500 group hover-lift"
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 icon-3d">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center transition-transform duration-500 icon-3d group-hover:scale-110">
                   <Users className="h-6 w-6 text-white" />
                 </div>
                 <span className="font-semibold text-gray-900 dark:text-white ml-4">Painel Admin</span>
@@ -254,15 +254,15 @@ const Dashboard = () => {
               className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200 flex items-center group"
             >
               Ver todos
-              <ArrowUp className="h-4 w-4 ml-1 rotate-45 group-hover:translate-x-1 transition-transform duration-300" />
+              <ArrowUp className="h-4 w-4 ml-1 rotate-45 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </div>
           
           <div className="space-y-4">
             {orders.slice(0, 5).map((order) => (
-              <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 glass-card border border-gray-100/50 dark:border-gray-700/50 rounded-xl hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-all duration-500 group hover-lift gap-4 sm:gap-6">
+              <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 glass-card border border-gray-100/50 dark:border-gray-700/50 rounded-xl transition-all duration-500 group hover-lift gap-4 sm:gap-6">
                 <div className="flex items-center space-x-4 flex-1 min-w-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 icon-3d flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl flex items-center justify-center transition-transform duration-500 icon-3d group-hover:scale-110 flex-shrink-0">
                     <FileText className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -290,7 +290,7 @@ const Dashboard = () => {
                       maximumFractionDigits: 2
                     })}
                   </span>
-                  <span className={`status-badge ${getStatusClass(order.status)} justify-center text-xs sm:text-sm min-w-[100px] sm:min-w-[120px] hover-lift`}>
+                  <span className={`status-badge ${getStatusClass(order.status)} justify-center text-xs sm:text-sm min-w-[100px] sm:min-w-[120px]`}>
                     {order.status}
                   </span>
                 </div>
@@ -307,7 +307,7 @@ const Dashboard = () => {
                   to="/new-order" 
                   className="btn-primary inline-flex items-center space-x-2 px-6 py-3 rounded-xl group"
                 >
-                  <Plus className="h-4 w-4 group-hover:scale-110 transition-transform duration-500" />
+                  <Plus className="h-4 w-4 transition-transform duration-500 group-hover:scale-110" />
                   <span>Criar primeiro pedido</span>
                 </Link>
               </div>

@@ -51,7 +51,7 @@ const Login = () => {
       <div className="absolute top-6 right-6 z-10">
         <button
           onClick={toggleTheme}
-          className="p-3 glass-card border border-white/20 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 rounded-xl transition-all duration-500 hover:scale-110 shadow-lg hover:shadow-xl backdrop-blur-sm"
+          className="p-3 glass-card border border-white/20 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 rounded-xl transition-all duration-500 hover:scale-110 shadow-lg backdrop-blur-sm"
         >
           {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
@@ -73,7 +73,7 @@ const Login = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="glass-card border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500">
+        <div className="glass-card border border-white/20 shadow-2xl transition-all duration-500 hover:shadow-3xl">
           <form className="space-y-6 p-8" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-50/80 dark:bg-red-900/20 border border-red-200/50 dark:border-red-800/50 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl backdrop-blur-sm">
@@ -140,7 +140,7 @@ const Login = () => {
                   </div>
                 ) : (
                   <>
-                    <Zap className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform duration-500" />
+                    <Zap className="h-5 w-5 mr-2 transition-transform duration-500 group-hover:scale-110" />
                     Entrar
                   </>
                 )}

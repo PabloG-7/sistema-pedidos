@@ -61,12 +61,12 @@ const Dashboard = () => {
   const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'pink' }) => (
     <div className="group relative">
       <div className="absolute inset-0 bg-gradient-to-r from-neon-pink to-neon-blue rounded-sm blur-lg opacity-30 group-hover:opacity-50 transition-all duration-500"></div>
-      <div className="relative metric-cyber border-2 hover:border-neon-green hover:shadow-[0_0_30px_#00ff00] transition-all duration-500">
+      <div className="relative card-cyber border-2 hover:border-neon-green hover:shadow-[0_0_30px_#00ff00] transition-all duration-500">
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex-1">
               <p className="text-sm font-rajdhani font-semibold text-gray-300 mb-3 uppercase tracking-wider">{title}</p>
-              <p className="text-4xl font-orbitron font-bold rgb-text mb-4">{value}</p>
+              <p className="text-4xl font-orbitron font-bold text-white mb-4">{value}</p>
               {change && (
                 <div className="flex items-center">
                   {trend === 'up' ? (
@@ -114,7 +114,7 @@ const Dashboard = () => {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div className="relative">
           <div className="absolute -left-6 -top-6 w-12 h-12 bg-neon-pink rounded-full blur-xl opacity-50"></div>
-          <h1 className="text-5xl font-orbitron font-bold rgb-text relative glitch-text" data-text="DASHBOARD">
+          <h1 className="text-5xl font-orbitron font-bold text-white relative glitch-text" data-text="DASHBOARD">
             DASHBOARD
           </h1>
           <p className="text-xl font-rajdhani text-gray-300 mt-4">
@@ -138,7 +138,7 @@ const Dashboard = () => {
       </div>
 
       {/* Grid de Métricas Cyberpunk */}
-      <div className="cyber-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
           title="TOTAL DE PEDIDOS"
           value={stats.totalOrders}
@@ -209,7 +209,7 @@ const Dashboard = () => {
                           background: `linear-gradient(90deg, ${getStatusColor(item.label)}, ${getStatusColor(item.label)}80)`
                         }}
                       >
-                        <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
                       </div>
                     </div>
                   </div>
@@ -351,7 +351,7 @@ const Dashboard = () => {
   );
 };
 
-// Helper functions atualizadas
+// Helper functions
 const getMetricBorderColor = (color) => {
   const colorMap = {
     pink: 'border-neon-pink',

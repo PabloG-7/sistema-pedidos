@@ -42,7 +42,7 @@
 
   .btn-cyber::before {
     content: '';
-    @apply absolute inset-0 bg-linear-to-r from-neon-pink to-neon-blue opacity-0 transition-opacity duration-300;
+    @apply absolute inset-0 bg-gradient-to-r from-neon-pink to-neon-blue opacity-0 transition-opacity duration-300;
   }
 
   .btn-cyber:hover::before {
@@ -63,12 +63,11 @@
     @apply relative bg-exotic-200/30 border-2 border-neon-blue p-8 backdrop-blur-lg;
     background: linear-gradient(145deg, rgba(26,26,46,0.8) 0%, rgba(22,33,62,0.6) 100%);
     box-shadow: 0 8px 32px 0 rgba(0, 255, 255, 0.1);
-    border-image: linear-gradient(45deg, #ff00ff, #00ffff, #bf00ff) 1;
   }
 
   .card-cyber::before {
     content: '';
-    @apply absolute inset-0 bg-linear-to-br from-neon-pink/10 to-neon-blue/10 opacity-0 transition-opacity duration-500;
+    @apply absolute inset-0 bg-gradient-to-br from-neon-pink/10 to-neon-blue/10 opacity-0 transition-opacity duration-500;
   }
 
   .card-cyber:hover::before {
@@ -107,16 +106,6 @@
 
   .status-concluido {
     @apply status-neon border-neon-purple text-neon-purple shadow-[0_0_15px_#bf00ff];
-  }
-
-  /* Metric cards com efeito matrix */
-  .metric-cyber {
-    @apply relative card-cyber overflow-hidden;
-  }
-
-  .metric-cyber::after {
-    content: '';
-    @apply absolute inset-0 bg-repeat-space bg-cyber-grid opacity-30;
   }
 }
 
@@ -183,22 +172,6 @@
     radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.05) 0%, transparent 20%);
 }
 
-.bg-matrix {
-  position: relative;
-  overflow: hidden;
-}
-
-.bg-matrix::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(transparent 90%, rgba(0, 255, 0, 0.1) 100%);
-  animation: matrix 20s linear infinite;
-}
-
 /* Efeitos de glitch */
 .glitch-text {
   position: relative;
@@ -256,24 +229,21 @@
   box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
 }
 
-/* Efeito de partículas */
-.particles {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: -1;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: #00ffff;
-  border-radius: 50%;
-  animation: float 6s infinite linear;
+/* Efeito de shimmer */
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 /* Responsive improvements */
@@ -291,13 +261,6 @@
   }
 }
 
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .card-cyber {
-    @apply bg-exotic-200 border-white;
-  }
-}
-
 /* Performance optimizations */
 .animate-transform {
   will-change: transform;
@@ -305,21 +268,4 @@
 
 .animate-opacity {
   will-change: opacity;
-}
-
-/* Grid layout futurista */
-.cyber-grid {
-  display: grid;
-  gap: 2rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
-/* Efeito de distorção */
-.distortion {
-  filter: url(#turbulence);
-}
-
-/* Textura de ruído */
-.noise-texture {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
 }

@@ -2,8 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, BarChart3, Sun, Moon, Sparkles, Zap } from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext';
+import { Eye, EyeOff, Cpu, Zap, Binary, Terminal } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -11,7 +10,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { isDark, toggleTheme } = useTheme();
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -19,7 +18,7 @@ const Login = () => {
     e.preventDefault();
     
     if (!email || !password) {
-      setError('Preencha todos os campos');
+      setError('PREENCHA TODOS OS CAMPOS');
       return;
     }
 
@@ -31,10 +30,10 @@ const Login = () => {
       if (result.success) {
         navigate('/', { replace: true });
       } else {
-        setError(result.message);
+        setError(result.message.toUpperCase());
       }
     } catch (error) {
-      setError('Erro inesperado. Tente novamente.');
+      setError('ERRO INESPERADO. TENTE NOVAMENTE.');
       console.error('Login error:', error);
     } finally {
       setLoading(false);
@@ -42,54 +41,64 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-animated relative overflow-hidden">
+    <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-circuit">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-grid"></div>
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-blob"></div>
-      <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-1/4 left-1/2 w-72 h-72 bg-pink-500/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+      <div className="absolute inset-0 bg-matrix"></div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-neon-pink/10 rounded-full blur-3xl animate-morph"></div>
+      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-neon-blue/10 rounded-full blur-3xl animate-morph" style={{animationDelay: '2s'}}></div>
+      <div className="absolute bottom-1/4 left-1/2 w-96 h-96 bg-neon-green/10 rounded-full blur-3xl animate-morph" style={{animationDelay: '4s'}}></div>
 
-      {/* Theme Toggle Premium */}
-      <div className="absolute top-8 right-8">
-        <button
-          onClick={toggleTheme}
-          className="p-3 bg-white/10 backdrop-blur-md border border-white/20 text-white/80 hover:text-white rounded-2xl transition-all duration-500 hover:scale-110 shadow-2xl hover:shadow-3xl"
-        >
-          {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-        </button>
+      {/* Terminal Header */}
+      <div className="absolute top-8 left-8">
+        <div className="flex items-center space-x-3">
+          <div className="w-3 h-3 bg-neon-pink rounded-full animate-pulse"></div>
+          <div className="w-3 h-3 bg-neon-blue rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+          <div className="w-3 h-3 bg-neon-green rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+        </div>
       </div>
 
       <div className="relative sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur-lg opacity-75 animate-pulse"></div>
-            <div className="relative w-24 h-24 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl">
-              <BarChart3 className="h-10 w-10 text-white" />
+            <div className="absolute inset-0 bg-neon-pink rounded-sm blur-lg animate-pulse-glow"></div>
+            <div className="relative w-28 h-28 border-4 border-neon-pink flex items-center justify-center">
+              <Cpu className="h-12 w-12 text-neon-pink" />
             </div>
           </div>
         </div>
-        <h2 className="mt-8 text-center text-4xl font-bold gradient-text">
-          PGSystem
+        <h2 className="mt-8 text-center text-6xl font-orbitron font-bold rgb-text glitch-text" data-text="PGSYSTEM">
+          PGSYSTEM
         </h2>
-        <p className="mt-4 text-center text-lg text-white/60">
-          Entre na sua conta
+        <p className="mt-6 text-center text-xl font-rajdhani text-gray-300">
+          ACESSE O SISTEMA
         </p>
       </div>
 
-      <div className="relative mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="card border-0 bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-2xl shadow-2xl hover:shadow-3xl transition-all duration-500">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+      <div className="relative mt-12 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="card-cyber border-2 border-neon-blue hover:border-neon-green transition-all duration-500">
+          <div className="flex items-center space-x-3 mb-8">
+            <Terminal className="h-6 w-6 text-neon-green" />
+            <span className="font-orbitron text-neon-green text-lg">TERMINAL DE ACESSO</span>
+          </div>
+
+          <form className="space-y-8" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-6 py-4 rounded-2xl text-sm backdrop-blur-md">
-                {error}
+              <div className="border-2 border-neon-pink p-4">
+                <div className="flex items-center space-x-3">
+                  <Zap className="h-5 w-5 text-neon-pink" />
+                  <span className="font-orbitron text-neon-pink text-sm">{error}</span>
+                </div>
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-3">
-                Email
+              <label htmlFor="email" className="block text-sm font-orbitron text-neon-blue mb-4 uppercase tracking-wider">
+                EMAIL
               </label>
               <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Binary className="h-5 w-5 text-neon-blue" />
+                </div>
                 <input
                   id="email"
                   name="email"
@@ -98,23 +107,22 @@ const Login = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="input-field pl-12"
-                  placeholder="seu@email.com"
+                  className="input-cyber pl-12"
+                  placeholder="USUARIO@DOMINIO.COM"
                   disabled={loading}
+                  style={{textTransform: 'uppercase'}}
                 />
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <div className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-                    <Zap className="h-3 w-3 text-white" />
-                  </div>
-                </div>
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-3">
-                Senha
+              <label htmlFor="password" className="block text-sm font-orbitron text-neon-blue mb-4 uppercase tracking-wider">
+                SENHA
               </label>
               <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Zap className="h-5 w-5 text-neon-blue" />
+                </div>
                 <input
                   id="password"
                   name="password"
@@ -123,18 +131,13 @@ const Login = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input-field pl-12 pr-12"
-                  placeholder="Sua senha"
+                  className="input-cyber pl-12 pr-12"
+                  placeholder="••••••••"
                   disabled={loading}
                 />
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <div className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-                    <Sparkles className="h-3 w-3 text-white" />
-                  </div>
-                </div>
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white/60 transition-colors duration-300"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-neon-blue hover:text-neon-green transition-colors duration-300"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={loading}
                 >
@@ -147,42 +150,54 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary flex items-center justify-center py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="w-full btn-cyber flex items-center justify-center py-4 text-lg font-orbitron disabled:opacity-50 disabled:cursor-not-allowed group"
               >
                 {loading ? (
                   <div className="flex items-center">
-                    <div className="spinner-premium h-5 w-5 border-2 mr-3"></div>
-                    Entrando...
+                    <div className="spinner-cyber h-6 w-6 border-2 mr-4"></div>
+                    <span>ACESSANDO...</span>
                   </div>
                 ) : (
                   <>
-                    <span>Entrar</span>
-                    <Sparkles className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <span>INICIAR SESSÃO</span>
+                    <Binary className="h-5 w-5 ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </>
                 )}
               </button>
             </div>
 
-            <div className="text-center pt-6 border-t border-white/10">
-              <span className="text-sm text-white/60">
-                Não tem uma conta?{' '}
+            <div className="text-center pt-8 border-t border-neon-blue/30">
+              <span className="text-sm font-rajdhani text-gray-400">
+                NOVO USUÁRIO?{' '}
                 <Link
                   to="/register"
-                  className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 hover:from-indigo-300 hover:to-purple-300 transition-all duration-300"
+                  className="font-orbitron text-neon-green hover:text-neon-blue transition-all duration-300 hover:underline"
                 >
-                  Criar conta
+                  CRIAR CONTA
                 </Link>
               </span>
             </div>
 
-            {/* Credenciais de teste premium */}
+            {/* Credenciais de teste */}
             <div className="text-center">
-              <div className="text-xs text-white/40 space-y-2 bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
-                <p><strong className="text-white/80">Admin:</strong> admin@sistema.com / admin123</p>
-                <p><strong className="text-white/80">Usuário:</strong> Crie uma conta</p>
+              <div className="text-xs font-rajdhani text-gray-500 space-y-2 border-2 border-neon-purple/30 p-4">
+                <p><strong className="text-neon-green">ADMIN:</strong> admin@sistema.com / admin123</p>
+                <p><strong className="text-neon-blue">USUÁRIO:</strong> CRIE UMA CONTA</p>
               </div>
             </div>
           </form>
+        </div>
+      </div>
+
+      {/* Footer Terminal */}
+      <div className="absolute bottom-8 left-8 right-8">
+        <div className="flex justify-between items-center">
+          <div className="font-orbitron text-xs text-neon-blue">
+            SYSTEM v2.0.4 | STATUS: <span className="text-neon-green">ONLINE</span>
+          </div>
+          <div className="font-rajdhani text-xs text-gray-500">
+            {new Date().toLocaleString('pt-BR')}
+          </div>
         </div>
       </div>
     </div>

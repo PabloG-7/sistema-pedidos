@@ -44,8 +44,8 @@ export default {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         float: {
-          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-          '50%': { transform: 'translateY(-10px) rotate(1deg)' },
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
         },
         glow: {
           '0%, 100%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)' },
@@ -69,6 +69,7 @@ export default {
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
         'neumorphic': '20px 20px 60px #bebebe, -20px -20px 60px #ffffff',
         'glow': '0 0 50px -12px rgba(99, 102, 241, 0.5)',
+        '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
       }
     },
   },

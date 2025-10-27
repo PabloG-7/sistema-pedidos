@@ -1,8 +1,7 @@
-// pages/Orders.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { Package, Clock, CheckCircle, XCircle, PlayCircle, Plus, Search, Filter, Download, Sparkles } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, PlayCircle, Plus, Search, Filter, Download } from 'lucide-react';
 import SearchFilters from '../components/SearchFilters';
 
 const Orders = () => {
@@ -13,11 +12,11 @@ const Orders = () => {
   const [exporting, setExporting] = useState(false);
 
   const statusIcons = {
-    'Em análise': <Clock className="h-6 w-6 text-amber-400" />,
-    'Aprovado': <CheckCircle className="h-6 w-6 text-emerald-400" />,
-    'Rejeitado': <XCircle className="h-6 w-6 text-rose-400" />,
-    'Em andamento': <PlayCircle className="h-6 w-6 text-blue-400" />,
-    'Concluído': <Package className="h-6 w-6 text-violet-400" />
+    'Em análise': <Clock className="h-5 w-5 text-yellow-500" />,
+    'Aprovado': <CheckCircle className="h-5 w-5 text-green-500" />,
+    'Rejeitado': <XCircle className="h-5 w-5 text-red-500" />,
+    'Em andamento': <PlayCircle className="h-5 w-5 text-blue-500" />,
+    'Concluído': <Package className="h-5 w-5 text-gray-500" />
   };
 
   const statusColors = {
@@ -125,44 +124,40 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-96">
+      <div className="flex justify-center items-center h-96">
         <div className="text-center">
-          <div className="spinner-premium w-16 h-16 mx-auto mb-4"></div>
-          <p className="text-white/60">Carregando pedidos...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando pedidos...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Header Premium */}
+    <div className="space-y-8">
+      {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative">
-          <div className="absolute -left-4 -top-4 w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur-sm"></div>
-          <h1 className="text-4xl font-bold gradient-text relative">
-            Meus Pedidos
-          </h1>
-          <p className="text-white/60 mt-3 text-lg">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Meus Pedidos</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-lg">
             Gerencie e acompanhe todos os seus pedidos
           </p>
         </div>
-        <div className="flex items-center space-x-4 mt-6 lg:mt-0">
+        <div className="flex items-center space-x-3 mt-6 lg:mt-0">
           <button
             onClick={exportToCSV}
             disabled={exporting || filteredOrders.length === 0}
-            className="btn-secondary flex items-center space-x-3 disabled:opacity-50 group"
+            className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
           >
-            <Download className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+            <Download className="h-4 w-4" />
             <span>{exporting ? 'Exportando...' : 'Exportar CSV'}</span>
           </button>
           <Link
             to="/new-order"
-            className="btn-primary flex items-center space-x-3 group"
+            className="btn-primary flex items-center space-x-2"
           >
-            <Plus className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+            <Plus className="h-4 w-4" />
             <span>Novo Pedido</span>
-            <Sparkles className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </Link>
         </div>
       </div>
@@ -173,90 +168,83 @@ const Orders = () => {
         orders={orders}
       />
 
-      {/* Estatísticas Premium */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          { label: 'Total', value: orders.length, color: 'from-blue-500 to-cyan-500' },
-          { label: 'Em Análise', value: orders.filter(o => o.status === 'Em análise').length, color: 'from-amber-500 to-orange-500' },
-          { label: 'Aprovados', value: orders.filter(o => o.status === 'Aprovado').length, color: 'from-emerald-500 to-green-500' },
-          { label: 'Filtrados', value: filteredOrders.length, color: 'from-purple-500 to-pink-500' },
-        ].map((stat, index) => (
-          <div key={index} className="group">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur-lg opacity-20 group-hover:opacity-30 transition-all duration-500"></div>
-            <div className="relative card border-0 bg-gradient-to-br from-slate-800 to-slate-900 text-center hover:scale-105 transition-all duration-500">
-              <div className={`w-12 h-12 bg-gradient-to-r ${stat.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl group-hover:scale-110 transition-transform duration-500`}>
-                <Package className="h-6 w-6 text-white" />
-              </div>
-              <div className="text-3xl font-bold text-white">
-                {stat.value}
-              </div>
-              <div className="text-sm text-white/60 mt-2">{stat.label}</div>
-            </div>
+      {/* Estatísticas */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="metric-card text-center">
+          <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            {orders.length}
           </div>
-        ))}
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Total</div>
+        </div>
+        <div className="metric-card text-center">
+          <div className="text-3xl font-bold text-yellow-600">
+            {orders.filter(o => o.status === 'Em análise').length}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Em Análise</div>
+        </div>
+        <div className="metric-card text-center">
+          <div className="text-3xl font-bold text-green-600">
+            {orders.filter(o => o.status === 'Aprovado').length}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Aprovados</div>
+        </div>
+        <div className="metric-card text-center">
+          <div className="text-3xl font-bold text-blue-600">
+            {filteredOrders.length}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Filtrados</div>
+        </div>
       </div>
 
-      {/* Lista de Pedidos Premium */}
+      {/* Lista de Pedidos */}
       {filteredOrders.length === 0 ? (
-        <div className="group">
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-700 to-slate-800 rounded-3xl blur-lg opacity-20 group-hover:opacity-30 transition-all duration-500"></div>
-          <div className="relative card border-0 bg-gradient-to-br from-slate-800 to-slate-900 text-center py-16">
-            <div className="w-20 h-20 bg-gradient-to-r from-slate-600 to-slate-700 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
-              <Package className="h-8 w-8 text-white" />
-            </div>
-            <h3 className="text-2xl font-semibold text-white mb-3">
-              {orders.length === 0 ? 'Nenhum pedido encontrado' : 'Nenhum pedido com esses filtros'}
-            </h3>
-            <p className="text-white/60 mb-6">
-              {orders.length === 0 
-                ? 'Você ainda não fez nenhum pedido.' 
-                : 'Tente ajustar os filtros de busca.'
-              }
-            </p>
-            {orders.length === 0 && (
-              <Link
-                to="/new-order"
-                className="btn-primary inline-flex items-center space-x-3 group"
-              >
-                <Plus className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                <span>Criar Primeiro Pedido</span>
-              </Link>
-            )}
-          </div>
+        <div className="card text-center py-16">
+          <Package className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+          <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
+            {orders.length === 0 ? 'Nenhum pedido encontrado' : 'Nenhum pedido com esses filtros'}
+          </h3>
+          <p className="text-gray-400 dark:text-gray-500 mb-6">
+            {orders.length === 0 
+              ? 'Você ainda não fez nenhum pedido.' 
+              : 'Tente ajustar os filtros de busca.'
+            }
+          </p>
+          {orders.length === 0 && (
+            <Link
+              to="/new-order"
+              className="btn-primary inline-flex items-center space-x-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Criar Primeiro Pedido</span>
+            </Link>
+          )}
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {filteredOrders.map((order) => (
-            <div key={order.id} className="group">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur-lg opacity-0 group-hover:opacity-20 transition-all duration-500"></div>
-              <div className="relative card border-0 bg-gradient-to-br from-slate-800 to-slate-900 hover:scale-[1.02] transition-all duration-500">
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="flex-shrink-0">
-                        {statusIcons[order.status]}
-                      </div>
-                      <span className={`status-badge ${statusColors[order.status]} glow`}>
-                        {order.status}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-3">
-                      {order.category}
-                    </h3>
-                    <p className="text-white/70 mb-6 leading-relaxed">
-                      {order.description}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-6 text-sm">
-                      <div className="flex items-center space-x-2 bg-white/5 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10">
-                        <span className="font-semibold text-white/80">Orçamento:</span>
-                        <span className="text-emerald-400 font-bold">R$ {order.estimated_budget}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-white/60">
-                        <span>Criado em: {new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
-                        <span>•</span>
-                        <span>{new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                    </div>
+            <div key={order.id} className="card hover:scale-105 transition-transform duration-300">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-3 mb-3">
+                    {statusIcons[order.status]}
+                    <span className={`status-badge ${statusColors[order.status]}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    {order.category}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                    {order.description}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                      Orçamento: <span className="text-green-600">R$ {order.estimated_budget}</span>
+                    </span>
+                    <span>•</span>
+                    <span>Criado em: {new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
+                    <span>•</span>
+                    <span>{new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 </div>
               </div>

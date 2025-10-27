@@ -1,13 +1,11 @@
-// pages/AdminOrders.tsx
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Package, Filter, Users, Settings, Eye, RefreshCw } from 'lucide-react';
+import { Package, Filter } from 'lucide-react';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
-  const [updatingOrder, setUpdatingOrder] = useState(null);
 
   const statusOptions = [
     'Todos',
@@ -19,11 +17,11 @@ const AdminOrders = () => {
   ];
 
   const statusColors = {
-    'Em análise': 'status-em-analise',
-    'Aprovado': 'status-aprovado',
-    'Rejeitado': 'status-rejeitado',
-    'Em andamento': 'status-andamento',
-    'Concluído': 'status-concluido'
+    'Em análise': 'bg-yellow-100 text-yellow-800',
+    'Aprovado': 'bg-green-100 text-green-800',
+    'Rejeitado': 'bg-red-100 text-red-800',
+    'Em andamento': 'bg-blue-100 text-blue-800',
+    'Concluído': 'bg-gray-100 text-gray-800'
   };
 
   useEffect(() => {
@@ -32,7 +30,6 @@ const AdminOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      setLoading(true);
       const params = statusFilter && statusFilter !== 'Todos' ? { status: statusFilter } : {};
       const response = await api.get('/orders', { params });
       setOrders(response.data.orders);
@@ -45,70 +42,38 @@ const AdminOrders = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      setUpdatingOrder(orderId);
       await api.patch(`/orders/${orderId}/status`, { status: newStatus });
-      await fetchOrders();
+      fetchOrders();
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
       alert('Erro ao atualizar status do pedido');
-    } finally {
-      setUpdatingOrder(null);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Settings className="h-8 w-8 text-white" />
-          </div>
-          <p className="text-slate-600 dark:text-slate-400 text-lg">Carregando pedidos...</p>
-        </div>
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-2xl">
-            <Users className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Painel Administrativo
-            </h1>
-            <p className="text-slate-600 dark:text-slate-300 mt-2 text-lg">
-              Gerencie todos os pedidos do sistema
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-3 mt-6 lg:mt-0">
-          <button
-            onClick={fetchOrders}
-            className="btn-secondary flex items-center space-x-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            <span>Atualizar</span>
-          </button>
-        </div>
+    <div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Painel Administrativo</h1>
+        <p className="text-gray-600">Gerencie todos os pedidos do sistema</p>
       </div>
 
       {/* Filtros */}
-      <div className="card">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+      <div className="card mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <Filter className="h-5 w-5 text-white" />
-            </div>
+            <Filter className="h-5 w-5 text-gray-400" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="input-field w-64 text-lg"
+              className="input-field w-48"
             >
               {statusOptions.map((status) => (
                 <option key={status} value={status}>
@@ -117,38 +82,33 @@ const AdminOrders = () => {
               ))}
             </select>
           </div>
-          <div className="text-lg font-semibold text-slate-600 dark:text-slate-400">
-            Total: <span className="text-indigo-600 dark:text-indigo-400">{orders.length}</span> pedido(s)
+          <div className="text-sm text-gray-500">
+            Total: {orders.length} pedido(s)
           </div>
         </div>
       </div>
 
       {/* Lista de Pedidos */}
       {orders.length === 0 ? (
-        <div className="card text-center py-16">
-          <Package className="mx-auto h-16 w-16 text-slate-300 dark:text-slate-600 mb-6" />
-          <h3 className="text-2xl font-bold text-slate-500 dark:text-slate-400 mb-4">
-            Nenhum pedido encontrado
-          </h3>
-          <p className="text-slate-400 dark:text-slate-500 text-lg">
-            Não há pedidos com os filtros selecionados.
-          </p>
+        <div className="card text-center">
+          <Package className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-4 text-lg font-medium text-gray-900">Nenhum pedido encontrado</h3>
+          <p className="mt-2 text-gray-500">Não há pedidos com os filtros selecionados.</p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {orders.map((order) => (
-            <div key={order.id} className="card group hover:scale-[1.02] transition-all duration-300">
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
+            <div key={order.id} className="card">
+              <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className={`status-badge ${statusColors[order.status]} text-sm`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[order.status]}`}>
                       {order.status}
                     </span>
                     <select
                       value={order.status}
                       onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                      disabled={updatingOrder === order.id}
-                      className="input-field w-48 text-sm disabled:opacity-50"
+                      className="text-sm border border-gray-300 rounded px-2 py-1"
                     >
                       <option value="Em análise">Em análise</option>
                       <option value="Aprovado">Aprovado</option>
@@ -157,49 +117,23 @@ const AdminOrders = () => {
                       <option value="Concluído">Concluído</option>
                     </select>
                   </div>
-                  
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
-                    {order.category}
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed mb-6">
-                    {order.description}
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
-                    <div className="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl">
-                      <Users className="h-5 w-5 text-indigo-500" />
-                      <div>
-                        <div className="font-semibold text-slate-900 dark:text-white">Cliente</div>
-                        <div className="text-slate-600 dark:text-slate-400">{order.user_name}</div>
-                      </div>
+                  <h3 className="text-lg font-medium text-gray-900">{order.category}</h3>
+                  <p className="mt-1 text-gray-600">{order.description}</p>
+                  <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
+                    <div>
+                      <strong>Cliente:</strong> {order.user_name}
                     </div>
-                    
-                    <div className="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl">
-                      <Eye className="h-5 w-5 text-blue-500" />
-                      <div>
-                        <div className="font-semibold text-slate-900 dark:text-white">Email</div>
-                        <div className="text-slate-600 dark:text-slate-400">{order.user_email}</div>
-                      </div>
+                    <div>
+                      <strong>Email:</strong> {order.user_email}
                     </div>
-                    
-                    <div className="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl">
-                      <Package className="h-5 w-5 text-emerald-500" />
-                      <div>
-                        <div className="font-semibold text-slate-900 dark:text-white">Orçamento</div>
-                        <div className="text-emerald-600 dark:text-emerald-400 font-bold">
-                          R$ {order.estimated_budget}
-                        </div>
-                      </div>
+                    <div>
+                      <strong>Orçamento:</strong> R$ {order.estimated_budget}
                     </div>
-                    
-                    <div className="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl">
-                      <RefreshCw className="h-5 w-5 text-violet-500" />
-                      <div>
-                        <div className="font-semibold text-slate-900 dark:text-white">Atualizado em</div>
-                        <div className="text-slate-600 dark:text-slate-400">
-                          {new Date(order.updated_at).toLocaleDateString('pt-BR')}
-                        </div>
-                      </div>
+                    <div>
+                      <strong>Criado em:</strong> {new Date(order.created_at).toLocaleDateString('pt-BR')}
+                    </div>
+                    <div>
+                      <strong>Atualizado em:</strong> {new Date(order.updated_at).toLocaleDateString('pt-BR')}
                     </div>
                   </div>
                 </div>

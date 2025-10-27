@@ -1,4 +1,3 @@
-// App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -17,26 +16,24 @@ function App() {
     <ThemeProvider>
       <Router>
         <AuthProvider>
-          <div className="bg-animated min-h-screen">
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Layout />
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Dashboard />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="new-order" element={<NewOrder />} />
+              <Route path="admin/orders" element={
+                <ProtectedRoute requireAdmin>
+                  <AdminOrders />
                 </ProtectedRoute>
-              }>
-                <Route index element={<Dashboard />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="new-order" element={<NewOrder />} />
-                <Route path="admin/orders" element={
-                  <ProtectedRoute requireAdmin>
-                    <AdminOrders />
-                  </ProtectedRoute>
-                } />
-              </Route>
-            </Routes>
-          </div>
+              } />
+            </Route>
+          </Routes>
         </AuthProvider>
       </Router>
     </ThemeProvider>

@@ -61,6 +61,23 @@ export default {
       },
       backdropBlur: {
         'xs': '2px',
+      },
+      // ADICIONE ESTAS CONFIGURAÇÕES DE SOMBRA
+      boxShadow: {
+        'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        'DEFAULT': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        'lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        'xl': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+        '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+        '3xl': '0 35px 60px -15px rgb(0 0 0 / 0.3)',
+        'inner': 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        'neumorphic': '5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff',
+      },
+      // ADICIONE ESTAS CONFIGURAÇÕES DE BORDA
+      borderWidth: {
+        '3': '3px',
       }
     },
   },

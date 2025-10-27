@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { Package, Clock, CheckCircle, XCircle, PlayCircle, Plus, Search, Filter, Download } from 'lucide-react';
+import { 
+  Package, Clock, CheckCircle, XCircle, PlayCircle, 
+  Plus, Search, Filter, Download, BarChart3, Sparkles 
+} from 'lucide-react';
 import SearchFilters from '../components/SearchFilters';
 
 const Orders = () => {
@@ -12,11 +15,11 @@ const Orders = () => {
   const [exporting, setExporting] = useState(false);
 
   const statusIcons = {
-    'Em análise': <Clock className="h-5 w-5 text-yellow-500" />,
-    'Aprovado': <CheckCircle className="h-5 w-5 text-green-500" />,
-    'Rejeitado': <XCircle className="h-5 w-5 text-red-500" />,
-    'Em andamento': <PlayCircle className="h-5 w-5 text-blue-500" />,
-    'Concluído': <Package className="h-5 w-5 text-gray-500" />
+    'Em análise': <Clock className="h-6 w-6 text-amber-500 animate-pulse" />,
+    'Aprovado': <CheckCircle className="h-6 w-6 text-emerald-500 animate-bounce" />,
+    'Rejeitado': <XCircle className="h-6 w-6 text-rose-500 animate-pulse" />,
+    'Em andamento': <PlayCircle className="h-6 w-6 text-blue-500 animate-pulse" />,
+    'Concluído': <Package className="h-6 w-6 text-violet-500" />
   };
 
   const statusColors = {
@@ -126,38 +129,48 @@ const Orders = () => {
     return (
       <div className="flex justify-center items-center h-96">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando pedidos...</p>
+          <div className="spinner-premium w-16 h-16 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400 text-lg font-medium animate-pulse">
+            Carregando pedidos...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div className="space-y-8 animate-fade-in">
+      {/* Header Premium */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Meus Pedidos</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2 text-lg">
-            Gerencie e acompanhe todos os seus pedidos
-          </p>
+          <div className="flex items-center space-x-4 mb-3">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-2xl">
+              <Package className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold gradient-text">Meus Pedidos</h1>
+              <p className="text-lg text-gray-600 dark:text-gray-400 mt-2">
+                Gerencie e acompanhe todos os seus pedidos
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center space-x-3 mt-6 lg:mt-0">
+        <div className="flex items-center space-x-4 mt-6 lg:mt-0">
           <button
             onClick={exportToCSV}
             disabled={exporting || filteredOrders.length === 0}
-            className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
+            className="btn-secondary flex items-center space-x-3 px-6 py-3 rounded-xl disabled:opacity-50"
           >
-            <Download className="h-4 w-4" />
-            <span>{exporting ? 'Exportando...' : 'Exportar CSV'}</span>
+            <Download className="h-5 w-5" />
+            <span className="font-semibold">{exporting ? 'Exportando...' : 'Exportar CSV'}</span>
           </button>
           <Link
             to="/new-order"
-            className="btn-primary flex items-center space-x-2"
+            className="btn-primary flex items-center space-x-3 px-6 py-3 rounded-xl"
           >
-            <Plus className="h-4 w-4" />
-            <span>Novo Pedido</span>
+            <Plus className="h-5 w-5" />
+            <span className="font-bold">Novo Pedido</span>
+            <Sparkles className="h-4 w-4" />
           </Link>
         </div>
       </div>
@@ -168,42 +181,38 @@ const Orders = () => {
         orders={orders}
       />
 
-      {/* Estatísticas */}
+      {/* Estatísticas Premium */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div className="metric-card text-center">
-          <div className="text-3xl font-bold text-gray-900 dark:text-white">
-            {orders.length}
+        {[
+          { label: 'Total', value: orders.length, color: 'from-gray-500 to-gray-600' },
+          { label: 'Em Análise', value: orders.filter(o => o.status === 'Em análise').length, color: 'from-amber-500 to-orange-500' },
+          { label: 'Aprovados', value: orders.filter(o => o.status === 'Aprovado').length, color: 'from-emerald-500 to-green-500' },
+          { label: 'Filtrados', value: filteredOrders.length, color: 'from-blue-500 to-cyan-500' },
+        ].map((stat, index) => (
+          <div key={index} className="metric-card text-center group hover-3d">
+            <div className={`w-16 h-16 bg-gradient-to-r ${stat.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl group-hover:scale-110 transition-transform duration-500`}>
+              <BarChart3 className="h-7 w-7 text-white" />
+            </div>
+            <div className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              {stat.value}
+            </div>
+            <div className="text-lg font-semibold text-gray-600 dark:text-gray-400 mt-2">
+              {stat.label}
+            </div>
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Total</div>
-        </div>
-        <div className="metric-card text-center">
-          <div className="text-3xl font-bold text-yellow-600">
-            {orders.filter(o => o.status === 'Em análise').length}
-          </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Em Análise</div>
-        </div>
-        <div className="metric-card text-center">
-          <div className="text-3xl font-bold text-green-600">
-            {orders.filter(o => o.status === 'Aprovado').length}
-          </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Aprovados</div>
-        </div>
-        <div className="metric-card text-center">
-          <div className="text-3xl font-bold text-blue-600">
-            {filteredOrders.length}
-          </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Filtrados</div>
-        </div>
+        ))}
       </div>
 
-      {/* Lista de Pedidos */}
+      {/* Lista de Pedidos Premium */}
       {filteredOrders.length === 0 ? (
-        <div className="card text-center py-16">
-          <Package className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
-          <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
+        <div className="card text-center py-20 bg-gradient-to-br from-white/80 to-white/60 dark:from-slate-800/80 dark:to-slate-800/60">
+          <div className="w-20 h-20 bg-gradient-to-r from-gray-400 to-gray-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            <Package className="h-10 w-10 text-white" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-600 dark:text-gray-400 mb-4">
             {orders.length === 0 ? 'Nenhum pedido encontrado' : 'Nenhum pedido com esses filtros'}
           </h3>
-          <p className="text-gray-400 dark:text-gray-500 mb-6">
+          <p className="text-gray-500 dark:text-gray-500 text-lg mb-8">
             {orders.length === 0 
               ? 'Você ainda não fez nenhum pedido.' 
               : 'Tente ajustar os filtros de busca.'
@@ -212,38 +221,48 @@ const Orders = () => {
           {orders.length === 0 && (
             <Link
               to="/new-order"
-              className="btn-primary inline-flex items-center space-x-2"
+              className="btn-primary inline-flex items-center space-x-3 px-8 py-4 rounded-2xl"
             >
-              <Plus className="h-4 w-4" />
-              <span>Criar Primeiro Pedido</span>
+              <Plus className="h-5 w-5" />
+              <span className="font-bold">Criar Primeiro Pedido</span>
+              <Sparkles className="h-4 w-4" />
             </Link>
           )}
         </div>
       ) : (
-        <div className="space-y-4">
-          {filteredOrders.map((order) => (
-            <div key={order.id} className="card hover:scale-105 transition-transform duration-300">
+        <div className="space-y-6">
+          {filteredOrders.map((order, index) => (
+            <div 
+              key={order.id} 
+              className="card group hover-3d bg-gradient-to-br from-white/80 to-white/60 dark:from-slate-800/80 dark:to-slate-800/60"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-3">
-                    {statusIcons[order.status]}
-                    <span className={`status-badge ${statusColors[order.status]}`}>
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="transform group-hover:scale-110 transition-transform duration-500">
+                      {statusIcons[order.status]}
+                    </div>
+                    <span className={`status-badge ${statusColors[order.status]} group-hover:scale-105 transition-transform duration-300`}>
                       {order.status}
                     </span>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                     {order.category}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                  
+                  <p className="text-gray-600 dark:text-gray-400 text-lg leading-relaxed mb-6">
                     {order.description}
                   </p>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span className="font-semibold text-gray-700 dark:text-gray-300">
-                      Orçamento: <span className="text-green-600">R$ {order.estimated_budget}</span>
+                  
+                  <div className="flex flex-wrap items-center gap-6 text-lg text-gray-500 dark:text-gray-400">
+                    <span className="font-bold text-gray-700 dark:text-gray-300">
+                      Orçamento: <span className="text-2xl text-green-600">R$ {order.estimated_budget}</span>
                     </span>
-                    <span>•</span>
+                    <span className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"></span>
                     <span>Criado em: {new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
-                    <span>•</span>
+                    <span className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"></span>
                     <span>{new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 </div>

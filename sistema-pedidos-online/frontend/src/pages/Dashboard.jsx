@@ -1,10 +1,11 @@
+// pages/Dashboard.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { 
   Package, Plus, BarChart3, Users, TrendingUp, Clock, 
-  ArrowUp, ArrowDown, FileText, Sparkles, Zap 
+  ArrowUp, ArrowDown, FileText, Sparkles, Zap, RefreshCw
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -17,16 +18,26 @@ const Dashboard = () => {
   });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchDashboardData = useCallback(async () => {
+  const fetchDashboardData = useCallback(async (showRefresh = false) => {
     try {
-      setLoading(true);
+      if (showRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
       const endpoint = isAdmin ? '/orders' : '/orders/my-orders';
-      const response = await api.get(endpoint);
+      const response = await api.get(endpoint, {
+        timeout: 8000
+      });
+      
       const ordersData = response.data.orders || [];
       
       setOrders(ordersData);
 
+      // Calcular estatísticas
       const totalOrders = ordersData.length;
       const pendingOrders = ordersData.filter(order => 
         ['Em análise', 'Em andamento'].includes(order.status)
@@ -44,21 +55,25 @@ const Dashboard = () => {
         totalOrders,
         pendingOrders,
         completedOrders,
-        averageBudget: averageBudget.toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        })
+        averageBudget: averageBudget.toFixed(2)
       });
+
     } catch (error) {
       console.error('Erro ao buscar dados do dashboard:', error);
+      // Não limpar dados existentes em caso de erro
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [isAdmin]);
 
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
+
+  const handleRefresh = () => {
+    fetchDashboardData(true);
+  };
 
   const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'indigo' }) => (
     <div className="metric-card group hover-3d relative overflow-hidden">
@@ -75,9 +90,9 @@ const Dashboard = () => {
           {change && (
             <div className="flex items-center">
               {trend === 'up' ? (
-                <ArrowUp className="h-4 w-4 text-emerald-500 animate-bounce" />
+                <ArrowUp className="h-4 w-4 text-emerald-500" />
               ) : (
-                <ArrowDown className="h-4 w-4 text-rose-500 animate-pulse" />
+                <ArrowDown className="h-4 w-4 text-rose-500" />
               )}
               <span className={`text-sm font-medium ml-2 ${trend === 'up' ? 'text-emerald-600' : 'text-rose-600'}`}>
                 {Math.abs(change)}%
@@ -86,23 +101,20 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-        <div className={`w-14 h-14 bg-gradient-to-br ${getMetricColor(color)} rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 relative overflow-hidden`}>
+        <div className={`w-14 h-14 bg-gradient-to-br ${getMetricColor(color)} rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-500 relative overflow-hidden`}>
           <div className="absolute inset-0 bg-white/20 rounded-2xl transform rotate-12 scale-150"></div>
           <Icon className="h-7 w-7 text-white relative z-10" />
         </div>
       </div>
-      
-      {/* Efeito de brilho */}
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
     </div>
   );
 
-  if (loading) {
+  if (loading && orders.length === 0) {
     return (
       <div className="flex justify-center items-center h-96">
         <div className="text-center">
           <div className="spinner-premium w-16 h-16 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400 text-lg font-medium animate-pulse">
+          <p className="text-gray-600 dark:text-gray-400 text-lg font-medium">
             Carregando dashboard...
           </p>
         </div>
@@ -116,7 +128,7 @@ const Dashboard = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div className="relative">
           <div className="flex items-center space-x-3 mb-2">
-            <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl glow-effect">
+            <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
               <Sparkles className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -128,18 +140,27 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-          <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
         </div>
         
-        <Link
-          to="/new-order"
-          className="btn-primary flex items-center space-x-3 mt-4 sm:mt-0 px-8 py-4 rounded-2xl group relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-          <Plus className="h-6 w-6 group-hover:rotate-90 transition-transform duration-500" />
-          <span className="font-bold text-lg">Novo Pedido</span>
-          <Zap className="h-5 w-5 group-hover:scale-125 transition-transform duration-300" />
-        </Link>
+        <div className="flex items-center space-x-3 mt-4 sm:mt-0">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="btn-secondary flex items-center space-x-2 px-4 py-3 rounded-xl disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>Atualizar</span>
+          </button>
+          
+          <Link
+            to="/new-order"
+            className="btn-primary flex items-center space-x-3 px-6 py-3 rounded-xl group relative overflow-hidden"
+          >
+            <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-500" />
+            <span className="font-bold">Novo Pedido</span>
+            <Zap className="h-4 w-4 group-hover:scale-125 transition-transform duration-300" />
+          </Link>
+        </div>
       </div>
 
       {/* Grid de Métricas Premium */}
@@ -182,12 +203,18 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Distribuição de Status */}
         <div className="xl:col-span-2 card group hover-3d">
-          <h3 className="text-2xl font-bold gradient-text mb-6 flex items-center">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mr-4 shadow-2xl">
-              <BarChart3 className="h-5 w-5 text-white" />
-            </div>
-            Distribuição por Status
-          </h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold gradient-text flex items-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mr-4 shadow-2xl">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
+              Distribuição por Status
+            </h3>
+            {refreshing && (
+              <RefreshCw className="h-5 w-5 text-blue-500 animate-spin" />
+            )}
+          </div>
+          
           <div className="space-y-6">
             {[
               { label: 'Em análise', value: orders.filter(o => o.status === 'Em análise').length, color: 'amber' },
@@ -198,7 +225,7 @@ const Dashboard = () => {
             ].filter(item => item.value > 0).map((item, index) => (
               <div key={index} className="flex items-center justify-between group/item">
                 <div className="flex items-center space-x-4 flex-1">
-                  <span className={`status-badge ${getStatusClass(item.label)} min-w-[120px] justify-center group-hover/item:scale-105 transition-transform duration-300`}>
+                  <span className={`status-badge ${getStatusClass(item.label)} min-w-[120px] justify-center`}>
                     {item.label}
                   </span>
                   <span className="text-lg font-bold text-gray-900 dark:text-white min-w-[50px]">
@@ -206,7 +233,7 @@ const Dashboard = () => {
                   </span>
                   <div className="progress-bar flex-1">
                     <div
-                      className="progress-fill group-hover/item:scale-y-110 transition-all duration-700"
+                      className="progress-fill transition-all duration-700"
                       style={{ 
                         width: `${(item.value / Math.max(1, orders.length)) * 100}%`,
                         background: `linear-gradient(90deg, ${getStatusGradient(item.label)})`
@@ -219,6 +246,13 @@ const Dashboard = () => {
                 </span>
               </div>
             ))}
+            
+            {orders.length === 0 && (
+              <div className="text-center py-8">
+                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">Nenhum pedido encontrado</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -235,7 +269,7 @@ const Dashboard = () => {
               to="/new-order"
               className="flex items-center p-5 border-2 border-dashed border-indigo-200/50 dark:border-indigo-800/50 rounded-2xl hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/30 transition-all duration-500 group/link backdrop-blur-sm"
             >
-              <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center group-hover/link:scale-110 group-hover/link:rotate-12 transition-all duration-500 shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center group-hover/link:scale-110 transition-all duration-500 shadow-lg">
                 <Plus className="h-6 w-6 text-white" />
               </div>
               <span className="font-bold text-gray-900 dark:text-white ml-4 text-lg">Novo Pedido</span>
@@ -245,7 +279,7 @@ const Dashboard = () => {
               to="/orders"
               className="flex items-center p-5 border-2 border-dashed border-blue-200/50 dark:border-blue-800/50 rounded-2xl hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/30 transition-all duration-500 group/link backdrop-blur-sm"
             >
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center group-hover/link:scale-110 group-hover/link:rotate-12 transition-all duration-500 shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center group-hover/link:scale-110 transition-all duration-500 shadow-lg">
                 <Package className="h-6 w-6 text-white" />
               </div>
               <span className="font-bold text-gray-900 dark:text-white ml-4 text-lg">Ver Pedidos</span>
@@ -256,7 +290,7 @@ const Dashboard = () => {
                 to="/admin/orders"
                 className="flex items-center p-5 border-2 border-dashed border-purple-200/50 dark:border-purple-800/50 rounded-2xl hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/30 transition-all duration-500 group/link backdrop-blur-sm"
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover/link:scale-110 group-hover/link:rotate-12 transition-all duration-500 shadow-lg">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover/link:scale-110 transition-all duration-500 shadow-lg">
                   <Users className="h-6 w-6 text-white" />
                 </div>
                 <span className="font-bold text-gray-900 dark:text-white ml-4 text-lg">Painel Admin</span>
@@ -274,24 +308,25 @@ const Dashboard = () => {
               </div>
               Pedidos Recentes
             </h3>
-            <Link 
-              to="/orders" 
-              className="btn-secondary flex items-center space-x-2 group/link px-6 py-3 rounded-xl"
-            >
-              <span>Ver todos</span>
-              <ArrowUp className="h-4 w-4 rotate-45 group-hover/link:translate-x-1 transition-transform duration-300" />
-            </Link>
+            <div className="flex items-center space-x-3">
+              {refreshing && <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />}
+              <Link 
+                to="/orders" 
+                className="btn-secondary flex items-center space-x-2 px-4 py-2 rounded-xl"
+              >
+                <span>Ver todos</span>
+              </Link>
+            </div>
           </div>
           
           <div className="space-y-4">
             {orders.slice(0, 5).map((order, index) => (
               <div 
                 key={order.id} 
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border-2 border-gray-100/50 dark:border-gray-700/50 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-700/30 transition-all duration-500 group/item backdrop-blur-sm hover:scale-[1.02]"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-6 border-2 border-gray-100/50 dark:border-gray-700/50 rounded-2xl hover:bg-white/50 dark:hover:bg-gray-700/30 transition-all duration-500 group/item backdrop-blur-sm"
               >
                 <div className="flex items-center space-x-4 flex-1 min-w-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl flex items-center justify-center group-hover/item:scale-110 group-hover/item:rotate-12 transition-all duration-500 shadow-lg">
+                  <div className="w-12 h-12 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg">
                     <FileText className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -319,7 +354,7 @@ const Dashboard = () => {
                       maximumFractionDigits: 2
                     })}
                   </span>
-                  <span className={`status-badge ${getStatusClass(order.status)} justify-center text-sm min-w-[140px] group-hover/item:scale-105 transition-transform duration-300`}>
+                  <span className={`status-badge ${getStatusClass(order.status)} justify-center text-sm min-w-[140px]`}>
                     {order.status}
                   </span>
                 </div>
@@ -334,9 +369,9 @@ const Dashboard = () => {
                 <p className="text-gray-500 dark:text-gray-400 text-xl mb-6 font-medium">Nenhum pedido encontrado</p>
                 <Link 
                   to="/new-order" 
-                  className="btn-primary inline-flex items-center space-x-3 px-8 py-4 rounded-2xl group"
+                  className="btn-primary inline-flex items-center space-x-3 px-6 py-3 rounded-xl"
                 >
-                  <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-500" />
+                  <Plus className="h-5 w-5" />
                   <span className="font-bold">Criar primeiro pedido</span>
                 </Link>
               </div>
@@ -348,7 +383,7 @@ const Dashboard = () => {
   );
 };
 
-// Helper functions atualizadas
+// Helper functions
 const getMetricColor = (color) => {
   const colorMap = {
     indigo: 'from-indigo-500 to-purple-500',

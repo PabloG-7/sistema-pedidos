@@ -1,4 +1,4 @@
-// contexts/AuthContext.tsx
+// contexts/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 
@@ -15,53 +15,50 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  // Carregar usuário do localStorage (SEM verificar com backend)
-  useEffect(() => {
-    const loadUser = () => {
-      try {
-        const token = localStorage.getItem('token');
-        const userData = localStorage.getItem('user');
-        
-        if (token && userData) {
-          setUser(JSON.parse(userData));
-        }
-      } catch (error) {
-        console.error('Erro ao carregar usuário:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUser();
-  }, []);
-
-  const login = useCallback(async (email, password) => {
+  // Verificar autenticação com o backend
+  const checkAuth = useCallback(async () => {
     try {
-      setLoading(true);
-      const response = await api.post('/auth/login', { email, password });
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      // Verificar token com backend
+      const response = await api.get('/auth/me', {
+        timeout: 5000
+      });
       
-      const { user, token } = response.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
-      
-      return { success: true };
+      if (response.data.user) {
+        setUser(response.data.user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
     } catch (error) {
-      const message = error.response?.data?.message || 'Erro ao fazer login';
-      return { success: false, message };
+      console.error('Erro ao verificar autenticação:', error);
+      // Limpar dados inválidos
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const register = useCallback(async (name, email, password) => {
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  const login = useCallback(async (email, password) => {
     try {
-      setLoading(true);
-      const response = await api.post('/auth/register', { name, email, password });
+      setIsAuthenticating(true);
+      const response = await api.post('/auth/login', { 
+        email, 
+        password 
+      }, {
+        timeout: 10000
+      });
       
       const { user, token } = response.data;
       
@@ -71,10 +68,42 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (error) {
-      const message = error.response?.data?.message || 'Erro ao criar conta';
+      console.error('Login error:', error);
+      const message = error.response?.data?.message || 
+                     error.code === 'ECONNABORTED' ? 'Timeout - servidor não respondeu' : 
+                     'Erro ao fazer login. Tente novamente.';
       return { success: false, message };
     } finally {
-      setLoading(false);
+      setIsAuthenticating(false);
+    }
+  }, []);
+
+  const register = useCallback(async (name, email, password) => {
+    try {
+      setIsAuthenticating(true);
+      const response = await api.post('/auth/register', { 
+        name, 
+        email, 
+        password 
+      }, {
+        timeout: 10000
+      });
+      
+      const { user, token } = response.data;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Register error:', error);
+      const message = error.response?.data?.message || 
+                     error.code === 'ECONNABORTED' ? 'Timeout - servidor não respondeu' : 
+                     'Erro ao criar conta. Tente novamente.';
+      return { success: false, message };
+    } finally {
+      setIsAuthenticating(false);
     }
   }, []);
 
@@ -90,6 +119,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     loading,
+    isAuthenticating,
     isAdmin: user?.role === 'admin'
   };
 

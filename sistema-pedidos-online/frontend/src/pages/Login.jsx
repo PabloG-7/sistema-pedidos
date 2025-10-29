@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, Rocket, Sparkles, Zap } from 'lucide-react';
+import { Eye, EyeOff, LogIn } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +9,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -38,41 +39,38 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Animation */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
-        <div className="absolute top-40 right-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style={{ animationDelay: '4s' }}></div>
-      </div>
-
-      <div className="max-w-md w-full space-y-8 z-10">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-8 px-4">
+      <div className="max-w-md w-full space-y-8">
         {/* Header */}
-        <div className="text-center animate-fade-up">
-          <div className="flex justify-center mb-6">
-            <div className="w-24 h-24 bg-gradient-to-r from-purple-600 to-blue-500 rounded-3xl flex items-center justify-center shadow-2xl animate-glow">
-              <Rocket className="h-12 w-12 text-white" />
-            </div>
+        <div className="text-center">
+          <div className="mx-auto w-12 h-12 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center mb-4">
+            <LogIn className="h-6 w-6 text-white dark:text-gray-900" />
           </div>
-          <h2 className="text-5xl font-black gradient-text mb-4">
-            PGSystem
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            Acesse sua conta
           </h2>
-          <p className="text-xl text-white/80 font-medium">
-            Entre no futuro dos pedidos
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Ou{' '}
+            <Link
+              to="/register"
+              className="font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
+            >
+              crie uma nova conta
+            </Link>
           </p>
         </div>
 
-        {/* Login Form */}
-        <div className="card animate-slide-in">
+        {/* Form */}
+        <div className="card">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-500/20 border border-red-400/30 text-red-200 px-6 py-4 rounded-2xl text-lg font-medium backdrop-blur-md">
+              <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-lg font-semibold text-white mb-3">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email
               </label>
               <input
@@ -83,14 +81,14 @@ const Login = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-field text-lg"
+                className="input"
                 placeholder="seu@email.com"
                 disabled={loading}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-lg font-semibold text-white mb-3">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Senha
               </label>
               <div className="relative">
@@ -102,60 +100,42 @@ const Login = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input-field text-lg pr-12"
+                  className="input pr-10"
                   placeholder="Sua senha"
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/60 hover:text-white transition-colors duration-300"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={loading}
                 >
-                  {showPassword ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full btn-primary flex items-center justify-center py-4 text-lg font-bold disabled:opacity-50"
-              >
-                {loading ? (
-                  <div className="flex items-center space-x-3">
-                    <div className="spinner-modern h-6 w-6"></div>
-                    <span>Iniciando...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-3">
-                    <Zap className="h-6 w-6" />
-                    <span>Acessar Sistema</span>
-                    <Sparkles className="h-5 w-5" />
-                  </div>
-                )}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full btn-primary flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="spinner h-4 w-4"></div>
+                  <span>Entrando...</span>
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-4 w-4" />
+                  <span>Entrar</span>
+                </>
+              )}
+            </button>
 
-            <div className="text-center pt-6 border-t border-white/20">
-              <span className="text-lg text-white/60">
-                Novo aqui?{' '}
-                <Link
-                  to="/register"
-                  className="font-bold text-white hover:text-purple-300 transition-all duration-300"
-                >
-                  Criar conta
-                </Link>
-              </span>
-            </div>
-
-            {/* Credenciais de teste */}
-            <div className="text-center">
-              <div className="text-sm text-white/40 space-y-2 bg-white/5 p-4 rounded-2xl backdrop-blur-md border border-white/10">
-                <p className="font-semibold"><strong>Admin:</strong> admin@sistema.com / admin123</p>
-                <p className="font-semibold"><strong>Usuário:</strong> Crie uma conta</p>
-              </div>
+            {/* Demo credentials */}
+            <div className="text-center text-sm text-gray-500 dark:text-gray-500 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+              <p><strong>Admin:</strong> admin@sistema.com / admin123</p>
             </div>
           </form>
         </div>

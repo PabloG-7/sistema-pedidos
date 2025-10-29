@@ -2,17 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import FileUpload from '../components/FileUpload';
-import { Plus, ArrowLeft } from 'lucide-react';
+import { 
+  Plus, ArrowLeft, FileText, DollarSign, 
+  Target, Calendar, Upload, CheckCircle
+} from 'lucide-react';
 
 const NewOrder = () => {
   const [formData, setFormData] = useState({
     description: '',
     category: '',
-    estimated_budget: ''
+    estimated_budget: '',
+    deadline: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [attachments, setAttachments] = useState([]);
+  const [currentStep, setCurrentStep] = useState(1);
 
   const navigate = useNavigate();
 
@@ -20,7 +25,10 @@ const NewOrder = () => {
     'Desenvolvimento Web',
     'Design Gráfico',
     'Marketing Digital',
-    'Consultoria',
+    'Consultoria TI',
+    'Desenvolvimento Mobile',
+    'Infraestrutura Cloud',
+    'Análise de Dados',
     'Outros'
   ];
 
@@ -35,6 +43,12 @@ const NewOrder = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (formData.description.length < 10) {
+      setError('A descrição deve ter pelo menos 10 caracteres');
+      setLoading(false);
+      return;
+    }
 
     try {
       await api.post('/orders', {
@@ -55,135 +69,259 @@ const NewOrder = () => {
     setLoading(false);
   };
 
+  const nextStep = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const StepIndicator = () => (
+    <div className="flex items-center justify-center mb-8">
+      {[1, 2, 3].map((step) => (
+        <div key={step} className="flex items-center">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+            step === currentStep 
+              ? 'bg-blue-600 border-blue-600 text-white' 
+              : step < currentStep 
+              ? 'bg-green-500 border-green-500 text-white'
+              : 'border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-400'
+          }`}>
+            {step < currentStep ? <CheckCircle className="h-5 w-5" /> : step}
+          </div>
+          {step < 3 && (
+            <div className={`w-20 h-1 ${
+              step < currentStep ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+            }`}></div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
+  const Step1 = () => (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+          <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Informações Básicas
+        </h3>
+      </div>
+
+      <div>
+        <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Categoria do Projeto *
+        </label>
+        <select
+          id="category"
+          name="category"
+          required
+          value={formData.category}
+          onChange={handleChange}
+          className="input"
+        >
+          <option value="">Selecione uma categoria</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="estimated_budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Orçamento Estimado (R$) *
+        </label>
+        <div className="relative">
+          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="number"
+            id="estimated_budget"
+            name="estimated_budget"
+            min="0"
+            step="0.01"
+            required
+            value={formData.estimated_budget}
+            onChange={handleChange}
+            className="input pl-10"
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Prazo Desejado
+        </label>
+        <div className="relative">
+          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="date"
+            id="deadline"
+            name="deadline"
+            value={formData.deadline}
+            onChange={handleChange}
+            className="input pl-10"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const Step2 = () => (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+          <FileText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Descrição do Projeto
+        </h3>
+      </div>
+
+      <div>
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Descrição Detalhada *
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          rows={8}
+          required
+          value={formData.description}
+          onChange={handleChange}
+          className="input resize-none"
+          placeholder="Descreva detalhadamente o que você precisa...
+• Objetivos do projeto
+• Funcionalidades necessárias
+• Requisitos técnicos
+• Expectativas e prazos"
+        />
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Quanto mais detalhes, melhor será o orçamento
+          </p>
+          <span className={`text-sm font-medium ${
+            formData.description.length < 10 ? 'text-red-500' : 
+            formData.description.length < 50 ? 'text-yellow-500' : 'text-green-500'
+          }`}>
+            {formData.description.length}/50 caracteres mínimos
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const Step3 = () => (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+          <Upload className="h-5 w-5 text-green-600 dark:text-green-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Anexos e Documentos
+        </h3>
+      </div>
+
+      <div>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Adicione arquivos, imagens ou documentos que possam ajudar na elaboração do orçamento.
+        </p>
+        <FileUpload 
+          onFilesChange={setAttachments}
+          maxFiles={5}
+        />
+        <div className="mt-4 text-sm text-gray-500 dark:text-gray-500">
+          <p>• Formatos aceitos: PDF, JPG, PNG, DOC, XLS</p>
+          <p>• Tamanho máximo por arquivo: 5MB</p>
+          <p>• Máximo de 5 arquivos</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="max-w-2xl mx-auto fade-in">
+    <div className="max-w-4xl mx-auto fade-in">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-4 mb-8">
         <button
           onClick={() => navigate('/orders')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Novo Pedido
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Preencha os detalhes do seu pedido
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-lg">
+            Preencha as informações do seu projeto
           </p>
         </div>
       </div>
 
       <div className="card">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <StepIndicator />
+
+        <form onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded-lg text-sm mb-6">
               {error}
             </div>
           )}
 
-          {/* Category */}
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Categoria *
-            </label>
-            <select
-              id="category"
-              name="category"
-              required
-              value={formData.category}
-              onChange={handleChange}
-              className="input"
-            >
-              <option value="">Selecione uma categoria</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
+          {currentStep === 1 && <Step1 />}
+          {currentStep === 2 && <Step2 />}
+          {currentStep === 3 && <Step3 />}
 
-          {/* Budget */}
-          <div>
-            <label htmlFor="estimated_budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Orçamento Estimado (R$) *
-            </label>
-            <input
-              type="number"
-              id="estimated_budget"
-              name="estimated_budget"
-              min="0"
-              step="0.01"
-              required
-              value={formData.estimated_budget}
-              onChange={handleChange}
-              className="input"
-              placeholder="0.00"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Descrição do Pedido *
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={6}
-              required
-              value={formData.description}
-              onChange={handleChange}
-              className="input resize-none"
-              placeholder="Descreva detalhadamente o que você precisa..."
-            />
-            <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
-              <span>Mínimo de 10 caracteres</span>
-              <span className={formData.description.length < 10 ? 'text-yellow-500' : 'text-green-500'}>
-                {formData.description.length}/10
-              </span>
-            </div>
-          </div>
-
-          {/* File Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Anexos (Opcional)
-            </label>
-            <FileUpload 
-              onFilesChange={setAttachments}
-              maxFiles={5}
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+          {/* Navigation */}
+          <div className="flex justify-between pt-8 mt-8 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
-              onClick={() => navigate('/orders')}
-              className="btn-secondary"
+              onClick={prevStep}
+              disabled={currentStep === 1}
+              className="btn-secondary flex items-center gap-2 disabled:opacity-50"
             >
-              Cancelar
+              <ArrowLeft className="h-4 w-4" />
+              <span>Voltar</span>
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary flex items-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="spinner h-4 w-4"></div>
-                  <span>Enviando...</span>
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" />
-                  <span>Enviar Pedido</span>
-                </>
-              )}
-            </button>
+
+            {currentStep < 3 ? (
+              <button
+                type="button"
+                onClick={nextStep}
+                className="btn-primary flex items-center gap-2"
+              >
+                <span>Continuar</span>
+                <ArrowLeft className="h-4 w-4 rotate-180" />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary flex items-center gap-3"
+              >
+                {loading ? (
+                  <>
+                    <div className="spinner h-5 w-5"></div>
+                    <span>Enviando...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-5 w-5" />
+                    <span>Finalizar Pedido</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </form>
       </div>

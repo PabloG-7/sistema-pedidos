@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { 
-  Package, Plus, BarChart3, Users, TrendingUp, Clock, 
-  ArrowUp, ArrowDown, FileText, RefreshCw, Zap, Rocket
+  Package, Plus, Clock, CheckCircle, TrendingUp, 
+  Users, DollarSign, ArrowRight, FileText, BarChart3,
+  Calendar, Download, Eye
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -13,27 +14,20 @@ const Dashboard = () => {
     totalOrders: 0,
     pendingOrders: 0,
     completedOrders: 0,
-    averageBudget: 0
+    totalRevenue: 0
   });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchDashboardData = useCallback(async (showRefresh = false) => {
+  const fetchDashboardData = useCallback(async () => {
     try {
-      if (showRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
+      setLoading(true);
       const endpoint = isAdmin ? '/orders' : '/orders/my-orders';
       const response = await api.get(endpoint);
-      
       const ordersData = response.data.orders || [];
+      
       setOrders(ordersData);
 
-      // Calcular estatísticas
       const totalOrders = ordersData.length;
       const pendingOrders = ordersData.filter(order => 
         ['Em análise', 'Em andamento'].includes(order.status)
@@ -42,23 +36,23 @@ const Dashboard = () => {
         order.status === 'Concluído'
       ).length;
       
-      const totalBudget = ordersData.reduce((sum, order) => 
+      const totalRevenue = ordersData.reduce((sum, order) => 
         sum + parseFloat(order.estimated_budget || 0), 0
       );
-      const averageBudget = totalOrders > 0 ? totalBudget / totalOrders : 0;
 
       setStats({
         totalOrders,
         pendingOrders,
         completedOrders,
-        averageBudget: averageBudget.toFixed(2)
+        totalRevenue: totalRevenue.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })
       });
-
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error('Erro ao buscar dados do dashboard:', error);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   }, [isAdmin]);
 
@@ -66,237 +60,319 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  const handleRefresh = () => {
-    fetchDashboardData(true);
-  };
+  const StatCard = ({ title, value, icon: Icon, trend, description, color = 'blue' }) => {
+    const colorClasses = {
+      blue: 'from-blue-500 to-blue-600',
+      green: 'from-green-500 to-green-600',
+      purple: 'from-purple-500 to-purple-600',
+      orange: 'from-orange-500 to-orange-600'
+    };
 
-  const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'purple' }) => (
-    <div className="metric-card hover-3d">
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-white/60 mb-3">
-            {title}
-          </p>
-          <p className="text-3xl font-black text-white mb-3">
-            {value}
-          </p>
-          {change && (
-            <div className="flex items-center">
-              {trend === 'up' ? (
-                <ArrowUp className="h-5 w-5 text-emerald-400" />
-              ) : (
-                <ArrowDown className="h-5 w-5 text-rose-400" />
-              )}
-              <span className={`text-lg font-bold ml-2 ${trend === 'up' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {Math.abs(change)}%
-              </span>
-            </div>
-          )}
-        </div>
-        <div className={`w-16 h-16 ${getMetricColorClass(color)} rounded-2xl flex items-center justify-center shadow-2xl`}>
-          <Icon className="h-8 w-8 text-white" />
+    return (
+      <div className="metric-card group hover:scale-105 transition-transform duration-300">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+              {title}
+            </p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              {value}
+            </p>
+            {trend && (
+              <div className="flex items-center gap-1">
+                <TrendingUp className={`h-4 w-4 ${trend > 0 ? 'text-green-500' : 'text-red-500'}`} />
+                <span className={`text-sm font-medium ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {trend > 0 ? '+' : ''}{trend}%
+                </span>
+              </div>
+            )}
+            {description && (
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                {description}
+              </p>
+            )}
+          </div>
+          <div className={`p-3 rounded-xl bg-gradient-to-r ${colorClasses[color]} text-white shadow-lg`}>
+            <Icon className="h-6 w-6" />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
-  if (loading && orders.length === 0) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-96">
         <div className="text-center">
-          <div className="spinner-modern w-16 h-16 mx-auto mb-4"></div>
-          <p className="text-white/60 text-lg font-medium">Carregando dashboard...</p>
+          <div className="spinner h-12 w-12 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400 font-medium">
+            Carregando dashboard...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fade-up">
+    <div className="space-y-8 fade-in">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative">
-          <div className="flex items-center space-x-4 mb-4">
-            <div className="w-14 h-14 bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-2xl animate-glow">
-              <Rocket className="h-7 w-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-black gradient-text">
-                Dashboard
-              </h1>
-              <p className="text-xl text-white/60 mt-2">
-                Bem-vindo, <span className="font-bold text-white">{user?.name}</span>!
-              </p>
-            </div>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Dashboard
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-lg">
+            Bem-vindo de volta, <span className="font-semibold gradient-text">{user?.name}</span>
+          </p>
         </div>
         
-        <div className="flex items-center space-x-4 mt-6 lg:mt-0">
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="btn-secondary flex items-center space-x-3 px-6 py-3"
-          >
-            <RefreshCw className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="font-semibold">Atualizar</span>
+        <div className="flex items-center gap-4 mt-6 lg:mt-0">
+          <button className="btn-secondary flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            <span>Exportar</span>
           </button>
-          
           <Link
             to="/new-order"
-            className="btn-primary flex items-center space-x-3 px-6 py-3"
+            className="btn-primary flex items-center gap-3"
           >
             <Plus className="h-5 w-5" />
-            <span className="font-bold">Novo Pedido</span>
-            <Zap className="h-4 w-4" />
+            <span>Novo Pedido</span>
           </Link>
         </div>
       </div>
 
-      {/* Grid de Métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <StatCard
           title="Total de Pedidos"
           value={stats.totalOrders}
           icon={Package}
-          change={12}
-          trend="up"
-          color="purple"
+          trend={12}
+          color="blue"
         />
-        <MetricCard
-          title="Pendentes"
+        <StatCard
+          title="Pedidos Pendentes"
           value={stats.pendingOrders}
           icon={Clock}
-          change={5}
-          trend="down"
-          color="amber"
+          trend={-5}
+          color="orange"
         />
-        <MetricCard
-          title="Concluídos"
+        <StatCard
+          title="Pedidos Concluídos"
           value={stats.completedOrders}
-          icon={TrendingUp}
-          change={8}
-          trend="up"
-          color="emerald"
+          icon={CheckCircle}
+          trend={8}
+          color="green"
         />
-        <MetricCard
-          title="Ticket Médio"
-          value={`R$ ${stats.averageBudget}`}
-          icon={BarChart3}
-          change={15}
-          trend="up"
-          color="blue"
+        <StatCard
+          title="Receita Total"
+          value={`R$ ${stats.totalRevenue}`}
+          icon={DollarSign}
+          trend={15}
+          color="purple"
         />
       </div>
 
-      {/* Conteúdo Principal */}
+      {/* Main Content */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Pedidos Recentes */}
-        <div className="xl:col-span-2 card hover-3d">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-2xl font-black gradient-text flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl flex items-center justify-center mr-4 shadow-2xl">
-                <Clock className="h-6 w-6 text-white" />
+        {/* Recent Orders */}
+        <div className="xl:col-span-2 card">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
-              Pedidos Recentes
-            </h3>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Pedidos Recentes
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  Últimos pedidos criados
+                </p>
+              </div>
+            </div>
             <Link 
               to="/orders" 
-              className="btn-secondary flex items-center space-x-2 px-4 py-2"
+              className="btn-secondary flex items-center gap-2 text-sm"
             >
-              <span>Ver todos</span>
-              <ArrowUp className="h-4 w-4 rotate-45" />
+              <Eye className="h-4 w-4" />
+              <span>Ver Todos</span>
             </Link>
           </div>
           
           <div className="space-y-4">
-            {orders.slice(0, 5).map((order) => (
+            {orders.slice(0, 6).map((order) => (
               <div 
                 key={order.id} 
-                className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-500"
+                className="card-hover p-4 border border-gray-200 dark:border-gray-700"
               >
-                <div className="flex items-center space-x-4 flex-1 min-w-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-slate-600 to-slate-700 rounded-2xl flex items-center justify-center shadow-lg">
-                    <FileText className="h-6 w-6 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                      <FileText className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                        {order.category}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm truncate">
+                        {order.description}
+                      </p>
+                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          <span>{new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <DollarSign className="h-3 w-3" />
+                          <span className="font-semibold">R$ {order.estimated_budget}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-white truncate text-lg">
-                      {order.category}
-                    </h4>
-                    <p className="text-white/60 truncate mt-2">
-                      {order.description}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex items-center space-x-6 ml-6">
-                  <span className="text-xl font-black text-white whitespace-nowrap">
-                    R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR')}
-                  </span>
-                  <span className={`status-badge min-w-[140px] justify-center`}>
-                    {order.status}
-                  </span>
+                  <div className="text-right">
+                    <span className={`status-badge ${getStatusClass(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
             
             {orders.length === 0 && (
               <div className="text-center py-12">
-                <div className="w-20 h-20 bg-gradient-to-r from-slate-600 to-slate-700 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
-                  <Package className="h-10 w-10 text-white" />
-                </div>
-                <p className="text-white/60 text-xl mb-6 font-medium">Nenhum pedido encontrado</p>
+                <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Nenhum pedido encontrado
+                </h3>
+                <p className="text-gray-500 dark:text-gray-500 mb-6">
+                  Comece criando seu primeiro pedido
+                </p>
                 <Link 
                   to="/new-order" 
-                  className="btn-primary inline-flex items-center space-x-3 px-8 py-4"
+                  className="btn-primary inline-flex items-center gap-2"
                 >
-                  <Plus className="h-5 w-5" />
-                  <span className="font-bold">Criar primeiro pedido</span>
+                  <Plus className="h-4 w-4" />
+                  <span>Criar Primeiro Pedido</span>
                 </Link>
               </div>
             )}
           </div>
         </div>
 
-        {/* Ações Rápidas */}
-        <div className="card hover-3d">
-          <h3 className="text-2xl font-black gradient-text mb-6 flex items-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mr-4 shadow-2xl">
-              <Zap className="h-6 w-6 text-white" />
+        {/* Sidebar - Quick Stats & Actions */}
+        <div className="space-y-6">
+          {/* Quick Stats */}
+          <div className="card">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                Estatísticas Rápidas
+              </h3>
             </div>
-            Ações Rápidas
-          </h3>
-          <div className="space-y-4">
-            <Link
-              to="/new-order"
-              className="flex items-center p-5 bg-purple-600/20 rounded-2xl border border-purple-400/30 hover:bg-purple-600/30 transition-all duration-500"
-            >
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <Plus className="h-6 w-6 text-white" />
-              </div>
-              <span className="font-bold text-white ml-4 text-lg">Novo Pedido</span>
-            </Link>
             
-            <Link
-              to="/orders"
-              className="flex items-center p-5 bg-blue-600/20 rounded-2xl border border-blue-400/30 hover:bg-blue-600/30 transition-all duration-500"
-            >
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <Package className="h-6 w-6 text-white" />
+            <div className="space-y-3">
+              <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-gray-600 dark:text-gray-400">Taxa de Conclusão</span>
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  {stats.totalOrders > 0 ? Math.round((stats.completedOrders / stats.totalOrders) * 100) : 0}%
+                </span>
               </div>
-              <span className="font-bold text-white ml-4 text-lg">Ver Pedidos</span>
-            </Link>
+              <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-gray-600 dark:text-gray-400">Tempo Médio</span>
+                <span className="font-semibold text-gray-900 dark:text-white">3 dias</span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="text-gray-600 dark:text-gray-400">Satisfação</span>
+                <span className="font-semibold text-green-600">94%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="card">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                Ações Rápidas
+              </h3>
+            </div>
             
-            {isAdmin && (
+            <div className="space-y-3">
               <Link
-                to="/admin/orders"
-                className="flex items-center p-5 bg-violet-600/20 rounded-2xl border border-violet-400/30 hover:bg-violet-600/30 transition-all duration-500"
+                to="/new-order"
+                className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 group"
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-violet-600 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Users className="h-6 w-6 text-white" />
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <Plus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 </div>
-                <span className="font-bold text-white ml-4 text-lg">Painel Admin</span>
+                <div>
+                  <span className="font-semibold text-gray-900 dark:text-white">Novo Pedido</span>
+                  <p className="text-xs text-gray-500 dark:text-gray-500">Criar um novo pedido</p>
+                </div>
               </Link>
-            )}
+              
+              <Link
+                to="/orders"
+                className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 group"
+              >
+                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <Package className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <span className="font-semibold text-gray-900 dark:text-white">Ver Pedidos</span>
+                  <p className="text-xs text-gray-500 dark:text-gray-500">Gerenciar todos os pedidos</p>
+                </div>
+              </Link>
+              
+              {isAdmin && (
+                <Link
+                  to="/admin/orders"
+                  className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 group"
+                >
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                    <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-900 dark:text-white">Painel Admin</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">Gerenciar sistema</p>
+                  </div>
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="card">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                Atividade Recente
+              </h3>
+            </div>
+            
+            <div className="space-y-3">
+              {orders.slice(0, 3).map((order, index) => (
+                <div key={index} className="flex items-center gap-3 py-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      <span className="font-semibold">{order.category}</span> criado
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      {new Date(order.created_at).toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -304,15 +380,15 @@ const Dashboard = () => {
   );
 };
 
-// Helper functions
-const getMetricColorClass = (color) => {
-  const colorMap = {
-    purple: 'bg-gradient-to-r from-purple-600 to-violet-600',
-    blue: 'bg-gradient-to-r from-blue-600 to-cyan-600',
-    emerald: 'bg-gradient-to-r from-emerald-600 to-green-600',
-    amber: 'bg-gradient-to-r from-amber-600 to-orange-600'
+const getStatusClass = (status) => {
+  const statusMap = {
+    'Em análise': 'status-pending',
+    'Aprovado': 'status-approved',
+    'Rejeitado': 'status-rejected',
+    'Em andamento': 'status-progress',
+    'Concluído': 'status-completed'
   };
-  return colorMap[color] || 'bg-gradient-to-r from-purple-600 to-violet-600';
+  return statusMap[status] || 'status-pending';
 };
 
 export default Dashboard;

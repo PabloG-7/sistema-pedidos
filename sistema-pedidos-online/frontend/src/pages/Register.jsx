@@ -59,7 +59,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Animation */}
       <div className="absolute inset-0">
         <div className="absolute top-20 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
@@ -92,7 +92,7 @@ const Register = () => {
             Ou{' '}
             <Link
               to="/login"
-              className="font-semibold gradient-text hover:bg-pos-100 transition-all duration-300"
+              className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-300"
             >
               entre na sua conta existente
             </Link>
@@ -236,11 +236,11 @@ const Register = () => {
             <div className="text-center pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Ao criar uma conta, você concorda com nossos{' '}
-                <a href="#" className="font-semibold gradient-text hover:bg-pos-100 transition-all duration-300">
+                <a href="#" className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-300">
                   Termos
                 </a>{' '}
                 e{' '}
-                <a href="#" className="font-semibold gradient-text hover:bg-pos-100 transition-all duration-300">
+                <a href="#" className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-300">
                   Política de Privacidade
                 </a>
               </p>

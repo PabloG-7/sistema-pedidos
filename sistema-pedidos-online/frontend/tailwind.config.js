@@ -8,8 +8,15 @@ export default {
   theme: {
     extend: {
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
+        'fade-in': 'fadeIn 0.6s ease-out',
+        'fade-up': 'fadeInUp 0.8s ease-out',
+        'slide-in': 'slideIn 0.8s ease-out',
+        'float': 'float 6s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
       },
+      boxShadow: {
+        '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
+      }
     },
   },
   plugins: [],

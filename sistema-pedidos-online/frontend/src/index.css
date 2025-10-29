@@ -47,7 +47,7 @@
 }
 
 @layer components {
-  /* Botões Modernos */
+  /* Botões Modernos - SEM ERROS */
   .btn-primary {
     @apply bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-500 ease-out transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/30 shadow-lg backdrop-blur-sm border border-white/20;
   }
@@ -65,30 +65,22 @@
     @apply bg-black/20 border-white/10 focus:border-purple-400 placeholder:text-white/40;
   }
 
-  /* Cards Glassmorphism */
+  /* Cards Glassmorphism - CORRIGIDO */
   .card {
-    @apply bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-3xl p-8 shadow-2xl transition-all duration-500 hover:shadow-3xl;
+    @apply bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-3xl p-8 shadow-2xl transition-all duration-500;
   }
 
   .dark .card {
     @apply bg-black/20 border-white/10;
   }
 
-  .card:hover {
-    background: rgba(255, 255, 255, 0.15);
-  }
-
-  .dark .card:hover {
-    background: rgba(0, 0, 0, 0.3);
-  }
-
-  /* Cards de Métricas */
+  /* Cards de Métricas - CORRIGIDO */
   .metric-card {
-    @apply card bg-gradient-to-br from-white/15 to-white/5 border-white/30;
+    @apply card border-white/30;
   }
 
   .dark .metric-card {
-    @apply from-black/30 to-black/10 border-white/20;
+    @apply border-white/20;
   }
 
   /* Navigation */
@@ -127,12 +119,34 @@
 
   /* File Upload Moderno */
   .upload-zone {
-    @apply border-3 border-dashed border-white/30 rounded-3xl p-12 text-center transition-all duration-500 cursor-pointer backdrop-blur-sm bg-white/5 hover:bg-white/10 hover:border-purple-400/50;
+    @apply border-3 border-dashed border-white/30 rounded-3xl p-12 text-center transition-all duration-500 cursor-pointer backdrop-blur-sm bg-white/5 hover:border-purple-400/50;
   }
 
   .upload-zone-drag {
     @apply border-purple-400 bg-purple-500/20 scale-105;
   }
+}
+
+/* Efeitos hover customizados - FORA DO @layer components */
+.card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.dark .card:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.upload-zone:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.metric-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+}
+
+.dark .metric-card {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%);
 }
 
 /* Animações Avançadas */
@@ -282,11 +296,14 @@
 /* Mobile Optimizations */
 @media (max-width: 768px) {
   .card {
-    @apply rounded-2xl p-6;
+    border-radius: 1rem;
+    padding: 1.5rem;
   }
   
   .btn-primary, .btn-secondary {
-    @apply py-3 px-6 rounded-xl text-sm;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
   }
 
   .hover-3d:hover {

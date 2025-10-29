@@ -71,7 +71,7 @@ const Dashboard = () => {
   };
 
   const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'purple' }) => (
-    <div className="metric-card group hover-3d">
+    <div className="metric-card hover-3d">
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <p className="text-sm font-semibold text-white/60 mb-3">
@@ -93,7 +93,7 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-        <div className={`w-16 h-16 bg-gradient-to-r ${getMetricColor(color)} rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500`}>
+        <div className={`w-16 h-16 ${getMetricColorClass(color)} rounded-2xl flex items-center justify-center shadow-2xl`}>
           <Icon className="h-8 w-8 text-white" />
         </div>
       </div>
@@ -191,7 +191,7 @@ const Dashboard = () => {
       {/* Conteúdo Principal */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Pedidos Recentes */}
-        <div className="xl:col-span-2 card group hover-3d">
+        <div className="xl:col-span-2 card hover-3d">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-2xl font-black gradient-text flex items-center">
               <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl flex items-center justify-center mr-4 shadow-2xl">
@@ -209,7 +209,7 @@ const Dashboard = () => {
           </div>
           
           <div className="space-y-4">
-            {orders.slice(0, 5).map((order, index) => (
+            {orders.slice(0, 5).map((order) => (
               <div 
                 key={order.id} 
                 className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-500"
@@ -258,7 +258,7 @@ const Dashboard = () => {
         </div>
 
         {/* Ações Rápidas */}
-        <div className="card group hover-3d">
+        <div className="card hover-3d">
           <h3 className="text-2xl font-black gradient-text mb-6 flex items-center">
             <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mr-4 shadow-2xl">
               <Zap className="h-6 w-6 text-white" />
@@ -268,7 +268,7 @@ const Dashboard = () => {
           <div className="space-y-4">
             <Link
               to="/new-order"
-              className="flex items-center p-5 bg-gradient-to-r from-purple-600/20 to-blue-500/20 rounded-2xl border border-purple-400/30 hover:from-purple-600/30 hover:to-blue-500/30 transition-all duration-500"
+              className="flex items-center p-5 bg-purple-600/20 rounded-2xl border border-purple-400/30 hover:bg-purple-600/30 transition-all duration-500"
             >
               <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <Plus className="h-6 w-6 text-white" />
@@ -278,7 +278,7 @@ const Dashboard = () => {
             
             <Link
               to="/orders"
-              className="flex items-center p-5 bg-gradient-to-r from-blue-600/20 to-cyan-500/20 rounded-2xl border border-blue-400/30 hover:from-blue-600/30 hover:to-cyan-500/30 transition-all duration-500"
+              className="flex items-center p-5 bg-blue-600/20 rounded-2xl border border-blue-400/30 hover:bg-blue-600/30 transition-all duration-500"
             >
               <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <Package className="h-6 w-6 text-white" />
@@ -289,7 +289,7 @@ const Dashboard = () => {
             {isAdmin && (
               <Link
                 to="/admin/orders"
-                className="flex items-center p-5 bg-gradient-to-r from-violet-600/20 to-purple-500/20 rounded-2xl border border-violet-400/30 hover:from-violet-600/30 hover:to-purple-500/30 transition-all duration-500"
+                className="flex items-center p-5 bg-violet-600/20 rounded-2xl border border-violet-400/30 hover:bg-violet-600/30 transition-all duration-500"
               >
                 <div className="w-12 h-12 bg-gradient-to-r from-violet-600 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
                   <Users className="h-6 w-6 text-white" />
@@ -305,14 +305,14 @@ const Dashboard = () => {
 };
 
 // Helper functions
-const getMetricColor = (color) => {
+const getMetricColorClass = (color) => {
   const colorMap = {
-    purple: 'from-purple-600 to-violet-600',
-    blue: 'from-blue-600 to-cyan-600',
-    emerald: 'from-emerald-600 to-green-600',
-    amber: 'from-amber-600 to-orange-600'
+    purple: 'bg-gradient-to-r from-purple-600 to-violet-600',
+    blue: 'bg-gradient-to-r from-blue-600 to-cyan-600',
+    emerald: 'bg-gradient-to-r from-emerald-600 to-green-600',
+    amber: 'bg-gradient-to-r from-amber-600 to-orange-600'
   };
-  return colorMap[color] || 'from-purple-600 to-violet-600';
+  return colorMap[color] || 'bg-gradient-to-r from-purple-600 to-violet-600';
 };
 
 export default Dashboard;

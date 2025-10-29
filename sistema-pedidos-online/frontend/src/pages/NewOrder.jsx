@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import FileUpload from '../components/FileUpload';
-import { Plus, Upload, Target, DollarSign, FileText, Sparkles } from 'lucide-react';
+import { Plus, Target, DollarSign, FileText, ArrowLeft } from 'lucide-react';
 
 const NewOrder = () => {
   const [formData, setFormData] = useState({
@@ -57,59 +57,64 @@ const NewOrder = () => {
 
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
-      {/* Header Premium */}
-      <div className="mb-8">
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-2xl">
-            <Plus className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold gradient-text">Novo Pedido</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mt-2">
-              Preencha os detalhes do seu pedido abaixo
-            </p>
-          </div>
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <button
+          onClick={() => navigate('/orders')}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors duration-300"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Novo Pedido
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Preencha os detalhes do seu pedido abaixo
+          </p>
         </div>
       </div>
 
-      <div className="card bg-gradient-to-br from-white/80 to-white/60 dark:from-slate-800/80 dark:to-slate-800/60 group hover-3d">
-        <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="card">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-6 py-4 rounded-2xl text-lg font-medium backdrop-blur-sm">
+            <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
 
-          {/* Categoria */}
-          <div className="space-y-3">
-            <label htmlFor="category" className="flex items-center text-xl font-bold text-gray-900 dark:text-white">
-              <Target className="h-6 w-6 text-indigo-500 mr-3" />
+          {/* Category */}
+          <div>
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Categoria *
             </label>
-            <select
-              id="category"
-              name="category"
-              required
-              value={formData.category}
-              onChange={handleChange}
-              className="input-field text-lg py-4 bg-white/80 backdrop-blur-sm"
-            >
-              <option value="">Selecione uma categoria</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <Target className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <select
+                id="category"
+                name="category"
+                required
+                value={formData.category}
+                onChange={handleChange}
+                className="input-field pl-10 w-full"
+              >
+                <option value="">Selecione uma categoria</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Orçamento */}
-          <div className="space-y-3">
-            <label htmlFor="estimated_budget" className="flex items-center text-xl font-bold text-gray-900 dark:text-white">
-              <DollarSign className="h-6 w-6 text-green-500 mr-3" />
+          {/* Budget */}
+          <div>
+            <label htmlFor="estimated_budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Orçamento Estimado (R$) *
             </label>
             <div className="relative">
+              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="number"
                 id="estimated_budget"
@@ -119,82 +124,72 @@ const NewOrder = () => {
                 required
                 value={formData.estimated_budget}
                 onChange={handleChange}
-                className="input-field text-lg py-4 pl-12 bg-white/80 backdrop-blur-sm"
+                className="input-field pl-10 w-full"
                 placeholder="0.00"
               />
-              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl font-bold text-gray-400">R$</span>
             </div>
           </div>
 
-          {/* Descrição */}
-          <div className="space-y-3">
-            <label htmlFor="description" className="flex items-center text-xl font-bold text-gray-900 dark:text-white">
-              <FileText className="h-6 w-6 text-blue-500 mr-3" />
+          {/* Description */}
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Descrição do Pedido *
             </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={8}
-              required
-              value={formData.description}
-              onChange={handleChange}
-              className="input-field text-lg py-4 bg-white/80 backdrop-blur-sm resize-none"
-              placeholder="Descreva detalhadamente o que você precisa... Seja específico sobre requisitos, prazos e expectativas para obter um orçamento mais preciso."
-            />
-            <div className="flex items-center justify-between text-sm">
-              <p className="text-gray-500 dark:text-gray-400">
-                Mínimo de 10 caracteres. Quanto mais detalhes, melhor o orçamento.
-              </p>
-              <span className={`font-semibold ${
-                formData.description.length < 10 ? 'text-amber-500' : 'text-green-500'
-              }`}>
+            <div className="relative">
+              <FileText className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <textarea
+                id="description"
+                name="description"
+                rows={6}
+                required
+                value={formData.description}
+                onChange={handleChange}
+                className="input-field pl-10 w-full resize-none"
+                placeholder="Descreva detalhadamente o que você precisa..."
+              />
+            </div>
+            <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+              <span>Mínimo de 10 caracteres</span>
+              <span className={formData.description.length < 10 ? 'text-amber-500' : 'text-green-500'}>
                 {formData.description.length}/10
               </span>
             </div>
           </div>
 
-          {/* Upload de Arquivos */}
-          <div className="space-y-4">
-            <label className="flex items-center text-xl font-bold text-gray-900 dark:text-white">
-              <Upload className="h-6 w-6 text-purple-500 mr-3" />
+          {/* File Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Anexos do Pedido (Opcional)
             </label>
-            <div className="card bg-white/60 dark:bg-slate-700/60 border-2 border-dashed border-gray-300/50 dark:border-gray-600/50 rounded-2xl">
-              <FileUpload 
-                onFilesChange={setAttachments}
-                maxFiles={5}
-              />
-            </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-              Adicione imagens, PDFs ou documentos para melhorar seu orçamento (Máx. 5MB por arquivo)
-            </p>
+            <FileUpload 
+              onFilesChange={setAttachments}
+              maxFiles={5}
+            />
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-slate-700">
             <button
               type="button"
               onClick={() => navigate('/orders')}
-              className="btn-secondary flex items-center space-x-3 px-8 py-4 rounded-2xl"
+              className="btn-secondary"
             >
-              <span className="font-bold">Cancelar</span>
+              Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary flex items-center space-x-3 px-8 py-4 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary flex items-center gap-2"
             >
               {loading ? (
                 <>
-                  <div className="spinner-premium h-6 w-6 border-2"></div>
-                  <span className="font-bold">Enviando...</span>
+                  <div className="spinner h-4 w-4"></div>
+                  <span>Enviando...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-6 w-6" />
-                  <span className="font-bold">Enviar Pedido</span>
                   <Plus className="h-5 w-5" />
+                  <span>Enviar Pedido</span>
                 </>
               )}
             </button>

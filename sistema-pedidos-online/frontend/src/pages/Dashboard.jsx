@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { 
-  Package, Plus, BarChart3, Users, TrendingUp, Clock, 
-  ArrowUp, ArrowDown, FileText, Sparkles, Zap, RefreshCw
+  Package, Plus, TrendingUp, Clock, CheckCircle, 
+  Users, DollarSign, ArrowUpRight, Activity 
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -17,25 +17,16 @@ const Dashboard = () => {
   });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchDashboardData = useCallback(async (showRefresh = false) => {
+  const fetchDashboardData = useCallback(async () => {
     try {
-      if (showRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
+      setLoading(true);
       const endpoint = isAdmin ? '/orders' : '/orders/my-orders';
-      const response = await api.get(endpoint, {
-        timeout: 8000
-      });
-      
+      const response = await api.get(endpoint);
       const ordersData = response.data.orders || [];
+      
       setOrders(ordersData);
 
-      // Calcular estatísticas
       const totalOrders = ordersData.length;
       const pendingOrders = ordersData.filter(order => 
         ['Em análise', 'Em andamento'].includes(order.status)
@@ -53,14 +44,15 @@ const Dashboard = () => {
         totalOrders,
         pendingOrders,
         completedOrders,
-        averageBudget: averageBudget.toFixed(2)
+        averageBudget: averageBudget.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })
       });
-
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error('Erro ao buscar dados do dashboard:', error);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   }, [isAdmin]);
 
@@ -68,180 +60,152 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  const handleRefresh = () => {
-    fetchDashboardData(true);
-  };
-
-  const MetricCard = ({ title, value, icon: Icon, change, trend, color = 'blue' }) => (
-    <div className="metric-card group hover-lift">
+  const StatCard = ({ title, value, icon: Icon, change, color = 'blue' }) => (
+    <div className="card group hover:shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2">
+        <div>
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
             {title}
           </p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">
             {value}
           </p>
           {change && (
-            <div className="flex items-center">
-              {trend === 'up' ? (
-                <ArrowUp className="h-4 w-4 text-green-500" />
-              ) : (
-                <ArrowDown className="h-4 w-4 text-red-500" />
-              )}
-              <span className={`text-sm font-medium ml-1 ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                {Math.abs(change)}%
-              </span>
-            </div>
+            <p className={`text-sm mt-1 ${
+              change > 0 ? 'text-green-600' : 'text-red-600'
+            }`}>
+              {change > 0 ? '+' : ''}{change}%
+            </p>
           )}
         </div>
-        <div className={`w-12 h-12 bg-gradient-to-r ${getMetricColor(color)} rounded-xl flex items-center justify-center shadow-lg`}>
-          <Icon className="h-6 w-6 text-white" />
+        <div className={`p-3 rounded-xl bg-${color}-100 dark:bg-${color}-900/30`}>
+          <Icon className={`h-6 w-6 text-${color}-600 dark:text-${color}-400`} />
         </div>
       </div>
     </div>
   );
 
-  if (loading && orders.length === 0) {
+  if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-96">
+      <div className="flex justify-center items-center h-96">
         <div className="text-center">
-          <div className="spinner-premium w-12 h-12 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando dashboard...</p>
+          <div className="spinner h-8 w-8 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">
+            Carregando dashboard...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold gradient-text">Dashboard</h1>
-              <p className="text-gray-600 dark:text-gray-300">
-                Bem-vindo, <span className="font-semibold text-blue-600 dark:text-blue-400">{user?.name}</span>!
-              </p>
-            </div>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Dashboard
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Bem-vindo de volta, <span className="font-semibold text-blue-600 dark:text-blue-400">{user?.name}</span>
+          </p>
         </div>
         
-        <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="btn-secondary flex items-center space-x-2 px-3 py-2 rounded-lg text-sm"
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            <span>Atualizar</span>
-          </button>
-          
-          <Link
-            to="/new-order"
-            className="btn-primary flex items-center space-x-2 px-4 py-2 rounded-lg text-sm"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Novo Pedido</span>
-          </Link>
-        </div>
+        <Link
+          to="/new-order"
+          className="btn-primary flex items-center gap-2 mt-4 sm:mt-0"
+        >
+          <Plus className="h-5 w-5" />
+          <span>Novo Pedido</span>
+        </Link>
       </div>
 
-      {/* Grid de Métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
           title="Total de Pedidos"
           value={stats.totalOrders}
           icon={Package}
           change={12}
-          trend="up"
           color="blue"
         />
-        <MetricCard
+        <StatCard
           title="Pendentes"
           value={stats.pendingOrders}
           icon={Clock}
-          change={5}
-          trend="down"
+          change={-5}
           color="amber"
         />
-        <MetricCard
+        <StatCard
           title="Concluídos"
           value={stats.completedOrders}
-          icon={TrendingUp}
+          icon={CheckCircle}
           change={8}
-          trend="up"
           color="emerald"
         />
-        <MetricCard
+        <StatCard
           title="Ticket Médio"
           value={`R$ ${stats.averageBudget}`}
-          icon={BarChart3}
+          icon={DollarSign}
           change={15}
-          trend="up"
           color="purple"
         />
       </div>
 
-      {/* Conteúdo Principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Pedidos Recentes */}
-        <div className="lg:col-span-2 card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold gradient-text flex items-center">
-              <Clock className="h-5 w-5 mr-2" />
+      {/* Recent Orders */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="xl:col-span-2 card">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               Pedidos Recentes
             </h3>
             <Link 
               to="/orders" 
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-blue-600 hover:text-blue-500 text-sm font-medium flex items-center gap-1"
             >
-              Ver todos →
+              Ver todos
+              <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             {orders.slice(0, 5).map((order) => (
               <div 
                 key={order.id} 
-                className="flex items-center justify-between p-4 border border-gray-200/50 dark:border-gray-700/50 rounded-lg hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors"
+                className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:shadow-md transition-all duration-300"
               >
-                <div className="flex items-center space-x-3 flex-1 min-w-0">
-                  <div className="w-8 h-8 bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg flex items-center justify-center">
-                    <FileText className="h-4 w-4 text-white" />
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 dark:text-white truncate">
+                  <div>
+                    <h4 className="font-medium text-gray-900 dark:text-white">
                       {order.category}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                      {order.description}
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {order.description.substring(0, 60)}...
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-4 ml-4">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                    R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR')}
+                <div className="text-right">
+                  <span className="text-lg font-bold text-gray-900 dark:text-white">
+                    R$ {order.estimated_budget}
                   </span>
-                  <span className={`status-badge ${getStatusClass(order.status)} text-xs`}>
+                  <div className={`status-badge mt-1 ${getStatusClass(order.status)}`}>
                     {order.status}
-                  </span>
+                  </div>
                 </div>
               </div>
             ))}
             
             {orders.length === 0 && (
-              <div className="text-center py-8">
-                <Package className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500 dark:text-gray-400">Nenhum pedido encontrado</p>
+              <div className="text-center py-12">
+                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400 mb-4">Nenhum pedido encontrado</p>
                 <Link 
                   to="/new-order" 
-                  className="btn-primary inline-flex items-center space-x-2 px-4 py-2 rounded-lg text-sm mt-3"
+                  className="btn-primary inline-flex items-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Criar primeiro pedido</span>
@@ -251,42 +215,41 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Ações Rápidas */}
+        {/* Quick Actions */}
         <div className="card">
-          <h3 className="text-lg font-bold gradient-text mb-4 flex items-center">
-            <Zap className="h-5 w-5 mr-2" />
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
             Ações Rápidas
           </h3>
           <div className="space-y-3">
             <Link
               to="/new-order"
-              className="flex items-center p-3 border-2 border-dashed border-blue-200/50 dark:border-blue-800/50 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/30 transition-all duration-300"
+              className="flex items-center gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:shadow-md transition-all duration-300 group"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                <Plus className="h-4 w-4 text-white" />
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
-              <span className="font-medium text-gray-900 dark:text-white ml-3">Novo Pedido</span>
+              <span className="font-medium text-gray-900 dark:text-white">Novo Pedido</span>
             </Link>
             
             <Link
               to="/orders"
-              className="flex items-center p-3 border-2 border-dashed border-green-200/50 dark:border-green-800/50 rounded-lg hover:border-green-500 dark:hover:border-green-400 hover:bg-green-50/50 dark:hover:bg-green-900/30 transition-all duration-300"
+              className="flex items-center gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:shadow-md transition-all duration-300 group"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
-                <Package className="h-4 w-4 text-white" />
+              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                <Package className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
-              <span className="font-medium text-gray-900 dark:text-white ml-3">Ver Pedidos</span>
+              <span className="font-medium text-gray-900 dark:text-white">Ver Pedidos</span>
             </Link>
             
             {isAdmin && (
               <Link
                 to="/admin/orders"
-                className="flex items-center p-3 border-2 border-dashed border-purple-200/50 dark:border-purple-800/50 rounded-lg hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/30 transition-all duration-300"
+                className="flex items-center gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:shadow-md transition-all duration-300 group"
               >
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                  <Users className="h-4 w-4 text-white" />
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <span className="font-medium text-gray-900 dark:text-white ml-3">Painel Admin</span>
+                <span className="font-medium text-gray-900 dark:text-white">Painel Admin</span>
               </Link>
             )}
           </div>
@@ -294,17 +257,6 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
-
-// Helper functions
-const getMetricColor = (color) => {
-  const colorMap = {
-    blue: 'from-blue-500 to-blue-600',
-    amber: 'from-amber-500 to-amber-600',
-    emerald: 'from-emerald-500 to-emerald-600',
-    purple: 'from-purple-500 to-purple-600'
-  };
-  return colorMap[color] || 'from-blue-500 to-blue-600';
 };
 
 const getStatusClass = (status) => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, Sun, Moon, ArrowRight, Shield } from 'lucide-react';
+import { Eye, EyeOff, BarChart3, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Login = () => {
@@ -34,18 +34,18 @@ const Login = () => {
       }
     } catch (error) {
       setError('Erro inesperado. Tente novamente.');
-      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-900">
+      {/* Theme Toggle */}
       <div className="absolute top-6 right-6">
         <button
           onClick={toggleTheme}
-          className="p-2.5 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-600 dark:text-gray-400 rounded-lg transition-all duration-300 hover:shadow-md"
+          className="p-2 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors duration-300"
         >
           {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
@@ -54,34 +54,30 @@ const Login = () => {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg mb-4">
-            <Shield className="h-8 w-8 text-white" />
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center">
+              <BarChart3 className="h-8 w-8 text-white" />
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Acesse sua conta
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+            PGSystem
           </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Ou{' '}
-            <Link
-              to="/register"
-              className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-300"
-            >
-              crie uma nova conta
-            </Link>
+          <p className="mt-2 text-slate-600 dark:text-slate-400">
+            Entre na sua conta
           </p>
         </div>
 
-        {/* Form */}
-        <div className="card bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
+        {/* Login Form */}
+        <div className="card">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Email
               </label>
               <input
@@ -92,14 +88,14 @@ const Login = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-field w-full"
+                className="input-field"
                 placeholder="seu@email.com"
                 disabled={loading}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Senha
               </label>
               <div className="relative">
@@ -111,13 +107,13 @@ const Login = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input-field w-full pr-10"
+                  className="input-field pr-10"
                   placeholder="Sua senha"
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-300"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={loading}
                 >
@@ -126,27 +122,41 @@ const Login = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-primary flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="spinner h-4 w-4"></div>
-                  <span>Entrando...</span>
-                </>
-              ) : (
-                <>
-                  <span>Entrar</span>
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              )}
-            </button>
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full btn-primary flex items-center justify-center py-3"
+              >
+                {loading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="spinner h-4 w-4"></div>
+                    <span>Entrando...</span>
+                  </div>
+                ) : (
+                  'Entrar'
+                )}
+              </button>
+            </div>
 
-            {/* Demo credentials */}
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
-              <p><strong>Admin:</strong> admin@sistema.com / admin123</p>
+            <div className="text-center pt-4 border-t border-slate-200 dark:border-slate-700">
+              <span className="text-sm text-slate-600 dark:text-slate-400">
+                Não tem uma conta?{' '}
+                <Link
+                  to="/register"
+                  className="font-medium text-slate-900 hover:text-slate-700 dark:text-white dark:hover:text-slate-300 transition-colors duration-300"
+                >
+                  Criar conta
+                </Link>
+              </span>
+            </div>
+
+            {/* Credenciais de teste */}
+            <div className="text-center">
+              <div className="text-xs text-slate-500 dark:text-slate-400 space-y-1 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg">
+                <p className="font-medium"><strong>Admin:</strong> admin@sistema.com / admin123</p>
+                <p className="font-medium"><strong>Usuário:</strong> Crie uma conta</p>
+              </div>
             </div>
           </form>
         </div>

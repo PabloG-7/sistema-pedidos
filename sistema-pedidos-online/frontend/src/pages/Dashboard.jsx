@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { 
-  Package, Plus, TrendingUp, Clock, CheckCircle, 
-  Users, DollarSign, ArrowUpRight, Activity 
+  Package, Plus, BarChart3, Users, TrendingUp, Clock, 
+  ArrowUp, ArrowDown, FileText, RefreshCw
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -17,16 +17,23 @@ const Dashboard = () => {
   });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchDashboardData = useCallback(async () => {
+  const fetchDashboardData = useCallback(async (showRefresh = false) => {
     try {
-      setLoading(true);
+      if (showRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
       const endpoint = isAdmin ? '/orders' : '/orders/my-orders';
       const response = await api.get(endpoint);
-      const ordersData = response.data.orders || [];
       
+      const ordersData = response.data.orders || [];
       setOrders(ordersData);
 
+      // Calcular estatísticas
       const totalOrders = ordersData.length;
       const pendingOrders = ordersData.filter(order => 
         ['Em análise', 'Em andamento'].includes(order.status)
@@ -44,15 +51,14 @@ const Dashboard = () => {
         totalOrders,
         pendingOrders,
         completedOrders,
-        averageBudget: averageBudget.toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        })
+        averageBudget: averageBudget.toFixed(2)
       });
+
     } catch (error) {
-      console.error('Erro ao buscar dados do dashboard:', error);
+      console.error('Erro ao buscar dados:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [isAdmin]);
 
@@ -60,161 +66,169 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  const StatCard = ({ title, value, icon: Icon, change, color = 'blue' }) => {
-    const colorClasses = {
-      blue: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-      amber: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
-      emerald: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
-      purple: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
-    };
-
-    return (
-      <div className="card hover-lift">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-              {title}
-            </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {value}
-            </p>
-            {change && (
-              <p className={`text-sm mt-1 ${
-                change > 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {change > 0 ? '+' : ''}{change}%
-              </p>
-            )}
-          </div>
-          <div className={`p-3 rounded-xl ${colorClasses[color]}`}>
-            <Icon className="h-6 w-6" />
-          </div>
-        </div>
-      </div>
-    );
+  const handleRefresh = () => {
+    fetchDashboardData(true);
   };
 
-  if (loading) {
+  const MetricCard = ({ title, value, icon: Icon, change, trend }) => (
+    <div className="metric-card">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+            {title}
+          </p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+            {value}
+          </p>
+          {change && (
+            <div className="flex items-center">
+              {trend === 'up' ? (
+                <ArrowUp className="h-4 w-4 text-emerald-500" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-rose-500" />
+              )}
+              <span className={`text-sm font-medium ml-1 ${trend === 'up' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {Math.abs(change)}%
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
+          <Icon className="h-6 w-6 text-slate-600 dark:text-slate-400" />
+        </div>
+      </div>
+    </div>
+  );
+
+  if (loading && orders.length === 0) {
     return (
-      <div className="flex justify-center items-center h-96">
+      <div className="flex justify-center items-center min-h-96">
         <div className="text-center">
           <div className="spinner h-8 w-8 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">
-            Carregando dashboard...
-          </p>
+          <p className="text-slate-600 dark:text-slate-400">Carregando dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Dashboard
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Bem-vindo de volta, <span className="font-semibold text-blue-600 dark:text-blue-400">{user?.name}</span>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
+          <p className="text-slate-600 dark:text-slate-400">
+            Bem-vindo, <span className="font-medium text-slate-900 dark:text-white">{user?.name}</span>!
           </p>
         </div>
         
-        <Link
-          to="/new-order"
-          className="btn-primary flex items-center gap-2 mt-4 sm:mt-0"
-        >
-          <Plus className="h-5 w-5" />
-          <span>Novo Pedido</span>
-        </Link>
+        <div className="flex items-center space-x-3 mt-4 sm:mt-0">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="btn-secondary flex items-center space-x-2 px-3 py-2 text-sm"
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>Atualizar</span>
+          </button>
+          
+          <Link
+            to="/new-order"
+            className="btn-primary flex items-center space-x-2 px-4 py-2 text-sm"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Novo Pedido</span>
+          </Link>
+        </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
+      {/* Grid de Métricas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
           title="Total de Pedidos"
           value={stats.totalOrders}
           icon={Package}
           change={12}
-          color="blue"
+          trend="up"
         />
-        <StatCard
+        <MetricCard
           title="Pendentes"
           value={stats.pendingOrders}
           icon={Clock}
-          change={-5}
-          color="amber"
+          change={5}
+          trend="down"
         />
-        <StatCard
+        <MetricCard
           title="Concluídos"
           value={stats.completedOrders}
-          icon={CheckCircle}
+          icon={TrendingUp}
           change={8}
-          color="emerald"
+          trend="up"
         />
-        <StatCard
+        <MetricCard
           title="Ticket Médio"
           value={`R$ ${stats.averageBudget}`}
-          icon={DollarSign}
+          icon={BarChart3}
           change={15}
-          color="purple"
+          trend="up"
         />
       </div>
 
-      {/* Recent Orders */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div className="xl:col-span-2 card">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+      {/* Conteúdo Principal */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Pedidos Recentes */}
+        <div className="lg:col-span-2 card">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center">
+              <Clock className="h-5 w-5 mr-2" />
               Pedidos Recentes
             </h3>
             <Link 
               to="/orders" 
-              className="text-blue-600 hover:text-blue-500 text-sm font-medium flex items-center gap-1"
+              className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-medium"
             >
-              Ver todos
-              <ArrowUpRight className="h-4 w-4" />
+              Ver todos →
             </Link>
           </div>
           
-          <div className="space-y-4">
+          <div className="space-y-3">
             {orders.slice(0, 5).map((order) => (
               <div 
                 key={order.id} 
-                className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:shadow-md transition-all duration-300"
+                className="flex items-center justify-between p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
               >
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                    <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
+                    <FileText className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                   </div>
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-slate-900 dark:text-white truncate">
                       {order.category}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {order.description.substring(0, 60)}...
+                    <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
+                      {order.description}
                     </p>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-lg font-bold text-gray-900 dark:text-white">
-                    R$ {order.estimated_budget}
+                <div className="flex items-center space-x-4 ml-4">
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                    R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR')}
                   </span>
-                  <div className={`status-badge mt-1 ${getStatusClass(order.status)}`}>
+                  <span className={`status-badge text-xs`}>
                     {order.status}
-                  </div>
+                  </span>
                 </div>
               </div>
             ))}
             
             {orders.length === 0 && (
-              <div className="text-center py-12">
-                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 mb-4">Nenhum pedido encontrado</p>
+              <div className="text-center py-8">
+                <Package className="h-12 w-12 text-slate-400 mx-auto mb-3" />
+                <p className="text-slate-500 dark:text-slate-400">Nenhum pedido encontrado</p>
                 <Link 
                   to="/new-order" 
-                  className="btn-primary inline-flex items-center gap-2"
+                  className="btn-primary inline-flex items-center space-x-2 px-4 py-2 text-sm mt-3"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Criar primeiro pedido</span>
@@ -224,41 +238,42 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Ações Rápidas */}
         <div className="card">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+            <TrendingUp className="h-5 w-5 mr-2" />
             Ações Rápidas
           </h3>
           <div className="space-y-3">
             <Link
               to="/new-order"
-              className="flex items-center gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:shadow-md transition-all duration-300 group"
+              className="flex items-center p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
             >
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center">
+                <Plus className="h-4 w-4 text-white" />
               </div>
-              <span className="font-medium text-gray-900 dark:text-white">Novo Pedido</span>
+              <span className="font-medium text-slate-900 dark:text-white ml-3">Novo Pedido</span>
             </Link>
             
             <Link
               to="/orders"
-              className="flex items-center gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:shadow-md transition-all duration-300 group"
+              className="flex items-center p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
             >
-              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                <Package className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
+                <Package className="h-4 w-4 text-slate-600 dark:text-slate-400" />
               </div>
-              <span className="font-medium text-gray-900 dark:text-white">Ver Pedidos</span>
+              <span className="font-medium text-slate-900 dark:text-white ml-3">Ver Pedidos</span>
             </Link>
             
             {isAdmin && (
               <Link
                 to="/admin/orders"
-                className="flex items-center gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:shadow-md transition-all duration-300 group"
+                className="flex items-center p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
               >
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                  <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
+                  <Users className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                 </div>
-                <span className="font-medium text-gray-900 dark:text-white">Painel Admin</span>
+                <span className="font-medium text-slate-900 dark:text-white ml-3">Painel Admin</span>
               </Link>
             )}
           </div>
@@ -266,17 +281,6 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
-
-const getStatusClass = (status) => {
-  const statusMap = {
-    'Em análise': 'status-em-analise',
-    'Aprovado': 'status-aprovado',
-    'Rejeitado': 'status-rejeitado',
-    'Em andamento': 'status-andamento',
-    'Concluído': 'status-concluido'
-  };
-  return statusMap[status] || 'status-em-analise';
 };
 
 export default Dashboard;

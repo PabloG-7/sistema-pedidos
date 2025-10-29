@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, Sun, Moon, UserPlus, ArrowRight, Shield } from 'lucide-react';
+import { Eye, EyeOff, Sun, Moon, UserPlus } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Register = () => {
@@ -59,11 +59,12 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-900">
+      {/* Theme Toggle */}
       <div className="absolute top-6 right-6">
         <button
           onClick={toggleTheme}
-          className="p-2.5 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-600 dark:text-gray-400 rounded-lg transition-all duration-300 hover:shadow-md"
+          className="p-2 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors duration-300"
         >
           {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
@@ -72,54 +73,53 @@ const Register = () => {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg mb-4">
-            <UserPlus className="h-8 w-8 text-white" />
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center">
+              <UserPlus className="h-8 w-8 text-white" />
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
             Criar Conta
           </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-slate-600 dark:text-slate-400">
             Ou{' '}
             <Link
               to="/login"
-              className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-300"
+              className="font-medium text-slate-900 hover:text-slate-700 dark:text-white dark:hover:text-slate-300 transition-colors duration-300"
             >
               entre na sua conta existente
             </Link>
           </p>
         </div>
 
-        {/* Form */}
-        <div className="card bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
+        {/* Register Form */}
+        <div className="card">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Nome completo
               </label>
-              <div className="relative">
-                <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="input-field pl-10 w-full"
-                  placeholder="Seu nome completo"
-                />
-              </div>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="Seu nome completo"
+              />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Email
               </label>
               <input
@@ -130,17 +130,16 @@ const Register = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="input-field w-full"
+                className="input-field"
                 placeholder="seu@email.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Senha
               </label>
               <div className="relative">
-                <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   id="password"
                   name="password"
@@ -149,12 +148,12 @@ const Register = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="input-field pl-10 pr-10 w-full"
+                  className="input-field pr-10"
                   placeholder="Mínimo 6 caracteres"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-300"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -163,11 +162,10 @@ const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Confirmar senha
               </label>
               <div className="relative">
-                <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -176,12 +174,12 @@ const Register = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="input-field pl-10 pr-10 w-full"
+                  className="input-field pr-10"
                   placeholder="Digite a senha novamente"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-300"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -189,23 +187,35 @@ const Register = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-primary flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="spinner h-4 w-4"></div>
-                  <span>Criando conta...</span>
-                </>
-              ) : (
-                <>
-                  <span>Criar Conta</span>
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              )}
-            </button>
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full btn-primary flex items-center justify-center py-3"
+              >
+                {loading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="spinner h-4 w-4"></div>
+                    <span>Criando conta...</span>
+                  </div>
+                ) : (
+                  'Criar Conta'
+                )}
+              </button>
+            </div>
+
+            <div className="text-center pt-4 border-t border-slate-200 dark:border-slate-700">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Ao criar uma conta, você concorda com nossos{' '}
+                <a href="#" className="font-medium text-slate-900 hover:text-slate-700 dark:text-white dark:hover:text-slate-300 transition-colors duration-300">
+                  Termos
+                </a>{' '}
+                e{' '}
+                <a href="#" className="font-medium text-slate-900 hover:text-slate-700 dark:text-white dark:hover:text-slate-300 transition-colors duration-300">
+                  Política de Privacidade
+                </a>
+              </p>
+            </div>
           </form>
         </div>
       </div>

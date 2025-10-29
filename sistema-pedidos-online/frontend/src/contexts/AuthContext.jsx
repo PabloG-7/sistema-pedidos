@@ -1,4 +1,3 @@
-// contexts/AuthContext.tsx
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 
@@ -16,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Carregar usuário do localStorage (SEM verificar com backend)
+  // Carregar usuário do localStorage
   useEffect(() => {
     const loadUser = () => {
       try {

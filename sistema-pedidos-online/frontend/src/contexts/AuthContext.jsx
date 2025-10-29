@@ -1,4 +1,3 @@
-// contexts/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 
@@ -17,27 +16,23 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  // Verificar autenticação com o backend
   const checkAuth = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      // Verificar token com backend
-      const response = await api.get('/auth/me', {
-        timeout: 5000
-      });
+      const savedUser = localStorage.getItem('user');
       
-      if (response.data.user) {
-        setUser(response.data.user);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (token && savedUser) {
+        setUser(JSON.parse(savedUser));
+        
+        // Verificar com backend em segundo plano
+        try {
+          await api.get('/auth/me', { timeout: 5000 });
+        } catch (error) {
+          console.log('Token verification failed, using cached user');
+        }
       }
     } catch (error) {
-      console.error('Erro ao verificar autenticação:', error);
-      // Limpar dados inválidos
+      console.error('Auth check error:', error);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       setUser(null);
@@ -70,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Login error:', error);
       const message = error.response?.data?.message || 
-                     error.code === 'ECONNABORTED' ? 'Timeout - servidor não respondeu' : 
+                     error.code === 'ECONNABORTED' ? 'Servidor demorou para responder' : 
                      'Erro ao fazer login. Tente novamente.';
       return { success: false, message };
     } finally {
@@ -99,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Register error:', error);
       const message = error.response?.data?.message || 
-                     error.code === 'ECONNABORTED' ? 'Timeout - servidor não respondeu' : 
+                     error.code === 'ECONNABORTED' ? 'Servidor demorou para responder' : 
                      'Erro ao criar conta. Tente novamente.';
       return { success: false, message };
     } finally {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, Sun, Moon, UserPlus, Sparkles, Shield } from 'lucide-react';
+import { Eye, EyeOff, Sun, Moon, UserPlus, Sparkles, Shield, User } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Register = () => {
@@ -59,56 +59,57 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-purple-900 dark:to-pink-900 transition-colors duration-500 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Animation */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
-        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '3s' }}></div>
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute top-20 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+        <div className="absolute bottom-20 left-10 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '3s' }}></div>
+        <div className="absolute top-40 left-1/2 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '1.5s' }}></div>
       </div>
 
       {/* Theme Toggle */}
-      <div className="absolute top-6 right-6 z-10">
+      <div className="absolute top-6 right-6 z-50">
         <button
           onClick={toggleTheme}
-          className="p-3 bg-white/80 backdrop-blur-sm border border-white/20 text-slate-600 hover:text-slate-900 dark:bg-slate-800/80 dark:border-slate-700/20 dark:text-slate-400 dark:hover:text-slate-100 rounded-2xl transition-all duration-500 hover:scale-110 shadow-2xl hover:shadow-3xl"
+          className="p-3 bg-white/80 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-gray-900 dark:bg-gray-800/80 dark:border-gray-700/20 dark:text-gray-400 dark:hover:text-gray-100 rounded-xl transition-all duration-300 hover:scale-110 shadow-2xl"
         >
           {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
       </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="flex justify-center">
-          <div className="w-24 h-24 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 rounded-3xl flex items-center justify-center shadow-2xl glow-effect relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/20 rounded-3xl transform rotate-45 scale-150"></div>
-            <UserPlus className="h-12 w-12 text-white relative z-10" />
+      <div className="max-w-md w-full space-y-8 z-10">
+        {/* Header */}
+        <div className="text-center">
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-2xl glow-effect">
+              <UserPlus className="h-10 w-10 text-white" />
+            </div>
           </div>
+          <h2 className="text-4xl font-bold gradient-text mb-2">
+            Criar Conta
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-300 font-medium">
+            Ou{' '}
+            <Link
+              to="/login"
+              className="font-semibold gradient-text hover:bg-pos-100 transition-all duration-300"
+            >
+              entre na sua conta existente
+            </Link>
+          </p>
         </div>
-        <h2 className="mt-8 text-center text-5xl font-bold gradient-text">
-          Criar Conta
-        </h2>
-        <p className="mt-4 text-center text-xl text-slate-600 dark:text-slate-400 font-medium">
-          Ou{' '}
-          <Link
-            to="/login"
-            className="font-bold gradient-text hover:bg-pos-100 transition-all duration-500"
-          >
-            entre na sua conta existente
-          </Link>
-        </p>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="card bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-white/20 dark:border-slate-700/20 shadow-2xl hover:shadow-3xl transition-all duration-500">
+        {/* Register Form */}
+        <div className="card bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-white/20 dark:border-gray-700/20 shadow-2xl">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-6 py-4 rounded-2xl text-lg font-medium backdrop-blur-sm">
+              <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 px-4 py-3 rounded-lg text-sm font-medium">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="name" className="block text-lg font-semibold text-slate-700 dark:text-slate-300 mb-3">
+              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Nome completo
               </label>
               <div className="relative">
@@ -120,15 +121,17 @@ const Register = () => {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="input-field w-full text-lg py-4 pl-12"
+                  className="input-field pl-10"
                   placeholder="Seu nome completo"
                 />
-                <UserPlus className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-slate-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
+                </div>
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-lg font-semibold text-slate-700 dark:text-slate-300 mb-3">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Email
               </label>
               <div className="relative">
@@ -140,17 +143,19 @@ const Register = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="input-field w-full text-lg py-4 pl-12"
+                  className="input-field pl-10"
                   placeholder="seu@email.com"
                 />
-                <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-lg font-semibold text-slate-700 dark:text-slate-300 mb-3">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Senha
               </label>
               <div className="relative">
@@ -162,22 +167,24 @@ const Register = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="input-field w-full text-lg py-4 pl-12 pr-12"
+                  className="input-field pl-10 pr-10"
                   placeholder="Mínimo 6 caracteres"
                 />
-                <Shield className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-slate-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Shield className="h-5 w-5 text-gray-400" />
+                </div>
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-300"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-lg font-semibold text-slate-700 dark:text-slate-300 mb-3">
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Confirmar senha
               </label>
               <div className="relative">
@@ -189,16 +196,18 @@ const Register = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="input-field w-full text-lg py-4 pl-12 pr-12"
+                  className="input-field pl-10 pr-10"
                   placeholder="Digite a senha novamente"
                 />
-                <Shield className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-slate-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Shield className="h-5 w-5 text-gray-400" />
+                </div>
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-300"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
@@ -207,31 +216,31 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary flex items-center justify-center py-4 text-lg font-bold"
+                className="w-full btn-primary flex items-center justify-center py-3 font-semibold"
               >
                 {loading ? (
-                  <div className="flex items-center space-x-3">
-                    <div className="spinner-premium h-6 w-6 border-2"></div>
+                  <div className="flex items-center space-x-2">
+                    <div className="spinner-premium h-5 w-5 border-2"></div>
                     <span>Criando conta...</span>
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-3">
-                    <Sparkles className="h-6 w-6" />
+                  <div className="flex items-center space-x-2">
+                    <Sparkles className="h-5 w-5" />
                     <span>Criar Conta</span>
-                    <UserPlus className="h-5 w-5" />
+                    <UserPlus className="h-4 w-4" />
                   </div>
                 )}
               </button>
             </div>
 
-            <div className="text-center pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+            <div className="text-center pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Ao criar uma conta, você concorda com nossos{' '}
-                <a href="#" className="font-semibold gradient-text hover:bg-pos-100 transition-all duration-500">
-                  Termos de Serviço
+                <a href="#" className="font-semibold gradient-text hover:bg-pos-100 transition-all duration-300">
+                  Termos
                 </a>{' '}
                 e{' '}
-                <a href="#" className="font-semibold gradient-text hover:bg-pos-100 transition-all duration-500">
+                <a href="#" className="font-semibold gradient-text hover:bg-pos-100 transition-all duration-300">
                   Política de Privacidade
                 </a>
               </p>

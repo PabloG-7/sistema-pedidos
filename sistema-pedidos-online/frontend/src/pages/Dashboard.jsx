@@ -83,9 +83,9 @@ const Dashboard = () => {
           {change && (
             <div className="flex items-center">
               {trend === 'up' ? (
-                <ArrowUp className="h-5 w-5 text-emerald-400 animate-bounce" />
+                <ArrowUp className="h-5 w-5 text-emerald-400" />
               ) : (
-                <ArrowDown className="h-5 w-5 text-rose-400 animate-pulse" />
+                <ArrowDown className="h-5 w-5 text-rose-400" />
               )}
               <span className={`text-lg font-bold ml-2 ${trend === 'up' ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {Math.abs(change)}%
@@ -143,11 +143,11 @@ const Dashboard = () => {
           
           <Link
             to="/new-order"
-            className="btn-primary flex items-center space-x-3 px-6 py-3 group"
+            className="btn-primary flex items-center space-x-3 px-6 py-3"
           >
-            <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-500" />
+            <Plus className="h-5 w-5" />
             <span className="font-bold">Novo Pedido</span>
-            <Zap className="h-4 w-4 group-hover:scale-125 transition-transform duration-300" />
+            <Zap className="h-4 w-4" />
           </Link>
         </div>
       </div>
@@ -212,11 +212,10 @@ const Dashboard = () => {
             {orders.slice(0, 5).map((order, index) => (
               <div 
                 key={order.id} 
-                className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-500 group/item"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-500"
               >
                 <div className="flex items-center space-x-4 flex-1 min-w-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-slate-600 to-slate-700 rounded-2xl flex items-center justify-center group-hover/item:scale-110 transition-transform duration-500 shadow-lg">
+                  <div className="w-12 h-12 bg-gradient-to-r from-slate-600 to-slate-700 rounded-2xl flex items-center justify-center shadow-lg">
                     <FileText className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -233,7 +232,7 @@ const Dashboard = () => {
                   <span className="text-xl font-black text-white whitespace-nowrap">
                     R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR')}
                   </span>
-                  <span className={`status-badge min-w-[140px] justify-center group-hover/item:scale-105 transition-transform duration-300`}>
+                  <span className={`status-badge min-w-[140px] justify-center`}>
                     {order.status}
                   </span>
                 </div>
@@ -269,9 +268,9 @@ const Dashboard = () => {
           <div className="space-y-4">
             <Link
               to="/new-order"
-              className="flex items-center p-5 bg-gradient-to-r from-purple-600/20 to-blue-500/20 rounded-2xl border border-purple-400/30 hover:from-purple-600/30 hover:to-blue-500/30 transition-all duration-500 group/link"
+              className="flex items-center p-5 bg-gradient-to-r from-purple-600/20 to-blue-500/20 rounded-2xl border border-purple-400/30 hover:from-purple-600/30 hover:to-blue-500/30 transition-all duration-500"
             >
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl flex items-center justify-center group-hover/link:scale-110 transition-transform duration-500 shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <Plus className="h-6 w-6 text-white" />
               </div>
               <span className="font-bold text-white ml-4 text-lg">Novo Pedido</span>
@@ -279,9 +278,9 @@ const Dashboard = () => {
             
             <Link
               to="/orders"
-              className="flex items-center p-5 bg-gradient-to-r from-blue-600/20 to-cyan-500/20 rounded-2xl border border-blue-400/30 hover:from-blue-600/30 hover:to-cyan-500/30 transition-all duration-500 group/link"
+              className="flex items-center p-5 bg-gradient-to-r from-blue-600/20 to-cyan-500/20 rounded-2xl border border-blue-400/30 hover:from-blue-600/30 hover:to-cyan-500/30 transition-all duration-500"
             >
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center group-hover/link:scale-110 transition-transform duration-500 shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <Package className="h-6 w-6 text-white" />
               </div>
               <span className="font-bold text-white ml-4 text-lg">Ver Pedidos</span>
@@ -290,9 +289,9 @@ const Dashboard = () => {
             {isAdmin && (
               <Link
                 to="/admin/orders"
-                className="flex items-center p-5 bg-gradient-to-r from-violet-600/20 to-purple-500/20 rounded-2xl border border-violet-400/30 hover:from-violet-600/30 hover:to-purple-500/30 transition-all duration-500 group/link"
+                className="flex items-center p-5 bg-gradient-to-r from-violet-600/20 to-purple-500/20 rounded-2xl border border-violet-400/30 hover:from-violet-600/30 hover:to-purple-500/30 transition-all duration-500"
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-violet-600 to-purple-500 rounded-2xl flex items-center justify-center group-hover/link:scale-110 transition-transform duration-500 shadow-lg">
+                <div className="w-12 h-12 bg-gradient-to-r from-violet-600 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
                   <Users className="h-6 w-6 text-white" />
                 </div>
                 <span className="font-bold text-white ml-4 text-lg">Painel Admin</span>

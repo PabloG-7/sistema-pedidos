@@ -1,59 +1,45 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { api } from "../services/api";
-import {
-  Package,
-  Plus,
-  Search,
-  Download,
-  Calendar,
-  DollarSign,
-  Eye,
-  FileText,
-  CheckCircle,
-  Clock,
-  XCircle,
-  PlayCircle
-} from "lucide-react";
-import { motion } from "framer-motion";
-
-/**
- * Orders.jsx
- * - Lista com filtros, busca, ordenação
- * - Visual premium + animações Framer Motion
- */
-
-const itemVariants = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0 } };
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { api } from '../services/api';
+import { 
+  Package, Plus, Search, Filter, Download, 
+  Calendar, DollarSign, Eye, FileText, SortAsc,
+  CheckCircle, Clock, XCircle, PlayCircle, ChevronRight,
+  BarChart3, ShoppingCart
+} from 'lucide-react';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Todos");
-  const [sortBy, setSortBy] = useState("newest");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('Todos');
+  const [sortBy, setSortBy] = useState('newest');
 
-  const statusOptions = ["Todos", "Em análise", "Aprovado", "Rejeitado", "Em andamento", "Concluído"];
+  const statusOptions = ['Todos', 'Em análise', 'Aprovado', 'Rejeitado', 'Em andamento', 'Concluído'];
 
   const statusIcons = {
-    "Em análise": <Clock className="h-4 w-4" />,
-    Aprovado: <CheckCircle className="h-4 w-4" />,
-    Rejeitado: <XCircle className="h-4 w-4" />,
-    "Em andamento": <PlayCircle className="h-4 w-4" />,
-    Concluído: <Package className="h-4 w-4" />
+    'Em análise': <Clock className="h-4 w-4" />,
+    'Aprovado': <CheckCircle className="h-4 w-4" />,
+    'Rejeitado': <XCircle className="h-4 w-4" />,
+    'Em andamento': <PlayCircle className="h-4 w-4" />,
+    'Concluído': <Package className="h-4 w-4" />
   };
 
-  useEffect(() => { fetchOrders(); }, []);
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
-  useEffect(() => { applyFiltersAndSort(); /* eslint-disable-next-line */ }, [searchTerm, statusFilter, sortBy, orders]);
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [searchTerm, statusFilter, sortBy, orders]);
 
   const fetchOrders = async () => {
     try {
-      setLoading(true);
-      const res = await api.get("/orders/my-orders");
-      setOrders(res.data.orders || []);
-    } catch (err) {
-      console.error("Erro ao buscar pedidos:", err);
+      const response = await api.get('/orders/my-orders');
+      setOrders(response.data.orders || []);
+    } catch (error) {
+      console.error('Erro ao buscar pedidos:', error);
     } finally {
       setLoading(false);
     }
@@ -62,178 +48,353 @@ const Orders = () => {
   const applyFiltersAndSort = () => {
     let filtered = [...orders];
 
+    // Apply search filter
     if (searchTerm) {
-      const s = searchTerm.toLowerCase();
-      filtered = filtered.filter((o) => o.description?.toLowerCase().includes(s) || o.category?.toLowerCase().includes(s));
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(order => 
+        order.description?.toLowerCase().includes(searchLower) ||
+        order.category?.toLowerCase().includes(searchLower)
+      );
     }
 
-    if (statusFilter && statusFilter !== "Todos") filtered = filtered.filter((o) => o.status === statusFilter);
+    // Apply status filter
+    if (statusFilter && statusFilter !== 'Todos') {
+      filtered = filtered.filter(order => order.status === statusFilter);
+    }
 
+    // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case "newest": return new Date(b.created_at) - new Date(a.created_at);
-        case "oldest": return new Date(a.created_at) - new Date(b.created_at);
-        case "price-high": return parseFloat(b.estimated_budget || 0) - parseFloat(a.estimated_budget || 0);
-        case "price-low": return parseFloat(a.estimated_budget || 0) - parseFloat(b.estimated_budget || 0);
-        default: return 0;
+        case 'newest':
+          return new Date(b.created_at) - new Date(a.created_at);
+        case 'oldest':
+          return new Date(a.created_at) - new Date(b.created_at);
+        case 'price-high':
+          return parseFloat(b.estimated_budget) - parseFloat(a.estimated_budget);
+        case 'price-low':
+          return parseFloat(a.estimated_budget) - parseFloat(b.estimated_budget);
+        default:
+          return 0;
       }
     });
 
     setFilteredOrders(filtered);
   };
 
-  const getStatusCount = (status) => orders.filter((o) => o.status === status).length;
+  const getStatusCount = (status) => {
+    return orders.filter(order => order.status === status).length;
+  };
+
+  const StatusBadge = ({ status }) => {
+    const statusConfig = {
+      'Em análise': {
+        color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+        icon: Clock
+      },
+      'Aprovado': {
+        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+        icon: CheckCircle
+      },
+      'Rejeitado': {
+        color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+        icon: XCircle
+      },
+      'Em andamento': {
+        color: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300',
+        icon: PlayCircle
+      },
+      'Concluído': {
+        color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+        icon: Package
+      }
+    };
+
+    const config = statusConfig[status] || statusConfig['Em análise'];
+    const IconComponent = config.icon;
+
+    return (
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.color} transition-colors duration-200`}>
+        <IconComponent className="h-3 w-3" />
+        {status}
+      </span>
+    );
+  };
+
+  const StatCard = ({ label, value, color = 'gray' }) => {
+    const colorConfig = {
+      gray: {
+        bg: 'bg-gray-50 dark:bg-gray-800',
+        text: 'text-gray-600 dark:text-gray-300',
+        value: 'text-gray-900 dark:text-white'
+      },
+      yellow: {
+        bg: 'bg-amber-50 dark:bg-amber-900/20',
+        text: 'text-amber-600 dark:text-amber-400',
+        value: 'text-amber-700 dark:text-amber-300'
+      },
+      green: {
+        bg: 'bg-emerald-50 dark:bg-emerald-900/20',
+        text: 'text-emerald-600 dark:text-emerald-400',
+        value: 'text-emerald-700 dark:text-emerald-300'
+      },
+      blue: {
+        bg: 'bg-blue-50 dark:bg-blue-900/20',
+        text: 'text-blue-600 dark:text-blue-400',
+        value: 'text-blue-700 dark:text-blue-300'
+      },
+      purple: {
+        bg: 'bg-violet-50 dark:bg-violet-900/20',
+        text: 'text-violet-600 dark:text-violet-400',
+        value: 'text-violet-700 dark:text-violet-300'
+      }
+    };
+
+    const config = colorConfig[color];
+
+    return (
+      <div className={`p-4 rounded-xl border border-gray-200 dark:border-gray-700 ${config.bg} transition-all duration-200 hover:shadow-md`}>
+        <div className={`text-2xl font-bold mb-1 ${config.value}`}>
+          {value}
+        </div>
+        <div className={`text-sm font-medium ${config.text}`}>
+          {label}
+        </div>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] px-4">
+      <div className="flex justify-center items-center min-h-96">
         <div className="text-center">
           <div className="spinner h-12 w-12 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400 font-medium">Carregando pedidos...</p>
+          <p className="text-gray-600 dark:text-gray-300 font-medium">
+            Carregando pedidos...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.03 } } }} className="space-y-6 px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6">
       {/* Header */}
-      <motion.div variants={itemVariants} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Meus Pedidos</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">Gerencie e acompanhe todos os seus pedidos</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Meus Pedidos
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-1">
+            Gerencie e acompanhe todos os seus pedidos
+          </p>
         </div>
-
-        <div className="flex items-center gap-3">
-          <motion.button whileTap={{ scale: 0.98 }} className="btn-secondary inline-flex items-center gap-2 px-3 py-2 rounded-xl">
+        <div className="flex items-center gap-3 mt-4 lg:mt-0">
+          <button className="btn-secondary flex items-center gap-2">
             <Download className="h-4 w-4" />
-            <span className="text-sm">Exportar</span>
-          </motion.button>
-
-          <Link to="/new-order" className="btn-primary inline-flex items-center gap-2 px-4 py-2 rounded-xl">
-            <Plus className="h-5 w-5" />
-            <span className="text-sm font-semibold">Novo Pedido</span>
+            <span>Exportar</span>
+          </button>
+          <Link
+            to="/new-order"
+            className="btn-primary flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Novo Pedido</span>
           </Link>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Stats overview */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {[
-          { label: "Total", value: orders.length, color: "gray" },
-          { label: "Em Análise", value: getStatusCount("Em análise"), color: "yellow" },
-          { label: "Aprovados", value: getStatusCount("Aprovado"), color: "green" },
-          { label: "Em Andamento", value: getStatusCount("Em andamento"), color: "blue" },
-          { label: "Concluídos", value: getStatusCount("Concluído"), color: "purple" }
-        ].map((s, i) => (
-          <div key={i} className="card text-center p-4 rounded-xl">
-            <div className={`text-2xl font-bold mb-1 ${s.color === "gray" ? "text-gray-700 dark:text-gray-300" : s.color === "yellow" ? "text-yellow-600" : s.color === "green" ? "text-green-600" : s.color === "blue" ? "text-blue-600" : "text-purple-600"}`}>
-              {s.value}
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">{s.label}</div>
-          </div>
-        ))}
-      </motion.div>
+      {/* Stats Overview */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <StatCard
+          label="Total"
+          value={orders.length}
+          color="gray"
+        />
+        <StatCard
+          label="Em Análise"
+          value={getStatusCount('Em análise')}
+          color="yellow"
+        />
+        <StatCard
+          label="Aprovados"
+          value={getStatusCount('Aprovado')}
+          color="blue"
+        />
+        <StatCard
+          label="Em Andamento"
+          value={getStatusCount('Em andamento')}
+          color="purple"
+        />
+        <StatCard
+          label="Concluídos"
+          value={getStatusCount('Concluído')}
+          color="green"
+        />
+      </div>
 
-      {/* Filters */}
-      <motion.div variants={itemVariants} className="card p-4 rounded-2xl">
-        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+      {/* Filters and Search */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6">
+        <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input type="text" placeholder="Buscar por descrição, categoria..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="input pl-10" />
+            <input
+              type="text"
+              placeholder="Buscar por descrição, categoria..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2.5 pl-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+            />
           </div>
-
+          
           <div className="flex gap-3">
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input w-44">
-              {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-48"
+            >
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
             </select>
 
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="input w-40">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-40"
+            >
               <option value="newest">Mais Recentes</option>
               <option value="oldest">Mais Antigos</option>
               <option value="price-high">Maior Preço</option>
               <option value="price-low">Menor Preço</option>
             </select>
+
+            <button className="btn-secondary flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              <span>Filtrar</span>
+            </button>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Orders list */}
+      {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <motion.div variants={itemVariants} className="card text-center py-16 rounded-2xl">
-          <Package className="h-20 w-20 text-gray-400 mx-auto mb-6" />
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Nenhum pedido encontrado</h3>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm text-center py-16">
+          <Package className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            Nenhum pedido encontrado
+          </h3>
           <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
-            {orders.length === 0 ? "Você ainda não fez nenhum pedido. Comece criando seu primeiro pedido agora mesmo." : "Não encontramos pedidos com os filtros selecionados. Tente ajustar sua busca."}
+            {orders.length === 0 
+              ? 'Você ainda não fez nenhum pedido. Comece criando seu primeiro pedido agora mesmo.' 
+              : 'Não encontramos pedidos com os filtros selecionados. Tente ajustar sua busca.'
+            }
           </p>
-
-          {orders.length === 0 && <Link to="/new-order" className="btn-primary inline-flex items-center gap-2 px-4 py-2 rounded-xl"><Plus className="h-5 w-5" /> Criar Primeiro Pedido</Link>}
-        </motion.div>
+          {orders.length === 0 && (
+            <Link
+              to="/new-order"
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Criar Primeiro Pedido</span>
+            </Link>
+          )}
+        </div>
       ) : (
-        <motion.div variants={itemVariants} className="grid gap-4">
+        <div className="space-y-4">
           {filteredOrders.map((order) => (
-            <motion.div key={order.id} variants={itemVariants} whileHover={{ scale: 1.02 }} transition={{ duration: 0.16 }} className="card-hover group p-4 border border-gray-100 dark:border-gray-800 rounded-xl">
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex items-center gap-2">
-                      {statusIcons[order.status]}
-                      <span className={`status-badge ${getStatusClass(order.status)}`}>{order.status}</span>
+            <div 
+              key={order.id} 
+              className="group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl transition-all duration-300 group-hover:scale-105"></div>
+              <div className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 hover:border-blue-200 dark:hover:border-blue-800 p-6">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+                  <div className="flex-1">
+                    {/* Header with status and date */}
+                    <div className="flex items-center gap-4 mb-4">
+                      <StatusBadge status={order.status} />
+                      <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                        <Calendar className="h-4 w-4" />
+                        <span>{new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        ID: <span className="font-mono">#{order.id.slice(-8)}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 ml-4">
-                      <Calendar className="h-4 w-4" />
-                      <span>{new Date(order.created_at).toLocaleDateString("pt-BR")}</span>
+                    
+                    {/* Order content */}
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors duration-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30">
+                        <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          {order.category}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                          {order.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Order details */}
+                    <div className="flex flex-wrap items-center gap-6 text-sm">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-gray-400" />
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                      {order.files && order.files.length > 0 && (
+                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                          <FileText className="h-4 w-4" />
+                          <span>{order.files.length} anexo(s)</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                        <span className="font-medium">Prazo:</span>
+                        <span>5 dias úteis</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-3 bg-emerald-50 rounded-xl">
-                      <FileText className="h-6 w-6 text-emerald-600" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{order.category}</h3>
-                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed truncate">{order.description}</p>
-                    </div>
+                  {/* Actions */}
+                  <div className="flex items-center gap-3 mt-4 lg:mt-0 lg:ml-6">
+                    <button className="btn-secondary flex items-center gap-2 text-sm group/btn">
+                      <Eye className="h-4 w-4 transition-transform duration-200 group-hover/btn:scale-110" />
+                      <span>Detalhes</span>
+                    </button>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-1 transition-all duration-200" />
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center gap-2"><DollarSign className="h-4 w-4" /><span className="font-semibold text-gray-900 dark:text-white">R$ {order.estimated_budget}</span></div>
-                    {order.files && order.files.length > 0 && (<div className="flex items-center gap-2"><FileText className="h-4 w-4" /><span>{order.files.length} anexo(s)</span></div>)}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 mt-3 lg:mt-0">
-                  <button className="btn-secondary inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm"><Eye className="h-4 w-4" /><span>Detalhes</span></button>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       )}
 
       {/* Pagination */}
       {filteredOrders.length > 0 && (
-        <motion.div variants={itemVariants} className="flex justify-between items-center card p-4 rounded-2xl">
-          <p className="text-gray-600 dark:text-gray-400">Mostrando {filteredOrders.length} de {orders.length} pedidos</p>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6">
+          <p className="text-gray-600 dark:text-gray-300">
+            Mostrando <span className="font-semibold text-gray-900 dark:text-white">{filteredOrders.length}</span> de{' '}
+            <span className="font-semibold text-gray-900 dark:text-white">{orders.length}</span> pedidos
+          </p>
           <div className="flex items-center gap-2">
-            <button className="btn-secondary px-3 py-2 rounded-lg">Anterior</button>
-            <button className="btn-primary px-3 py-2 rounded-lg">Próximo</button>
+            <button className="btn-secondary text-sm flex items-center gap-2">
+              <span>Anterior</span>
+            </button>
+            <button className="btn-primary text-sm flex items-center gap-2">
+              <span>Próximo</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
-};
-
-const getStatusClass = (status) => {
-  const statusMap = {
-    "Em análise": "status-pending",
-    Aprovado: "status-approved",
-    Rejeitado: "status-rejected",
-    "Em andamento": "status-progress",
-    Concluído: "status-completed"
-  };
-  return statusMap[status] || "status-pending";
 };
 
 export default Orders;

@@ -1,104 +1,118 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
-import FileUpload from '../components/FileUpload';
-import { 
-  Plus, ArrowLeft, FileText, DollarSign, 
-  Target, Calendar, Upload, CheckCircle
-} from 'lucide-react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../services/api";
+import FileUpload from "../components/FileUpload";
+import {
+  Plus,
+  ArrowLeft,
+  FileText,
+  DollarSign,
+  Target,
+  Calendar,
+  Upload,
+  CheckCircle,
+} from "lucide-react";
 
 const NewOrder = () => {
   const [formData, setFormData] = useState({
-    description: '',
-    category: '',
-    estimated_budget: '',
-    deadline: ''
+    description: "",
+    category: "",
+    estimated_budget: "",
+    deadline: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [currentStep, setCurrentStep] = useState(1);
 
   const navigate = useNavigate();
 
   const categories = [
-    'Desenvolvimento Web',
-    'Design Gráfico',
-    'Marketing Digital',
-    'Consultoria TI',
-    'Desenvolvimento Mobile',
-    'Infraestrutura Cloud',
-    'Análise de Dados',
-    'Outros'
+    "Desenvolvimento Web",
+    "Design Gráfico",
+    "Marketing Digital",
+    "Consultoria TI",
+    "Desenvolvimento Mobile",
+    "Infraestrutura Cloud",
+    "Análise de Dados",
+    "Outros",
   ];
 
-  // 🔧 Mantém o foco e limita a descrição a 5 caracteres
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'description'
-        ? value.slice(0, 5) // 🔒 máximo de 5 letras
-        : value
-    }));
+    // Mantém teclado ativo (corrige bug de 1 letra)
+    e.stopPropagation();
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setError('');
 
-    // 🔒 Exige pelo menos 5 letras
-    if (formData.description.length < 5) {
-      setError('A descrição deve ter no mínimo 5 caracteres.');
+    if (formData.description.trim().length < 10) {
+      setError("A descrição deve ter pelo menos 10 caracteres.");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.category) {
+      setError("Selecione uma categoria para continuar.");
       setLoading(false);
       return;
     }
 
     try {
-      await api.post('/orders', {
+      await api.post("/orders", {
         ...formData,
         estimated_budget: parseFloat(formData.estimated_budget),
-        attachments: attachments.map(file => ({
+        attachments: attachments.map((file) => ({
           filename: file.filename,
           originalName: file.originalName,
-          path: file.path
-        }))
+          path: file.path,
+        })),
       });
 
-      navigate('/orders');
-    } catch (error) {
-      setError(error.response?.data?.message || 'Erro ao criar pedido');
+      navigate("/orders");
+    } catch (err) {
+      setError(err.response?.data?.message || "Erro ao criar pedido.");
     }
 
     setLoading(false);
   };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const nextStep = () => {
+    if (currentStep < 3) setCurrentStep((s) => s + 1);
+  };
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep((s) => s - 1);
+  };
 
   const StepIndicator = () => (
     <div className="flex items-center justify-center mb-8">
       {[1, 2, 3].map((step) => (
         <div key={step} className="flex items-center">
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+            className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
               step === currentStep
-                ? 'bg-blue-600 border-blue-600 text-white'
+                ? "bg-emerald-600 border-emerald-600 text-white scale-110 shadow-lg"
                 : step < currentStep
-                ? 'bg-green-500 border-green-500 text-white'
-                : 'border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-400'
+                ? "bg-green-500 border-green-500 text-white"
+                : "border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-400"
             }`}
           >
-            {step < currentStep ? <CheckCircle className="h-5 w-5" /> : step}
+            {step < currentStep ? (
+              <CheckCircle className="h-5 w-5" />
+            ) : (
+              step
+            )}
           </div>
           {step < 3 && (
             <div
-              className={`w-20 h-1 ${
+              className={`w-20 h-1 transition-all ${
                 step < currentStep
-                  ? 'bg-green-500'
-                  : 'bg-gray-300 dark:bg-gray-600'
+                  ? "bg-green-500"
+                  : "bg-gray-300 dark:bg-gray-600"
               }`}
             ></div>
           )}
@@ -108,10 +122,10 @@ const NewOrder = () => {
   );
 
   const Step1 = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn">
       <div className="flex items-center gap-3 mb-2">
-        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-          <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+        <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+          <Target className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
         </div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           Informações Básicas
@@ -119,7 +133,10 @@ const NewOrder = () => {
       </div>
 
       <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label
+          htmlFor="category"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
           Categoria do Projeto *
         </label>
         <select
@@ -140,7 +157,10 @@ const NewOrder = () => {
       </div>
 
       <div>
-        <label htmlFor="estimated_budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label
+          htmlFor="estimated_budget"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
           Orçamento Estimado (R$) *
         </label>
         <div className="relative">
@@ -161,7 +181,10 @@ const NewOrder = () => {
       </div>
 
       <div>
-        <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label
+          htmlFor="deadline"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
           Prazo Desejado
         </label>
         <div className="relative">
@@ -180,10 +203,10 @@ const NewOrder = () => {
   );
 
   const Step2 = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn">
       <div className="flex items-center gap-3 mb-2">
-        <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-          <FileText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+        <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+          <FileText className="h-5 w-5 text-amber-600 dark:text-amber-400" />
         </div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           Descrição do Projeto
@@ -191,29 +214,36 @@ const NewOrder = () => {
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Descrição Detalhada (máx. 5 caracteres) *
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
+          Descrição Detalhada *
         </label>
         <textarea
           id="description"
           name="description"
-          rows={3}
+          rows={8}
           required
-          maxLength={5}
           value={formData.description}
           onChange={handleChange}
           className="input resize-none"
-          placeholder="Ex: Teste"
+          placeholder="Descreva detalhadamente o que você precisa..."
         />
         <div className="flex justify-between items-center mt-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Quanto mais detalhes, melhor será o orçamento
+          </p>
           <span
             className={`text-sm font-medium ${
-              formData.description.length < 5
-                ? 'text-red-500'
-                : 'text-green-500'
+              formData.description.length < 10
+                ? "text-red-500"
+                : formData.description.length < 50
+                ? "text-yellow-500"
+                : "text-green-500"
             }`}
           >
-            {formData.description.length}/5 caracteres
+            {formData.description.length}/50 caracteres mínimos
           </span>
         </div>
       </div>
@@ -221,7 +251,7 @@ const NewOrder = () => {
   );
 
   const Step3 = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn">
       <div className="flex items-center gap-3 mb-2">
         <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
           <Upload className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -231,29 +261,27 @@ const NewOrder = () => {
         </h3>
       </div>
 
-      <div>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Adicione arquivos, imagens ou documentos que possam ajudar na elaboração do orçamento.
-        </p>
-        <FileUpload 
-          onFilesChange={setAttachments}
-          maxFiles={5}
-        />
-        <div className="mt-4 text-sm text-gray-500 dark:text-gray-500">
-          <p>• Formatos aceitos: PDF, JPG, PNG, DOC, XLS</p>
-          <p>• Tamanho máximo por arquivo: 5MB</p>
-          <p>• Máximo de 5 arquivos</p>
-        </div>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        Adicione arquivos, imagens ou documentos que possam ajudar na elaboração
+        do orçamento.
+      </p>
+
+      <FileUpload onFilesChange={setAttachments} maxFiles={5} />
+
+      <div className="mt-4 text-sm text-gray-500 dark:text-gray-500">
+        <p>• Formatos aceitos: PDF, JPG, PNG, DOC, XLS</p>
+        <p>• Tamanho máximo: 5MB por arquivo</p>
+        <p>• Máximo de 5 arquivos</p>
       </div>
     </div>
   );
 
   return (
-    <div className="max-w-4xl mx-auto fade-in">
+    <div className="max-w-4xl mx-auto fade-in pb-10">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <button
-          onClick={() => navigate('/orders')}
+          onClick={() => navigate("/orders")}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -268,7 +296,7 @@ const NewOrder = () => {
         </div>
       </div>
 
-      <div className="card">
+      <div className="card shadow-lg hover:shadow-xl transition-all duration-300">
         <StepIndicator />
 
         <form onSubmit={handleSubmit}>
@@ -282,7 +310,7 @@ const NewOrder = () => {
           {currentStep === 2 && <Step2 />}
           {currentStep === 3 && <Step3 />}
 
-          {/* Navigation */}
+          {/* Navegação */}
           <div className="flex justify-between pt-8 mt-8 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"

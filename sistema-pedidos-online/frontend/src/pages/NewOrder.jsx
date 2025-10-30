@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import FileUpload from "../components/FileUpload";
 import {
-  Plus,
   ArrowLeft,
   FileText,
   DollarSign,
@@ -26,6 +25,7 @@ const NewOrder = () => {
   const [currentStep, setCurrentStep] = useState(1);
 
   const navigate = useNavigate();
+  const activeInputRef = useRef(null); // garante foco contínuo
 
   const categories = [
     "Desenvolvimento Web",
@@ -38,13 +38,34 @@ const NewOrder = () => {
     "Outros",
   ];
 
+  // =======================
+  // CORREÇÃO DE FOCO / BUG DO TECLADO
+  // =======================
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Mantém teclado ativo (corrige bug de 1 letra)
     e.stopPropagation();
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
+  const handleFocus = (e) => {
+    activeInputRef.current = e.target;
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      if (activeInputRef.current) {
+        activeInputRef.current.focus();
+        activeInputRef.current = null;
+      }
+    }, 0);
+  };
+
+  // =======================
+  // ENVIO DO FORMULÁRIO
+  // =======================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -84,10 +105,14 @@ const NewOrder = () => {
   const nextStep = () => {
     if (currentStep < 3) setCurrentStep((s) => s + 1);
   };
+
   const prevStep = () => {
     if (currentStep > 1) setCurrentStep((s) => s - 1);
   };
 
+  // =======================
+  // COMPONENTES DE ETAPAS
+  // =======================
   const StepIndicator = () => (
     <div className="flex items-center justify-center mb-8">
       {[1, 2, 3].map((step) => (
@@ -145,6 +170,8 @@ const NewOrder = () => {
           required
           value={formData.category}
           onChange={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           className="input"
         >
           <option value="">Selecione uma categoria</option>
@@ -174,6 +201,9 @@ const NewOrder = () => {
             required
             value={formData.estimated_budget}
             onChange={handleChange}
+            onInput={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             className="input pl-10"
             placeholder="0.00"
           />
@@ -195,6 +225,9 @@ const NewOrder = () => {
             name="deadline"
             value={formData.deadline}
             onChange={handleChange}
+            onInput={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             className="input pl-10"
           />
         </div>
@@ -227,6 +260,9 @@ const NewOrder = () => {
           required
           value={formData.description}
           onChange={handleChange}
+          onInput={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           className="input resize-none"
           placeholder="Descreva detalhadamente o que você precisa..."
         />
@@ -276,6 +312,9 @@ const NewOrder = () => {
     </div>
   );
 
+  // =======================
+  // RENDER FINAL
+  // =======================
   return (
     <div className="max-w-4xl mx-auto fade-in pb-10">
       {/* Header */}
@@ -310,7 +349,6 @@ const NewOrder = () => {
           {currentStep === 2 && <Step2 />}
           {currentStep === 3 && <Step3 />}
 
-          {/* Navegação */}
           <div className="flex justify-between pt-8 mt-8 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"

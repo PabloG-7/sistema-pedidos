@@ -18,14 +18,6 @@ const Orders = () => {
 
   const statusOptions = ['Todos', 'Em análise', 'Aprovado', 'Rejeitado', 'Em andamento', 'Concluído'];
 
-  const statusIcons = {
-    'Em análise': <Clock className="h-4 w-4" />,
-    'Aprovado': <CheckCircle className="h-4 w-4" />,
-    'Rejeitado': <XCircle className="h-4 w-4" />,
-    'Em andamento': <PlayCircle className="h-4 w-4" />,
-    'Concluído': <Package className="h-4 w-4" />
-  };
-
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -113,9 +105,14 @@ const Orders = () => {
     const IconComponent = config.icon;
 
     return (
-      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.color} transition-colors duration-200`}>
+      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color} transition-colors duration-200`}>
         <IconComponent className="h-3 w-3" />
-        {status}
+        <span className="hidden sm:inline">{status}</span>
+        <span className="sm:hidden">
+          {status === 'Concluído' ? 'Concl.' : 
+           status === 'Em andamento' ? 'Andam.' : 
+           status === 'Em análise' ? 'Análise' : status}
+        </span>
       </span>
     );
   };
@@ -152,11 +149,11 @@ const Orders = () => {
     const config = colorConfig[color];
 
     return (
-      <div className={`p-4 rounded-xl border border-gray-200 dark:border-gray-700 ${config.bg} transition-all duration-200 hover:shadow-md`}>
-        <div className={`text-2xl font-bold mb-1 ${config.value}`}>
+      <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700 ${config.bg} transition-all duration-200 hover:shadow-md`}>
+        <div className={`text-xl sm:text-2xl font-bold mb-1 ${config.value}`}>
           {value}
         </div>
-        <div className={`text-sm font-medium ${config.text}`}>
+        <div className={`text-xs sm:text-sm font-medium ${config.text}`}>
           {label}
         </div>
       </div>
@@ -165,10 +162,10 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-96">
+      <div className="flex justify-center items-center min-h-64 sm:min-h-96">
         <div className="text-center">
-          <div className="spinner h-12 w-12 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300 font-medium">
+          <div className="spinner h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4"></div>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-medium">
             Carregando pedidos...
           </p>
         </div>
@@ -177,34 +174,34 @@ const Orders = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Meus Pedidos
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-1">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
             Gerencie e acompanhe todos os seus pedidos
           </p>
         </div>
-        <div className="flex items-center gap-3 mt-4 lg:mt-0">
-          <button className="btn-secondary flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            <span>Exportar</span>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button className="btn-secondary flex items-center gap-2 text-xs sm:text-sm px-3 py-2">
+            <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">Exportar</span>
           </button>
           <Link
             to="/new-order"
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary flex items-center gap-2 text-xs sm:text-sm px-3 sm:px-4 py-2"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
             <span>Novo Pedido</span>
           </Link>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
         <StatCard
           label="Total"
           value={orders.length}
@@ -233,24 +230,24 @@ const Orders = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6">
-        <div className="flex flex-col lg:flex-row gap-4">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 sm:p-6">
+        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Buscar por descrição, categoria..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2.5 pl-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+              className="w-full px-3 py-2 sm:py-2.5 pl-8 sm:pl-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 text-sm sm:text-base"
             />
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-48"
+              className="px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-full xs:w-40 sm:w-48 text-sm sm:text-base"
             >
               {statusOptions.map((status) => (
                 <option key={status} value={status}>
@@ -262,7 +259,7 @@ const Orders = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-40"
+              className="px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-full xs:w-40 text-sm sm:text-base"
             >
               <option value="newest">Mais Recentes</option>
               <option value="oldest">Mais Antigos</option>
@@ -270,8 +267,8 @@ const Orders = () => {
               <option value="price-low">Menor Preço</option>
             </select>
 
-            <button className="btn-secondary flex items-center gap-2">
-              <Filter className="h-4 w-4" />
+            <button className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm px-3 py-2 sm:py-2.5">
+              <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
               <span>Filtrar</span>
             </button>
           </div>
@@ -280,12 +277,12 @@ const Orders = () => {
 
       {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm text-center py-16">
-          <Package className="h-16 w-16 text-gray-400 mx-auto mb-6" />
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm text-center py-8 sm:py-16">
+          <Package className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4 sm:mb-6" />
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
             Nenhum pedido encontrado
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-6 sm:mb-8 max-w-md mx-auto px-4">
             {orders.length === 0 
               ? 'Você ainda não fez nenhum pedido. Comece criando seu primeiro pedido agora mesmo.' 
               : 'Não encontramos pedidos com os filtros selecionados. Tente ajustar sua busca.'
@@ -294,7 +291,7 @@ const Orders = () => {
           {orders.length === 0 && (
             <Link
               to="/new-order"
-              className="btn-primary inline-flex items-center gap-2"
+              className="btn-primary inline-flex items-center gap-2 text-sm sm:text-base px-4 py-2"
             >
               <Plus className="h-4 w-4" />
               <span>Criar Primeiro Pedido</span>
@@ -302,54 +299,54 @@ const Orders = () => {
           )}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {filteredOrders.map((order) => (
             <div 
               key={order.id} 
               className="group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl transition-all duration-300 group-hover:scale-105"></div>
-              <div className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 hover:border-blue-200 dark:hover:border-blue-800 p-6">
+              <div className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 hover:border-blue-200 dark:hover:border-blue-800 p-4 sm:p-6">
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                   <div className="flex-1">
                     {/* Header with status and date */}
-                    <div className="flex items-center gap-4 mb-4">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
                       <StatusBadge status={order.status} />
-                      <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                        <Calendar className="h-4 w-4" />
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                         <span>{new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
                       </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                         ID: <span className="font-mono">#{order.id.slice(-8)}</span>
                       </div>
                     </div>
                     
                     {/* Order content */}
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors duration-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30">
-                        <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                      <div className="p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors duration-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex-shrink-0">
+                        <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
                           {order.category}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
                           {order.description}
                         </p>
                       </div>
                     </div>
 
                     {/* Order details */}
-                    <div className="flex flex-wrap items-center gap-6 text-sm">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-gray-400" />
+                        <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
                         <span className="font-semibold text-gray-900 dark:text-white">
                           R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                       {order.files && order.files.length > 0 && (
                         <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                          <FileText className="h-4 w-4" />
+                          <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
                           <span>{order.files.length} anexo(s)</span>
                         </div>
                       )}
@@ -361,12 +358,13 @@ const Orders = () => {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-3 mt-4 lg:mt-0 lg:ml-6">
-                    <button className="btn-secondary flex items-center gap-2 text-sm group/btn">
-                      <Eye className="h-4 w-4 transition-transform duration-200 group-hover/btn:scale-110" />
-                      <span>Detalhes</span>
+                  <div className="flex items-center justify-between lg:justify-end gap-3 mt-3 sm:mt-4 lg:mt-0 lg:ml-6">
+                    <button className="btn-secondary flex items-center gap-2 text-xs sm:text-sm px-3 py-2 group/btn">
+                      <Eye className="h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-200 group-hover/btn:scale-110" />
+                      <span className="hidden sm:inline">Detalhes</span>
+                      <span className="sm:hidden">Ver</span>
                     </button>
-                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-1 transition-all duration-200" />
+                    <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200" />
                   </div>
                 </div>
               </div>
@@ -377,18 +375,18 @@ const Orders = () => {
 
       {/* Pagination */}
       {filteredOrders.length > 0 && (
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6">
-          <p className="text-gray-600 dark:text-gray-300">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 sm:p-6">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Mostrando <span className="font-semibold text-gray-900 dark:text-white">{filteredOrders.length}</span> de{' '}
             <span className="font-semibold text-gray-900 dark:text-white">{orders.length}</span> pedidos
           </p>
           <div className="flex items-center gap-2">
-            <button className="btn-secondary text-sm flex items-center gap-2">
+            <button className="btn-secondary text-xs sm:text-sm flex items-center gap-2 px-3 py-2">
               <span>Anterior</span>
             </button>
-            <button className="btn-primary text-sm flex items-center gap-2">
+            <button className="btn-primary text-xs sm:text-sm flex items-center gap-2 px-3 py-2">
               <span>Próximo</span>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
             </button>
           </div>
         </div>

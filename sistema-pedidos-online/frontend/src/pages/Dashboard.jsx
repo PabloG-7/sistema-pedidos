@@ -6,8 +6,7 @@ import {
   Package, Plus, Clock, CheckCircle, DollarSign, 
   FileText, Calendar, Eye, AlertCircle, Users,
   BarChart3, Activity, TrendingUp, Target, Zap,
-  ArrowUpRight, ArrowDownRight, Star, ChevronRight,
-  Menu, X
+  ArrowUpRight, ArrowDownRight, Star
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -16,12 +15,11 @@ const Dashboard = () => {
     totalOrders: 0,
     pendingOrders: 0,
     completedOrders: 0,
-    totalRevenue: 0
+    totalRevenue: 0 // Agora é número, não string
   });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,7 +71,7 @@ const Dashboard = () => {
           totalOrders,
           pendingOrders,
           completedOrders,
-          totalRevenue
+          totalRevenue // Agora é número
         });
 
       } catch (error) {
@@ -96,7 +94,7 @@ const Dashboard = () => {
           totalOrders: 8,
           pendingOrders: 3,
           completedOrders: 4,
-          totalRevenue: 1850.00
+          totalRevenue: 1850.00 // Número, não string
         });
         
         setOrders([
@@ -137,7 +135,7 @@ const Dashboard = () => {
     }
   }, [user, isAdmin]);
 
-  // Função segura para formatação
+  // CORREÇÃO: Função segura para formatar revenue
   const formatRevenue = (revenue) => {
     if (typeof revenue === 'number') {
       return revenue.toLocaleString('pt-BR', {
@@ -150,16 +148,19 @@ const Dashboard = () => {
 
   // Calcular métricas avançadas
   const completionRate = stats.totalOrders > 0 ? Math.round((stats.completedOrders / stats.totalOrders) * 100) : 0;
+  
+  // CORREÇÃO: Usar stats.totalRevenue diretamente (já é número)
   const averageOrderValue = stats.totalOrders > 0 ? (stats.totalRevenue / stats.totalOrders).toFixed(2) : '0.00';
+  
   const urgentOrders = orders.filter(order => order && order.status === 'Em análise').length;
   
   // Novas métricas úteis
   const efficiencyScore = Math.min(100, completionRate + (stats.completedOrders * 5));
-  const growthRate = stats.totalOrders > 5 ? 12 : 25;
-  const customerSatisfaction = 92;
-  const responseTime = '1.8';
+  const growthRate = stats.totalOrders > 5 ? 12 : 25; // Simulado
+  const customerSatisfaction = 92; // Simulado
+  const responseTime = '2.3'; // Dias médios - Simulado
 
-  const StatusBadge = ({ status, compact = false }) => {
+  const StatusBadge = ({ status }) => {
     const getStatusColor = (status) => {
       switch (status) {
         case 'Concluído': return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300';
@@ -170,26 +171,14 @@ const Dashboard = () => {
       }
     };
 
-    const getStatusText = (status) => {
-      if (compact) {
-        switch (status) {
-          case 'Concluído': return 'Concl.';
-          case 'Em andamento': return 'Andam.';
-          case 'Em análise': return 'Análise';
-          default: return status.substring(0, 5);
-        }
-      }
-      return status;
-    };
-
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
-        {getStatusText(status)}
+      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+        {status}
       </span>
     );
   };
 
-  const MetricCard = ({ title, value, change, icon: Icon, color = 'blue', trend = 'up', compact = false }) => {
+  const MetricCard = ({ title, value, change, icon: Icon, color = 'blue', trend = 'up' }) => {
     const colorConfig = {
       blue: { bg: 'bg-blue-50 dark:bg-blue-900/20', icon: 'text-blue-600 dark:text-blue-400' },
       green: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', icon: 'text-emerald-600 dark:text-emerald-400' },
@@ -198,30 +187,6 @@ const Dashboard = () => {
     };
 
     const config = colorConfig[color];
-
-    if (compact) {
-      return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-2">
-            <div className={`p-1.5 rounded-lg ${config.bg}`}>
-              <Icon className={`h-3 w-3 ${config.icon}`} />
-            </div>
-            {change && (
-              <div className={`text-xs font-medium ${
-                trend === 'up' ? 'text-emerald-600' : 'text-red-600'
-              }`}>
-                {change}%
-              </div>
-            )}
-          </div>
-          
-          <div className="space-y-1">
-            <p className="text-lg font-bold text-gray-900 dark:text-white truncate">{value}</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium truncate">{title}</p>
-          </div>
-        </div>
-      );
-    }
 
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg transition-all duration-300">
@@ -247,56 +212,6 @@ const Dashboard = () => {
     );
   };
 
-  // Mobile Actions Menu
-  const MobileActions = () => (
-    <div className="lg:hidden fixed bottom-4 left-4 right-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-3 z-40">
-      <div className="flex items-center justify-between gap-2">
-        <Link
-          to="/new-order"
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-semibold text-center transition-all duration-200 flex items-center justify-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span className="text-sm">Novo Pedido</span>
-        </Link>
-        
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg transition-all duration-200"
-        >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
-
-      {/* Expanded Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
-          <Link
-            to="/orders"
-            className="flex items-center gap-3 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          >
-            <Package className="h-4 w-4" />
-            <span className="text-sm">Ver Pedidos</span>
-          </Link>
-          
-          <button className="flex items-center gap-3 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors w-full text-left">
-            <FileText className="h-4 w-4" />
-            <span className="text-sm">Relatório</span>
-          </button>
-
-          {isAdmin && (
-            <Link
-              to="/admin/orders"
-              className="flex items-center gap-3 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              <Users className="h-4 w-4" />
-              <span className="text-sm">Painel Admin</span>
-            </Link>
-          )}
-        </div>
-      )}
-    </div>
-  );
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
@@ -309,20 +224,18 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-4 lg:space-y-6 pb-20 lg:pb-0">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Visão Geral
           </h1>
-          <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400">
-            Bem-vindo, <span className="font-semibold text-blue-600 dark:text-blue-400">{user?.name}</span>
+          <p className="text-gray-600 dark:text-gray-400">
+            Bem-vindo de volta, <span className="font-semibold text-blue-600 dark:text-blue-400">{user?.name}</span>
           </p>
         </div>
-        
-        {/* Desktop Actions */}
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="flex items-center gap-3 mt-4 sm:mt-0">
           <button className="btn-secondary flex items-center gap-2 text-sm px-4 py-2">
             <FileText className="h-4 w-4" />
             <span>Relatório</span>
@@ -339,66 +252,22 @@ const Dashboard = () => {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300 px-3 lg:px-4 py-2 lg:py-3 rounded-lg text-sm">
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300 px-4 py-3 rounded-lg">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            <div className="flex-1">
+            <AlertCircle className="h-4 w-4" />
+            <div>
               <span className="font-medium">Aviso: </span>
-              <span className="break-words">{error}</span>
+              <span>{error}</span>
               {error.includes('exemplo') && (
-                <div className="text-xs mt-1 opacity-80">Dados de demonstração carregados.</div>
+                <div className="text-sm mt-1 opacity-80">Dados de demonstração carregados.</div>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Métricas Principais - Versão Mobile Compacta */}
-      <div className="lg:hidden">
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
-          <div className="flex gap-2 min-w-max">
-            <MetricCard
-              title="Pedidos"
-              value={stats.totalOrders}
-              change={12}
-              icon={Package}
-              color="blue"
-              trend="up"
-              compact={true}
-            />
-            <MetricCard
-              title="Pendentes"
-              value={stats.pendingOrders}
-              change={-5}
-              icon={Clock}
-              color="orange"
-              trend="down"
-              compact={true}
-            />
-            <MetricCard
-              title="Concluídos"
-              value={stats.completedOrders}
-              change={8}
-              icon={CheckCircle}
-              color="green"
-              trend="up"
-              compact={true}
-            />
-            <MetricCard
-              title="Receita"
-              value={`R$ ${formatRevenue(stats.totalRevenue)}`}
-              change={15}
-              icon={DollarSign}
-              color="purple"
-              trend="up"
-              compact={true}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Métricas Principais - Desktop */}
-      <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-4">
+      {/* Métricas Principais */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Total de Pedidos"
           value={stats.totalOrders}
@@ -424,6 +293,7 @@ const Dashboard = () => {
           trend="up"
         />
         <MetricCard
+          // CORREÇÃO: Usar a função de formatação
           title="Receita Total"
           value={`R$ ${formatRevenue(stats.totalRevenue)}`}
           change={15}
@@ -434,55 +304,54 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pedidos Recentes */}
-        <div className="xl:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 lg:p-6">
-            <div className="flex items-center justify-between mb-4 lg:mb-6">
-              <div className="flex items-center gap-2 lg:gap-3">
+        <div className="lg:col-span-2">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <Package className="h-4 w-4 lg:h-5 lg:w-5 text-blue-600 dark:text-blue-400" />
+                  <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h2 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                     Pedidos Recentes
                   </h2>
-                  <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
-                    Últimos pedidos do sistema
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Acompanhe os últimos pedidos
                   </p>
                 </div>
               </div>
               <Link 
                 to="/orders" 
-                className="btn-secondary flex items-center gap-2 text-xs lg:text-sm px-3 py-2"
+                className="btn-secondary flex items-center gap-2 text-sm"
               >
-                <Eye className="h-3 w-3 lg:h-4 lg:w-4" />
-                <span className="hidden sm:inline">Ver Todos</span>
-                <span className="sm:hidden">Todos</span>
+                <Eye className="h-4 w-4" />
+                <span>Ver Todos</span>
               </Link>
             </div>
             
-            <div className="space-y-3">
-              {orders.slice(0, 3).map((order) => (
+            <div className="space-y-4">
+              {orders.slice(0, 4).map((order) => (
                 <div 
                   key={order.id} 
-                  className="group flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-300 active:scale-95"
+                  className="group flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-300"
                 >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors flex-shrink-0">
-                      <FileText className="h-3 w-3 lg:h-4 lg:w-4 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
+                      <FileText className="h-4 w-4 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white truncate">
                           {order.category}
                         </h3>
-                        <StatusBadge status={order.status} compact={true} />
+                        <StatusBadge status={order.status} />
                       </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate mb-2">
                         {order.description}
                       </p>
-                      <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
+                      <div className="flex items-center gap-4 text-xs text-gray-500">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           <span>{new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
@@ -494,25 +363,27 @@ const Dashboard = () => {
                       </div>
                     </div>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200 ml-2 flex-shrink-0" />
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ArrowUpRight className="h-4 w-4 text-gray-400" />
+                  </div>
                 </div>
               ))}
               
               {orders.length === 0 && (
-                <div className="text-center py-6">
-                  <Package className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
-                    Nenhum pedido
+                <div className="text-center py-8">
+                  <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Nenhum pedido encontrado
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">
                     Comece criando seu primeiro pedido
                   </p>
                   <Link 
                     to="/new-order" 
-                    className="btn-primary inline-flex items-center gap-2 text-sm px-4 py-2"
+                    className="btn-primary inline-flex items-center gap-2"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Criar Pedido</span>
+                    <span>Criar Primeiro Pedido</span>
                   </Link>
                 </div>
               )}
@@ -520,78 +391,134 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Sidebar - Oculto em Mobile Muito Pequeno */}
-        <div className="hidden md:space-y-4 lg:space-y-6">
+        {/* Sidebar - Métricas Avançadas */}
+        <div className="space-y-6">
           {/* Score de Performance */}
-          <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl p-4 lg:p-6 text-white">
-            <div className="flex items-center gap-2 lg:gap-3 mb-3">
+          <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl p-6 text-white">
+            <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                <TrendingUp className="h-4 w-4 lg:h-5 lg:w-5" />
+                <TrendingUp className="h-5 w-5" />
               </div>
-              <h3 className="text-base lg:text-lg font-bold">Performance</h3>
+              <h3 className="text-lg font-bold">Performance</h3>
             </div>
             
-            <div className="text-center mb-3">
-              <div className="text-2xl lg:text-3xl font-bold mb-1">{efficiencyScore}</div>
-              <div className="text-blue-100 text-xs lg:text-sm">Pontuação Geral</div>
+            <div className="text-center mb-4">
+              <div className="text-3xl font-bold mb-2">{efficiencyScore}</div>
+              <div className="text-blue-100 text-sm">Pontuação Geral</div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-center">
+            <div className="grid grid-cols-2 gap-4 text-center">
               <div>
-                <div className="text-base lg:text-lg font-bold">{completionRate}%</div>
-                <div className="text-blue-100 text-xs">Conclusão</div>
+                <div className="text-lg font-bold">{completionRate}%</div>
+                <div className="text-blue-100 text-xs">Taxa Conclusão</div>
               </div>
               <div>
-                <div className="text-base lg:text-lg font-bold">{growthRate}%</div>
+                <div className="text-lg font-bold">{growthRate}%</div>
                 <div className="text-blue-100 text-xs">Crescimento</div>
               </div>
             </div>
           </div>
 
-          {/* Ações Rápidas */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 lg:p-6">
-            <div className="flex items-center gap-2 lg:gap-3 mb-3">
-              <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <Activity className="h-4 w-4 lg:h-5 lg:w-5 text-blue-600 dark:text-blue-400" />
+          {/* Métricas de Qualidade */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                <Star className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h3 className="text-base lg:text-lg font-bold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                Qualidade
+              </h3>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="p-1.5 bg-emerald-100 dark:bg-emerald-800 rounded">
+                    <Target className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Satisfação</span>
+                </div>
+                <span className="text-sm font-bold text-emerald-600">{customerSatisfaction}%</span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="p-1.5 bg-blue-100 dark:bg-blue-800 rounded">
+                    <Zap className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tempo Resposta</span>
+                </div>
+                <span className="text-sm font-bold text-blue-600">{responseTime}d</span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="p-1.5 bg-purple-100 dark:bg-purple-800 rounded">
+                    <DollarSign className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Ticket Médio</span>
+                </div>
+                <span className="text-sm font-bold text-purple-600">R$ {averageOrderValue}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Ações Rápidas */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                 Ações Rápidas
               </h3>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Link
                 to="/new-order"
-                className="flex items-center gap-2 lg:gap-3 p-2 lg:p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 active:scale-95"
+                className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
               >
-                <div className="p-1.5 lg:p-2 bg-blue-100 dark:bg-blue-800 rounded-lg">
-                  <Plus className="h-3 w-3 lg:h-4 lg:w-4 text-blue-600 dark:text-blue-400" />
+                <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg group-hover:scale-110 transition-transform">
+                  <Plus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white block">Novo Pedido</span>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Criar pedido</p>
+                <div>
+                  <span className="font-semibold text-gray-900 dark:text-white">Novo Pedido</span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Criar um novo pedido</p>
                 </div>
               </Link>
               
               <Link
                 to="/orders"
-                className="flex items-center gap-2 lg:gap-3 p-2 lg:p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200 active:scale-95"
+                className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200 group"
               >
-                <div className="p-1.5 lg:p-2 bg-emerald-100 dark:bg-emerald-800 rounded-lg">
-                  <Package className="h-3 w-3 lg:h-4 lg:w-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="p-2 bg-emerald-100 dark:bg-emerald-800 rounded-lg group-hover:scale-110 transition-transform">
+                  <Package className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white block">Ver Pedidos</span>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Gerenciar pedidos</p>
+                <div>
+                  <span className="font-semibold text-gray-900 dark:text-white">Ver Pedidos</span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Gerenciar todos os pedidos</p>
                 </div>
               </Link>
+              
+              {isAdmin && (
+                <Link
+                  to="/admin/orders"
+                  className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-purple-300 dark:hover:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-200 group"
+                >
+                  <div className="p-2 bg-purple-100 dark:bg-purple-800 rounded-lg group-hover:scale-110 transition-transform">
+                    <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-900 dark:text-white">Painel Admin</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Gerenciar sistema</p>
+                  </div>
+                </Link>
+              )}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Mobile Actions Menu */}
-      <MobileActions />
     </div>
   );
 };

@@ -15,7 +15,7 @@ const Dashboard = () => {
     totalOrders: 0,
     pendingOrders: 0,
     completedOrders: 0,
-    totalRevenue: 0
+    totalRevenue: 0 // Agora é número, não string
   });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,10 +71,7 @@ const Dashboard = () => {
           totalOrders,
           pendingOrders,
           completedOrders,
-          totalRevenue: totalRevenue.toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          })
+          totalRevenue // Agora é número
         });
 
       } catch (error) {
@@ -97,7 +94,7 @@ const Dashboard = () => {
           totalOrders: 8,
           pendingOrders: 3,
           completedOrders: 4,
-          totalRevenue: '1.850,00'
+          totalRevenue: 1850.00 // Número, não string
         });
         
         setOrders([
@@ -138,10 +135,23 @@ const Dashboard = () => {
     }
   }, [user, isAdmin]);
 
+  // CORREÇÃO: Função segura para formatar revenue
+  const formatRevenue = (revenue) => {
+    if (typeof revenue === 'number') {
+      return revenue.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+    return '0,00';
+  };
+
   // Calcular métricas avançadas
   const completionRate = stats.totalOrders > 0 ? Math.round((stats.completedOrders / stats.totalOrders) * 100) : 0;
-  const revenueNumber = parseFloat(stats.totalRevenue.replace(/\./g, '').replace(',', '.')) || 0;
-  const averageOrderValue = stats.totalOrders > 0 ? (revenueNumber / stats.totalOrders).toFixed(2) : '0.00';
+  
+  // CORREÇÃO: Usar stats.totalRevenue diretamente (já é número)
+  const averageOrderValue = stats.totalOrders > 0 ? (stats.totalRevenue / stats.totalOrders).toFixed(2) : '0.00';
+  
   const urgentOrders = orders.filter(order => order && order.status === 'Em análise').length;
   
   // Novas métricas úteis
@@ -283,8 +293,9 @@ const Dashboard = () => {
           trend="up"
         />
         <MetricCard
+          // CORREÇÃO: Usar a função de formatação
           title="Receita Total"
-          value={`R$ ${stats.totalRevenue}`}
+          value={`R$ ${formatRevenue(stats.totalRevenue)}`}
           change={15}
           icon={DollarSign}
           color="purple"

@@ -1,3 +1,4 @@
+/* index.css atualizado */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
@@ -22,7 +23,7 @@
 @layer components {
   /* Buttons */
   .btn {
-    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
@@ -30,17 +31,17 @@
   }
 
   .btn-secondary {
-    @apply btn bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 focus:ring-gray-400 shadow-sm hover:shadow-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700;
+    @apply btn bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 focus:ring-gray-400 shadow-sm hover:shadow-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700;
   }
 
   /* Inputs */
   .input {
-    @apply w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 placeholder:text-gray-400 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500 shadow-sm hover:shadow-md;
+    @apply w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-500 placeholder:text-gray-400 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500 shadow-sm hover:shadow-md;
   }
 
   /* Cards */
   .card {
-    @apply bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 dark:bg-gray-800 dark:border-gray-700;
+    @apply bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-500 dark:bg-gray-800 dark:border-gray-700;
   }
 
   .card-hover {
@@ -49,7 +50,7 @@
 
   /* Navigation */
   .nav-item {
-    @apply flex items-center px-4 py-3 text-gray-600 rounded-xl transition-all duration-300 font-medium hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white;
+    @apply flex items-center px-4 py-3 text-gray-600 rounded-xl transition-all duration-500 font-medium hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white;
   }
 
   .nav-item-active {
@@ -58,7 +59,7 @@
 
   /* Status badges */
   .status-badge {
-    @apply inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold transition-all duration-300;
+    @apply inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold transition-all duration-500;
   }
 
   .status-pending {
@@ -142,7 +143,7 @@
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -150,11 +151,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full transition-colors duration-300;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500 dark:bg-gray-500;
+  @apply bg-gray-400 dark:bg-gray-500;
 }
 
 /* Gradient text */
@@ -169,3 +170,12 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Hover animations */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}

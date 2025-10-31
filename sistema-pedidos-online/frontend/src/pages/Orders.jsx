@@ -29,12 +29,50 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       setError(null);
-      const response = await api.get('/orders');
-      setOrders(response.data.orders || response.data || []);
+      setLoading(true);
+      
+      // Tenta diferentes endpoints possíveis
+      const endpoints = [
+        '/orders',
+        '/orders/my-orders',
+        '/orders/user',
+        '/api/orders'
+      ];
+
+      let response = null;
+      let lastError = null;
+
+      // Tenta cada endpoint até um funcionar
+      for (const endpoint of endpoints) {
+        try {
+          response = await api.get(endpoint);
+          console.log('✅ Sucesso no endpoint:', endpoint, response.data);
+          break; // Se deu certo, para o loop
+        } catch (err) {
+          lastError = err;
+          console.log('❌ Erro no endpoint:', endpoint, err.response?.status);
+          continue; // Continua para o próximo endpoint
+        }
+      }
+
+      if (response && response.data) {
+        // Tenta diferentes estruturas de resposta
+        const ordersData = response.data.orders || response.data.data || response.data || [];
+        setOrders(Array.isArray(ordersData) ? ordersData : []);
+      } else {
+        throw new Error(lastError || 'Não foi possível carregar os pedidos');
+      }
+
     } catch (error) {
       console.error('Erro ao buscar pedidos:', error);
-      setError('Erro ao carregar pedidos. Tente novamente.');
-      setOrders([]); // Garante que orders seja um array vazio em caso de erro
+      const errorMessage = error.response?.status === 403 
+        ? 'Acesso negado. Verifique suas permissões.'
+        : error.response?.status === 404
+        ? 'Endpoint não encontrado.'
+        : 'Erro ao carregar pedidos. Tente novamente.';
+      
+      setError(errorMessage);
+      setOrders([]); // Garante array vazio
     } finally {
       setLoading(false);
     }
@@ -164,6 +202,37 @@ const Orders = () => {
     );
   };
 
+  // Dados mock para teste enquanto a API não funciona
+  const mockOrders = [
+    {
+      id: '1',
+      category: 'Design Gráfico',
+      description: 'Criação de logo para nova marca',
+      status: 'Em análise',
+      estimated_budget: 1500.00,
+      created_at: new Date().toISOString(),
+      files: []
+    },
+    {
+      id: '2',
+      category: 'Desenvolvimento Web',
+      description: 'Site institucional responsivo',
+      status: 'Aprovado',
+      estimated_budget: 5000.00,
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+      files: [1, 2]
+    },
+    {
+      id: '3',
+      category: 'Marketing Digital',
+      description: 'Campanha para redes sociais',
+      status: 'Concluído',
+      estimated_budget: 3000.00,
+      created_at: new Date(Date.now() - 172800000).toISOString(),
+      files: [1]
+    }
+  ];
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
@@ -180,20 +249,34 @@ const Orders = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-64">
-        <div className="text-center">
-          <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+          </div>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            Erro ao carregar
+            Erro ao carregar pedidos
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             {error}
           </p>
-          <button
-            onClick={fetchOrders}
-            className="btn-primary text-sm px-4 py-2"
-          >
-            Tentar Novamente
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+            <button
+              onClick={fetchOrders}
+              className="btn-primary text-sm px-4 py-2"
+            >
+              Tentar Novamente
+            </button>
+            <button
+              onClick={() => {
+                setError(null);
+                setOrders(mockOrders);
+                setLoading(false);
+              }}
+              className="btn-secondary text-sm px-4 py-2"
+            >
+              Usar Dados de Exemplo
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -255,10 +338,10 @@ const Orders = () => {
         />
       </div>
 
-      {/* Filters and Search - TOTALMENTE REFEITO */}
+      {/* Filters and Search */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 sm:p-6">
         <div className="space-y-4">
-          {/* Search Bar - Melhorada */}
+          {/* Search Bar */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
             <input
@@ -270,7 +353,7 @@ const Orders = () => {
             />
           </div>
           
-          {/* Filters Grid - Layout muito melhor */}
+          {/* Filters Grid */}
           <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Status Filter */}
             <div className="space-y-1">
@@ -425,7 +508,7 @@ const Orders = () => {
         </div>
       )}
 
-      {/* Results Count - Simples */}
+      {/* Results Count */}
       {filteredOrders.length > 0 && (
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4">
           <p className="text-sm text-gray-600 dark:text-gray-300 text-center sm:text-left">

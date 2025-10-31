@@ -31,17 +31,22 @@ const Orders = () => {
       setError(null);
       setLoading(true);
       
-      // Usa apenas o endpoint que funciona
+      // CORRIGIDO: Usa apenas o endpoint correto
       const response = await api.get('/orders/my-orders');
-      console.log('✅ Dados recebidos:', response.data);
       
       // Extrai os pedidos da resposta
       const ordersData = response.data.orders || response.data || [];
       setOrders(Array.isArray(ordersData) ? ordersData : []);
       
     } catch (error) {
-      console.error('❌ Erro ao buscar pedidos:', error);
-      setError('Erro ao carregar pedidos. Tente novamente.');
+      console.error('Erro ao buscar pedidos:', error);
+      const errorMessage = error.response?.status === 403 
+        ? 'Acesso negado. Verifique suas permissões.'
+        : error.response?.status === 404
+        ? 'Endpoint não encontrado.'
+        : 'Erro ao carregar pedidos. Tente novamente.';
+      
+      setError(errorMessage);
       setOrders([]);
     } finally {
       setLoading(false);

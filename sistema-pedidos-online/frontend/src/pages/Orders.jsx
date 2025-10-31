@@ -31,48 +31,18 @@ const Orders = () => {
       setError(null);
       setLoading(true);
       
-      // Tenta diferentes endpoints possíveis
-      const endpoints = [
-        '/orders',
-        '/orders/my-orders',
-        '/orders/user',
-        '/api/orders'
-      ];
-
-      let response = null;
-      let lastError = null;
-
-      // Tenta cada endpoint até um funcionar
-      for (const endpoint of endpoints) {
-        try {
-          response = await api.get(endpoint);
-          console.log('✅ Sucesso no endpoint:', endpoint, response.data);
-          break; // Se deu certo, para o loop
-        } catch (err) {
-          lastError = err;
-          console.log('❌ Erro no endpoint:', endpoint, err.response?.status);
-          continue; // Continua para o próximo endpoint
-        }
-      }
-
-      if (response && response.data) {
-        // Tenta diferentes estruturas de resposta
-        const ordersData = response.data.orders || response.data.data || response.data || [];
-        setOrders(Array.isArray(ordersData) ? ordersData : []);
-      } else {
-        throw new Error(lastError || 'Não foi possível carregar os pedidos');
-      }
-
-    } catch (error) {
-      console.error('Erro ao buscar pedidos:', error);
-      const errorMessage = error.response?.status === 403 
-        ? 'Acesso negado. Verifique suas permissões.'
-        : error.response?.status === 404
-        ? 'Endpoint não encontrado.'
-        : 'Erro ao carregar pedidos. Tente novamente.';
+      // Usa apenas o endpoint que funciona
+      const response = await api.get('/orders/my-orders');
+      console.log('✅ Dados recebidos:', response.data);
       
-      setError(errorMessage);
-      setOrders([]); // Garante array vazio
+      // Extrai os pedidos da resposta
+      const ordersData = response.data.orders || response.data || [];
+      setOrders(Array.isArray(ordersData) ? ordersData : []);
+      
+    } catch (error) {
+      console.error('❌ Erro ao buscar pedidos:', error);
+      setError('Erro ao carregar pedidos. Tente novamente.');
+      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -202,37 +172,6 @@ const Orders = () => {
     );
   };
 
-  // Dados mock para teste enquanto a API não funciona
-  const mockOrders = [
-    {
-      id: '1',
-      category: 'Design Gráfico',
-      description: 'Criação de logo para nova marca',
-      status: 'Em análise',
-      estimated_budget: 1500.00,
-      created_at: new Date().toISOString(),
-      files: []
-    },
-    {
-      id: '2',
-      category: 'Desenvolvimento Web',
-      description: 'Site institucional responsivo',
-      status: 'Aprovado',
-      estimated_budget: 5000.00,
-      created_at: new Date(Date.now() - 86400000).toISOString(),
-      files: [1, 2]
-    },
-    {
-      id: '3',
-      category: 'Marketing Digital',
-      description: 'Campanha para redes sociais',
-      status: 'Concluído',
-      estimated_budget: 3000.00,
-      created_at: new Date(Date.now() - 172800000).toISOString(),
-      files: [1]
-    }
-  ];
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
@@ -254,29 +193,17 @@ const Orders = () => {
             <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
           </div>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            Erro ao carregar pedidos
+            Erro ao carregar
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             {error}
           </p>
-          <div className="flex flex-col sm:flex-row gap-2 justify-center">
-            <button
-              onClick={fetchOrders}
-              className="btn-primary text-sm px-4 py-2"
-            >
-              Tentar Novamente
-            </button>
-            <button
-              onClick={() => {
-                setError(null);
-                setOrders(mockOrders);
-                setLoading(false);
-              }}
-              className="btn-secondary text-sm px-4 py-2"
-            >
-              Usar Dados de Exemplo
-            </button>
-          </div>
+          <button
+            onClick={fetchOrders}
+            className="btn-primary text-sm px-4 py-2"
+          >
+            Tentar Novamente
+          </button>
         </div>
       </div>
     );

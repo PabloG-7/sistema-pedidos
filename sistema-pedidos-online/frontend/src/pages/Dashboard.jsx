@@ -30,7 +30,9 @@ const Dashboard = () => {
           return;
         }
 
-        const endpoint = isAdmin ? '/orders' : '/orders/my-orders';
+        // CORREÇÃO: Removido o endpoint /orders que não existe
+        // Para admin e usuário comum, usar o mesmo endpoint funcional
+        const endpoint = '/orders/my-orders';
         const response = await api.get(endpoint);
 
         let ordersData = [];

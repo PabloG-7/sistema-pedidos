@@ -4,12 +4,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { 
   Package, Plus, Clock, CheckCircle, DollarSign, 
-  FileText, Calendar, Eye, AlertCircle, Users,
-  TrendingUp, Target, Zap, Activity, ChevronRight
+  FileText, Calendar, Eye, AlertCircle,
+  TrendingUp, Activity, ChevronRight
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingOrders: 0,
@@ -27,13 +27,18 @@ const Dashboard = () => {
         setError('');
         
         if (!user) {
+          console.log('Usuário não autenticado');
           return;
         }
 
-        // Usar apenas o endpoint que sabemos que funciona
+        console.log('🔄 Iniciando requisição para /orders/my-orders');
+        
+        // Fazer a requisição com timeout
         const response = await api.get('/orders/my-orders');
         
-        // Extrair dados de forma mais segura
+        console.log('✅ Resposta recebida:', response.data);
+
+        // Extrair dados de forma segura
         let ordersData = [];
         
         if (response.data && Array.isArray(response.data.orders)) {
@@ -41,12 +46,14 @@ const Dashboard = () => {
         } else if (Array.isArray(response.data)) {
           ordersData = response.data;
         } else {
+          console.warn('⚠️ Formato de dados inesperado:', response.data);
           ordersData = [];
         }
 
+        console.log('📦 Pedidos extraídos:', ordersData.length);
         setOrders(ordersData);
 
-        // Calcular estatísticas básicas
+        // Calcular estatísticas
         const totalOrders = ordersData.length;
         const pendingOrders = ordersData.filter(order => 
           order && ['Em análise', 'Em andamento'].includes(order.status)
@@ -64,8 +71,8 @@ const Dashboard = () => {
           if (typeof budget === 'number') {
             budgetValue = budget;
           } else if (typeof budget === 'string') {
-            // Remover caracteres não numéricos e converter
-            const numericString = budget.replace(/[^\d,]/g, '').replace(',', '.');
+            // Converter string para número
+            const numericString = budget.replace(/[^\d,.-]/g, '').replace(',', '.');
             budgetValue = parseFloat(numericString) || 0;
           }
           
@@ -79,16 +86,30 @@ const Dashboard = () => {
           totalRevenue
         });
 
+        console.log('📊 Estatísticas calculadas:', { totalOrders, pendingOrders, completedOrders, totalRevenue });
+
       } catch (error) {
-        console.error('Erro no dashboard:', error);
+        console.error('❌ Erro no dashboard:', error);
+        console.error('❌ Detalhes do erro:', {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+          code: error.code
+        });
         
-        // Mensagem de erro mais simples
-        let errorMessage = 'Erro ao carregar dados do dashboard';
+        // Tratamento detalhado de erro
+        let errorMessage = 'Erro ao carregar dados';
         
-        if (error.response?.status === 404) {
-          errorMessage = 'Não foi possível conectar com o servidor';
+        if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
+          errorMessage = 'Erro de conexão. Verifique sua internet.';
+        } else if (error.code === 'ECONNABORTED') {
+          errorMessage = 'Tempo limite excedido. Tente novamente.';
+        } else if (error.response?.status === 404) {
+          errorMessage = 'Serviço indisponível no momento.';
         } else if (error.response?.status === 401) {
-          errorMessage = 'Sessão expirada - faça login novamente';
+          errorMessage = 'Sessão expirada. Faça login novamente.';
+        } else if (error.response?.status === 403) {
+          errorMessage = 'Acesso não autorizado.';
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -96,6 +117,7 @@ const Dashboard = () => {
         setError(errorMessage);
         
         // Usar dados locais em caso de erro
+        console.log('📋 Usando dados locais devido ao erro');
         setStats({
           totalOrders: 5,
           pendingOrders: 2,
@@ -119,6 +141,14 @@ const Dashboard = () => {
             status: 'Concluído',
             estimated_budget: '650.00',
             created_at: new Date(Date.now() - 86400000).toISOString()
+          },
+          {
+            id: '3',
+            category: 'Marketing Digital',
+            description: 'Campanha para redes sociais',
+            status: 'Em análise',
+            estimated_budget: '800.00',
+            created_at: new Date(Date.now() - 172800000).toISOString()
           }
         ]);
       } finally {
@@ -126,14 +156,18 @@ const Dashboard = () => {
       }
     };
 
-    if (user) {
-      fetchData();
-    } else {
-      setLoading(false);
-    }
+    // Adicionar pequeno delay para evitar múltiplas requisições
+    const timer = setTimeout(() => {
+      if (user) {
+        fetchData();
+      } else {
+        setLoading(false);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [user]);
 
-  // Formatação segura de valores
   const formatCurrency = (value) => {
     if (typeof value === 'number') {
       return value.toLocaleString('pt-BR', {
@@ -229,10 +263,16 @@ const Dashboard = () => {
         <div className="bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300 px-4 py-3 rounded-lg">
           <div className="flex items-center gap-2">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            <div>
+            <div className="flex-1">
               <span className="font-medium">Aviso: </span>
               {error}
             </div>
+            <button
+              onClick={() => setError('')}
+              className="text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300"
+            >
+              ×
+            </button>
           </div>
         </div>
       )}
@@ -280,7 +320,7 @@ const Dashboard = () => {
                     Pedidos Recentes
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Últimos pedidos do sistema
+                    {orders.length > 0 ? `${orders.length} pedidos encontrados` : 'Nenhum pedido no momento'}
                   </p>
                 </div>
               </div>
@@ -306,12 +346,12 @@ const Dashboard = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
-                          {order.category}
+                          {order.category || 'Sem categoria'}
                         </h3>
                         <StatusBadge status={order.status} />
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
-                        {order.description}
+                        {order.description || 'Sem descrição'}
                       </p>
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <div className="flex items-center gap-1">

@@ -31,20 +31,29 @@ const Orders = () => {
       setError(null);
       setLoading(true);
       
-      // CORRIGIDO: Usa apenas o endpoint correto
+      console.log('🔄 Fazendo requisição para /orders/my-orders');
+      
+      // CORREÇÃO: Garantir que está usando o endpoint correto
       const response = await api.get('/orders/my-orders');
+      
+      console.log('✅ Resposta recebida:', response.data);
       
       // Extrai os pedidos da resposta
       const ordersData = response.data.orders || response.data || [];
+      console.log('📦 Pedidos extraídos:', ordersData);
+      
       setOrders(Array.isArray(ordersData) ? ordersData : []);
       
     } catch (error) {
-      console.error('Erro ao buscar pedidos:', error);
+      console.error('❌ Erro completo:', error);
+      console.error('❌ Status do erro:', error.response?.status);
+      console.error('❌ Dados do erro:', error.response?.data);
+      
       const errorMessage = error.response?.status === 403 
         ? 'Acesso negado. Verifique suas permissões.'
         : error.response?.status === 404
-        ? 'Endpoint não encontrado.'
-        : 'Erro ao carregar pedidos. Tente novamente.';
+        ? 'Endpoint não encontrado. Contate o suporte.'
+        : error.message || 'Erro ao carregar pedidos. Tente novamente.';
       
       setError(errorMessage);
       setOrders([]);
@@ -177,6 +186,37 @@ const Orders = () => {
     );
   };
 
+  // Dados mock para desenvolvimento
+  const mockOrders = [
+    {
+      id: '1',
+      category: 'Design Gráfico',
+      description: 'Criação de logo para nova marca de roupas esportivas',
+      status: 'Em análise',
+      estimated_budget: 1500.00,
+      created_at: new Date().toISOString(),
+      files: []
+    },
+    {
+      id: '2',
+      category: 'Desenvolvimento Web',
+      description: 'Site institucional responsivo para empresa de consultoria',
+      status: 'Aprovado',
+      estimated_budget: 5000.00,
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+      files: [1, 2]
+    },
+    {
+      id: '3',
+      category: 'Marketing Digital',
+      description: 'Campanha para redes sociais - lançamento de produto',
+      status: 'Concluído',
+      estimated_budget: 3000.00,
+      created_at: new Date(Date.now() - 172800000).toISOString(),
+      files: [1]
+    }
+  ];
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
@@ -203,12 +243,24 @@ const Orders = () => {
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             {error}
           </p>
-          <button
-            onClick={fetchOrders}
-            className="btn-primary text-sm px-4 py-2"
-          >
-            Tentar Novamente
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+            <button
+              onClick={fetchOrders}
+              className="btn-primary text-sm px-4 py-2"
+            >
+              Tentar Novamente
+            </button>
+            <button
+              onClick={() => {
+                setError(null);
+                setOrders(mockOrders);
+                console.log('📋 Usando dados mock para desenvolvimento');
+              }}
+              className="btn-secondary text-sm px-4 py-2"
+            >
+              Usar Dados de Exemplo
+            </button>
+          </div>
         </div>
       </div>
     );

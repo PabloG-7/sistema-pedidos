@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { 
   Package, Plus, Search, Filter, Download, 
-  Calendar, DollarSign, Eye, FileText, SortAsc,
-  CheckCircle, Clock, XCircle, PlayCircle, ChevronRight,
-  BarChart3, ShoppingCart
+  Calendar, DollarSign, Eye, FileText,
+  CheckCircle, Clock, XCircle, PlayCircle, ChevronRight
 } from 'lucide-react';
 
 const Orders = () => {
@@ -45,8 +44,7 @@ const Orders = () => {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(order => 
         order.description?.toLowerCase().includes(searchLower) ||
-        order.category?.toLowerCase().includes(searchLower) ||
-        order.id?.toLowerCase().includes(searchLower)
+        order.category?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -150,11 +148,11 @@ const Orders = () => {
     const config = colorConfig[color];
 
     return (
-      <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700 ${config.bg} transition-all duration-200 hover:shadow-md`}>
-        <div className={`text-xl sm:text-2xl font-bold mb-1 ${config.value}`}>
+      <div className={`p-3 rounded-lg border border-gray-200 dark:border-gray-700 ${config.bg} transition-all duration-200 hover:shadow-md`}>
+        <div className={`text-lg font-bold mb-1 ${config.value}`}>
           {value}
         </div>
-        <div className={`text-xs sm:text-sm font-medium ${config.text}`}>
+        <div className={`text-xs font-medium ${config.text}`}>
           {label}
         </div>
       </div>
@@ -163,10 +161,10 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-64 sm:min-h-96">
+      <div className="flex justify-center items-center min-h-64">
         <div className="text-center">
-          <div className="spinner h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4"></div>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-medium">
+          <div className="spinner h-8 w-8 mx-auto mb-3"></div>
+          <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
             Carregando pedidos...
           </p>
         </div>
@@ -175,34 +173,34 @@ const Orders = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
             Meus Pedidos
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Gerencie e acompanhe todos os seus pedidos
           </p>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button className="btn-secondary flex items-center gap-2 text-xs sm:text-sm px-3 py-2">
-            <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+        <div className="flex items-center gap-2">
+          <button className="btn-secondary flex items-center gap-2 text-xs px-3 py-2">
+            <Download className="h-3 w-3" />
             <span className="hidden xs:inline">Exportar</span>
           </button>
           <Link
             to="/new-order"
-            className="btn-primary flex items-center gap-2 text-xs sm:text-sm px-3 sm:px-4 py-2"
+            className="btn-primary flex items-center gap-2 text-xs px-3 py-2"
           >
-            <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+            <Plus className="h-3 w-3" />
             <span>Novo Pedido</span>
           </Link>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
         <StatCard
           label="Total"
           value={orders.length}
@@ -230,25 +228,27 @@ const Orders = () => {
         />
       </div>
 
-      {/* Filters and Search */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 sm:p-6">
-        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+      {/* Filters and Search - Melhorado */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4">
+        <div className="flex flex-col gap-3">
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por descrição, categoria, ID..."
+              placeholder="Buscar pedidos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 sm:py-2.5 pl-8 sm:pl-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 text-sm sm:text-base"
+              className="w-full px-3 py-2 pl-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 text-sm"
             />
           </div>
           
-          <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
+          {/* Filters Row */}
+          <div className="flex flex-col xs:flex-row gap-2">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-full xs:w-40 sm:w-48 text-sm sm:text-base"
+              className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
             >
               {statusOptions.map((status) => (
                 <option key={status} value={status}>
@@ -260,7 +260,7 @@ const Orders = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 sm:py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-full xs:w-40 text-sm sm:text-base"
+              className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
             >
               <option value="newest">Mais Recentes</option>
               <option value="oldest">Mais Antigos</option>
@@ -268,11 +268,8 @@ const Orders = () => {
               <option value="price-low">Menor Preço</option>
             </select>
 
-            <button 
-              onClick={applyFiltersAndSort}
-              className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm px-3 py-2 sm:py-2.5"
-            >
-              <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
+            <button className="btn-secondary flex items-center justify-center gap-2 text-xs px-3 py-2 min-w-[100px]">
+              <Filter className="h-4 w-4" />
               <span>Filtrar</span>
             </button>
           </div>
@@ -281,12 +278,12 @@ const Orders = () => {
 
       {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm text-center py-8 sm:py-16">
-          <Package className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4 sm:mb-6" />
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-center py-12">
+          <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
             Nenhum pedido encontrado
           </h3>
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-6 sm:mb-8 max-w-md mx-auto px-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto px-4">
             {orders.length === 0 
               ? 'Você ainda não fez nenhum pedido. Comece criando seu primeiro pedido agora mesmo.' 
               : 'Não encontramos pedidos com os filtros selecionados. Tente ajustar sua busca.'
@@ -295,7 +292,7 @@ const Orders = () => {
           {orders.length === 0 && (
             <Link
               to="/new-order"
-              className="btn-primary inline-flex items-center gap-2 text-sm sm:text-base px-4 py-2"
+              className="btn-primary inline-flex items-center gap-2 text-sm px-4 py-2"
             >
               <Plus className="h-4 w-4" />
               <span>Criar Primeiro Pedido</span>
@@ -303,75 +300,67 @@ const Orders = () => {
           )}
         </div>
       ) : (
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-3">
           {filteredOrders.map((order) => (
             <div 
               key={order.id} 
-              className="group relative overflow-hidden"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:border-blue-200 dark:hover:border-blue-800 p-4"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl transition-all duration-300 group-hover:scale-105"></div>
-              <div className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 hover:border-blue-200 dark:hover:border-blue-800 p-4 sm:p-6">
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+              <div className="flex flex-col gap-3">
+                {/* Header with status and date */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge status={order.status} />
+                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                    <Calendar className="h-3 w-3" />
+                    <span>{new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    ID: <span className="font-mono">#{order.id.slice(-8)}</span>
+                  </div>
+                </div>
+                
+                {/* Order content */}
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex-shrink-0">
+                    <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    {/* Header with status and date */}
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-                      <StatusBadge status={order.status} />
-                      <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>{new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                        ID: <span className="font-mono">#{order.id?.slice(-8) || 'N/A'}</span>
-                      </div>
-                    </div>
-                    
-                    {/* Order content */}
-                    <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
-                      <div className="p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors duration-200 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex-shrink-0">
-                        <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2 truncate">
-                          {order.category || 'Sem categoria'}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
-                          {order.description || 'Sem descrição'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Order details */}
-                    <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm">
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
-                        <span className="font-semibold text-gray-900 dark:text-white">
-                          R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </span>
-                      </div>
-                      {order.files && order.files.length > 0 && (
-                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                          <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
-                          <span>{order.files.length} anexo(s)</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                        <span className="font-medium">Prazo:</span>
-                        <span>5 dias úteis</span>
-                      </div>
-                    </div>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1 truncate">
+                      {order.category}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
+                      {order.description}
+                    </p>
                   </div>
+                </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center justify-end gap-3 lg:flex-col lg:items-end lg:justify-start">
-                    <button className="btn-secondary flex items-center gap-2 text-xs sm:text-sm px-3 py-2 group/btn transition-all duration-200 hover:scale-105">
-                      <Eye className="h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-200 group-hover/btn:scale-110" />
-                      <span className="hidden sm:inline">Detalhes</span>
-                      <span className="sm:hidden">Ver</span>
-                    </button>
-                    <div className="hidden lg:block">
-                      <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200" />
-                    </div>
+                {/* Order details */}
+                <div className="flex flex-wrap items-center gap-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-3 w-3 text-gray-400" />
+                    <span className="font-semibold text-gray-900 dark:text-white">
+                      R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
                   </div>
+                  {order.files && order.files.length > 0 && (
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                      <FileText className="h-3 w-3" />
+                      <span>{order.files.length} anexo(s)</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <span className="font-medium">Prazo:</span>
+                    <span>5 dias úteis</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
+                  <button className="btn-secondary flex items-center gap-2 text-xs px-3 py-1">
+                    <Eye className="h-3 w-3" />
+                    <span>Detalhes</span>
+                  </button>
+                  <ChevronRight className="h-4 w-4 text-gray-400" />
                 </div>
               </div>
             </div>
@@ -379,14 +368,12 @@ const Orders = () => {
         </div>
       )}
 
-      {/* Results Count - Simplified */}
+      {/* Results Count - Simples e limpo */}
       {filteredOrders.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 sm:p-6">
-          <p className="text-sm text-gray-600 dark:text-gray-300 text-center sm:text-left">
-            Mostrando <span className="font-semibold text-gray-900 dark:text-white">{filteredOrders.length}</span> pedido(s)
-            {filteredOrders.length !== orders.length && (
-              <span> filtrado(s) de <span className="font-semibold text-gray-900 dark:text-white">{orders.length}</span> total</span>
-            )}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4">
+          <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
+            Mostrando {filteredOrders.length} pedido(s)
+            {filteredOrders.length !== orders.length && ` de ${orders.length} total`}
           </p>
         </div>
       )}

@@ -45,7 +45,8 @@ const Orders = () => {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(order => 
         order.description?.toLowerCase().includes(searchLower) ||
-        order.category?.toLowerCase().includes(searchLower)
+        order.category?.toLowerCase().includes(searchLower) ||
+        order.id?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -236,7 +237,7 @@ const Orders = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por descrição, categoria..."
+              placeholder="Buscar por descrição, categoria, ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-3 py-2 sm:py-2.5 pl-8 sm:pl-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 text-sm sm:text-base"
@@ -267,7 +268,10 @@ const Orders = () => {
               <option value="price-low">Menor Preço</option>
             </select>
 
-            <button className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm px-3 py-2 sm:py-2.5">
+            <button 
+              onClick={applyFiltersAndSort}
+              className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm px-3 py-2 sm:py-2.5"
+            >
               <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
               <span>Filtrar</span>
             </button>
@@ -307,8 +311,8 @@ const Orders = () => {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl transition-all duration-300 group-hover:scale-105"></div>
               <div className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 hover:border-blue-200 dark:hover:border-blue-800 p-4 sm:p-6">
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-                  <div className="flex-1">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                  <div className="flex-1 min-w-0">
                     {/* Header with status and date */}
                     <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
                       <StatusBadge status={order.status} />
@@ -317,7 +321,7 @@ const Orders = () => {
                         <span>{new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
                       </div>
                       <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                        ID: <span className="font-mono">#{order.id.slice(-8)}</span>
+                        ID: <span className="font-mono">#{order.id?.slice(-8) || 'N/A'}</span>
                       </div>
                     </div>
                     
@@ -327,11 +331,11 @@ const Orders = () => {
                         <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
-                          {order.category}
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2 truncate">
+                          {order.category || 'Sem categoria'}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
-                          {order.description}
+                          {order.description || 'Sem descrição'}
                         </p>
                       </div>
                     </div>
@@ -358,13 +362,15 @@ const Orders = () => {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center justify-between lg:justify-end gap-3 mt-3 sm:mt-4 lg:mt-0 lg:ml-6">
-                    <button className="btn-secondary flex items-center gap-2 text-xs sm:text-sm px-3 py-2 group/btn">
+                  <div className="flex items-center justify-end gap-3 lg:flex-col lg:items-end lg:justify-start">
+                    <button className="btn-secondary flex items-center gap-2 text-xs sm:text-sm px-3 py-2 group/btn transition-all duration-200 hover:scale-105">
                       <Eye className="h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-200 group-hover/btn:scale-110" />
                       <span className="hidden sm:inline">Detalhes</span>
                       <span className="sm:hidden">Ver</span>
                     </button>
-                    <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200" />
+                    <div className="hidden lg:block">
+                      <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-200" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -373,22 +379,15 @@ const Orders = () => {
         </div>
       )}
 
-      {/* Pagination */}
+      {/* Results Count - Simplified */}
       {filteredOrders.length > 0 && (
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 sm:p-6">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Mostrando <span className="font-semibold text-gray-900 dark:text-white">{filteredOrders.length}</span> de{' '}
-            <span className="font-semibold text-gray-900 dark:text-white">{orders.length}</span> pedidos
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 sm:p-6">
+          <p className="text-sm text-gray-600 dark:text-gray-300 text-center sm:text-left">
+            Mostrando <span className="font-semibold text-gray-900 dark:text-white">{filteredOrders.length}</span> pedido(s)
+            {filteredOrders.length !== orders.length && (
+              <span> filtrado(s) de <span className="font-semibold text-gray-900 dark:text-white">{orders.length}</span> total</span>
+            )}
           </p>
-          <div className="flex items-center gap-2">
-            <button className="btn-secondary text-xs sm:text-sm flex items-center gap-2 px-3 py-2">
-              <span>Anterior</span>
-            </button>
-            <button className="btn-primary text-xs sm:text-sm flex items-center gap-2 px-3 py-2">
-              <span>Próximo</span>
-              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
-            </button>
-          </div>
         </div>
       )}
     </div>

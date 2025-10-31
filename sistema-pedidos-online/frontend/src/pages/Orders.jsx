@@ -14,6 +14,7 @@ const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('Todos');
   const [sortBy, setSortBy] = useState('newest');
+  const [error, setError] = useState(null);
 
   const statusOptions = ['Todos', 'Em análise', 'Aprovado', 'Rejeitado', 'Em andamento', 'Concluído'];
 
@@ -27,10 +28,13 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await api.get('/orders/my-orders');
-      setOrders(response.data.orders || []);
+      setError(null);
+      const response = await api.get('/orders');
+      setOrders(response.data.orders || response.data || []);
     } catch (error) {
       console.error('Erro ao buscar pedidos:', error);
+      setError('Erro ao carregar pedidos. Tente novamente.');
+      setOrders([]); // Garante que orders seja um array vazio em caso de erro
     } finally {
       setLoading(false);
     }
@@ -44,7 +48,8 @@ const Orders = () => {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(order => 
         order.description?.toLowerCase().includes(searchLower) ||
-        order.category?.toLowerCase().includes(searchLower)
+        order.category?.toLowerCase().includes(searchLower) ||
+        order.id?.toString().toLowerCase().includes(searchLower)
       );
     }
 
@@ -57,13 +62,13 @@ const Orders = () => {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return new Date(b.created_at) - new Date(a.created_at);
+          return new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0);
         case 'oldest':
-          return new Date(a.created_at) - new Date(b.created_at);
+          return new Date(a.created_at || a.createdAt || 0) - new Date(b.created_at || b.createdAt || 0);
         case 'price-high':
-          return parseFloat(b.estimated_budget) - parseFloat(a.estimated_budget);
+          return parseFloat(b.estimated_budget || b.estimatedBudget || 0) - parseFloat(a.estimated_budget || a.estimatedBudget || 0);
         case 'price-low':
-          return parseFloat(a.estimated_budget) - parseFloat(b.estimated_budget);
+          return parseFloat(a.estimated_budget || a.estimatedBudget || 0) - parseFloat(b.estimated_budget || b.estimatedBudget || 0);
         default:
           return 0;
       }
@@ -163,7 +168,7 @@ const Orders = () => {
     return (
       <div className="flex justify-center items-center min-h-64">
         <div className="text-center">
-          <div className="spinner h-8 w-8 mx-auto mb-3"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
           <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
             Carregando pedidos...
           </p>
@@ -172,35 +177,57 @@ const Orders = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="text-center">
+          <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+            Erro ao carregar
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            {error}
+          </p>
+          <button
+            onClick={fetchOrders}
+            className="btn-primary text-sm px-4 py-2"
+          >
+            Tentar Novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Meus Pedidos
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
             Gerencie e acompanhe todos os seus pedidos
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="btn-secondary flex items-center gap-2 text-xs px-3 py-2">
-            <Download className="h-3 w-3" />
+          <button className="btn-secondary flex items-center gap-2 text-xs sm:text-sm px-3 py-2">
+            <Download className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden xs:inline">Exportar</span>
           </button>
           <Link
             to="/new-order"
-            className="btn-primary flex items-center gap-2 text-xs px-3 py-2"
+            className="btn-primary flex items-center gap-2 text-xs sm:text-sm px-3 sm:px-4 py-2"
           >
-            <Plus className="h-3 w-3" />
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
             <span>Novo Pedido</span>
           </Link>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
         <StatCard
           label="Total"
           value={orders.length}
@@ -228,62 +255,90 @@ const Orders = () => {
         />
       </div>
 
-      {/* Filters and Search - Melhorado */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4">
-        <div className="flex flex-col gap-3">
-          {/* Search Bar */}
+      {/* Filters and Search - TOTALMENTE REFEITO */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 sm:p-6">
+        <div className="space-y-4">
+          {/* Search Bar - Melhorada */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar pedidos..."
+              placeholder="Buscar por descrição, categoria ou ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 pl-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 text-sm"
+              className="w-full px-4 py-3 sm:py-3.5 pl-10 sm:pl-12 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base dark:text-white"
             />
           </div>
           
-          {/* Filters Row */}
-          <div className="flex flex-col xs:flex-row gap-2">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
-            >
-              {statusOptions.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
+          {/* Filters Grid - Layout muito melhor */}
+          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Status Filter */}
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
+                Status
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-3 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base dark:text-white"
+              >
+                {statusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
-            >
-              <option value="newest">Mais Recentes</option>
-              <option value="oldest">Mais Antigos</option>
-              <option value="price-high">Maior Preço</option>
-              <option value="price-low">Menor Preço</option>
-            </select>
+            {/* Sort Filter */}
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
+                Ordenar por
+              </label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full px-3 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base dark:text-white"
+              >
+                <option value="newest">Mais Recentes</option>
+                <option value="oldest">Mais Antigos</option>
+                <option value="price-high">Maior Preço</option>
+                <option value="price-low">Menor Preço</option>
+              </select>
+            </div>
 
-            <button className="btn-secondary flex items-center justify-center gap-2 text-xs px-3 py-2 min-w-[100px]">
-              <Filter className="h-4 w-4" />
-              <span>Filtrar</span>
-            </button>
+            {/* Action Buttons */}
+            <div className="xs:col-span-2 lg:col-span-2 flex gap-2 items-end">
+              <button 
+                onClick={applyFiltersAndSort}
+                className="flex-1 btn-primary flex items-center justify-center gap-2 text-sm px-4 py-2.5 min-h-[42px]"
+              >
+                <Filter className="h-4 w-4" />
+                <span>Aplicar Filtros</span>
+              </button>
+              <button 
+                onClick={() => {
+                  setSearchTerm('');
+                  setStatusFilter('Todos');
+                  setSortBy('newest');
+                }}
+                className="btn-secondary flex items-center justify-center gap-2 text-sm px-3 py-2.5 min-h-[42px]"
+              >
+                <span>Limpar</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-center py-12">
-          <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm text-center py-12 sm:py-16">
+          <Package className="h-16 w-16 sm:h-20 sm:w-20 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
             Nenhum pedido encontrado
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto px-4">
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto px-4">
             {orders.length === 0 
               ? 'Você ainda não fez nenhum pedido. Comece criando seu primeiro pedido agora mesmo.' 
               : 'Não encontramos pedidos com os filtros selecionados. Tente ajustar sua busca.'
@@ -292,75 +347,77 @@ const Orders = () => {
           {orders.length === 0 && (
             <Link
               to="/new-order"
-              className="btn-primary inline-flex items-center gap-2 text-sm px-4 py-2"
+              className="btn-primary inline-flex items-center gap-2 text-sm sm:text-base px-4 sm:px-6 py-2.5"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>Criar Primeiro Pedido</span>
             </Link>
           )}
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 sm:space-y-4">
           {filteredOrders.map((order) => (
             <div 
               key={order.id} 
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:border-blue-200 dark:hover:border-blue-800 p-4"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:border-blue-200 dark:hover:border-blue-800 p-4 sm:p-6"
             >
-              <div className="flex flex-col gap-3">
-                {/* Header with status and date */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <StatusBadge status={order.status} />
-                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                    <Calendar className="h-3 w-3" />
-                    <span>{new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    ID: <span className="font-mono">#{order.id.slice(-8)}</span>
-                  </div>
-                </div>
-                
-                {/* Order content */}
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex-shrink-0">
-                    <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1 truncate">
-                      {order.category}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
-                      {order.description}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Order details */}
-                <div className="flex flex-wrap items-center gap-3 text-xs">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-3 w-3 text-gray-400" />
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      R$ {parseFloat(order.estimated_budget || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  {order.files && order.files.length > 0 && (
-                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                      <FileText className="h-3 w-3" />
-                      <span>{order.files.length} anexo(s)</span>
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  {/* Header with status and date */}
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3">
+                    <StatusBadge status={order.status} />
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span>{new Date(order.created_at || order.createdAt).toLocaleDateString('pt-BR')}</span>
                     </div>
-                  )}
-                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                    <span className="font-medium">Prazo:</span>
-                    <span>5 dias úteis</span>
+                    <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                      ID: <span className="font-mono">#{order.id?.toString().slice(-8) || 'N/A'}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Order content */}
+                  <div className="flex items-start gap-3 sm:gap-4 mb-3">
+                    <div className="p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex-shrink-0">
+                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
+                        {order.category || 'Sem categoria'}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
+                        {order.description || 'Sem descrição'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Order details */}
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                      <span className="font-semibold text-gray-900 dark:text-white">
+                        R$ {parseFloat(order.estimated_budget || order.estimatedBudget || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    {order.files && order.files.length > 0 && (
+                      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                        <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span>{order.files.length} anexo(s)</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                      <span className="font-medium">Prazo:</span>
+                      <span>5 dias úteis</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
-                  <button className="btn-secondary flex items-center gap-2 text-xs px-3 py-1">
-                    <Eye className="h-3 w-3" />
+                <div className="flex items-center justify-between lg:justify-end gap-3 pt-3 lg:pt-0 border-t lg:border-t-0 border-gray-100 dark:border-gray-700">
+                  <button className="btn-secondary flex items-center gap-2 text-xs sm:text-sm px-3 py-2">
+                    <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span>Detalhes</span>
                   </button>
-                  <ChevronRight className="h-4 w-4 text-gray-400" />
+                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                 </div>
               </div>
             </div>
@@ -368,10 +425,10 @@ const Orders = () => {
         </div>
       )}
 
-      {/* Results Count - Simples e limpo */}
+      {/* Results Count - Simples */}
       {filteredOrders.length > 0 && (
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4">
-          <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-300 text-center sm:text-left">
             Mostrando {filteredOrders.length} pedido(s)
             {filteredOrders.length !== orders.length && ` de ${orders.length} total`}
           </p>
